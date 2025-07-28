@@ -1,4 +1,13 @@
 import type { TabsProps } from 'antd';
+import {
+  type DragEndEvent,
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  useSensor,
+} from '@dnd-kit/core';
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import DraggableTabNode, { type DraggableTabPaneProps } from './DraggableTabNode';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getMenuByKey } from '@/menus/utils/helper';
 import { message, Tabs, Dropdown } from 'antd';
@@ -20,6 +29,7 @@ function LayoutTabs() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { refresh, dropScope } = useAliveController();
+  const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } });
   const [messageApi, contextHolder] = message.useMessage();
   const [isChangeLang, setChangeLang] = useState(false); // 是否切换语言
   const [refreshTime, seRefreshTime] = useState<null | NodeJS.Timeout>(null);
@@ -31,6 +41,7 @@ function LayoutTabs() {
     activeKey, // 选中的标签值
     setActiveKey,
     addTabs,
+    sortTabs,
     closeTabs,
     setNav,
     toggleCloseTabsLock,
@@ -260,22 +271,42 @@ function LayoutTabs() {
   const dropdownMenuParams = { activeKey, handleRefresh: onClickRefresh };
   const [items, onClick] = useDropdownMenu(dropdownMenuParams);
 
+  /** 处理拖拽结束 */
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (active.id !== over?.id) {
+      const oldIndex = tabs.findIndex((item) => item.key === active.id);
+      const newIndex = tabs.findIndex((item) => item.key === over?.id);
+      const newTabs = arrayMove(tabs, oldIndex, newIndex);
+      sortTabs(newTabs);
+    }
+  };
+
   /** 二次封装标签 */
   const renderTabBar: TabsProps['renderTabBar'] = (tabBarProps, DefaultTabBar) => (
-    <DefaultTabBar {...tabBarProps}>
-      {(node) => (
-        <Dropdown
-          key={node.key}
-          menu={{
-            items: items(node.key as string),
-            onClick: (e) => onClick(e.key, node.key as string),
-          }}
-          trigger={['contextMenu']}
-        >
-          <div className="mr-1px">{node}</div>
-        </Dropdown>
-      )}
-    </DefaultTabBar>
+    <DndContext sensors={[sensor]} onDragEnd={onDragEnd} collisionDetection={closestCenter}>
+      <SortableContext items={tabs.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <DefaultTabBar {...tabBarProps}>
+          {(node) => (
+            <DraggableTabNode
+              {...(node as React.ReactElement<DraggableTabPaneProps>).props}
+              key={node.key}
+            >
+              <div>
+                <Dropdown
+                  menu={{
+                    items: items(node.key as string),
+                    onClick: (e) => onClick(e.key, node.key as string),
+                  }}
+                  trigger={['contextMenu']}
+                >
+                  {node}
+                </Dropdown>
+              </div>
+            </DraggableTabNode>
+          )}
+        </DefaultTabBar>
+      </SortableContext>
+    </DndContext>
   );
 
   return (
@@ -311,16 +342,16 @@ function LayoutTabs() {
           <div
             key={index}
             className={`
-                left-divide-tab
-                change
-                divide-solid
-                w-36px
-                h-36px
-                hover:opacity-70
-                flex
-                place-content-center
-                items-center
-              `}
+              left-divide-tab
+              change
+              divide-solid
+              w-36px
+              h-36px
+              hover:opacity-70
+              flex
+              place-content-center
+              items-center
+            `}
           >
             {item.element}
           </div>

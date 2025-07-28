@@ -1,5 +1,6 @@
 import type { MenuProps } from 'antd';
 import type { SideMenu } from '#/public';
+import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Menu } from 'antd';
 import { isUrl } from '@/utils/is';
@@ -201,7 +202,7 @@ function LayoutMenu() {
             theme="dark"
             forceSubMenuRender
             inlineCollapsed={isPhone ? false : isCollapsed}
-            items={handleFilterMenus(menus)}
+            items={handleFilterMenus(menus) as ItemType<MenuItemType>[]}
             onClick={onClickMenu}
             onOpenChange={onOpenChange}
           />

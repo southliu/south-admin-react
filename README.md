@@ -1,5 +1,5 @@
 <div align="center">
-	<h1>South Admin</h1>
+	<h1>South Admin React</h1>
 </div>
 
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
@@ -25,13 +25,13 @@
 - 获取项目代码
 
 ```bash
-git clone https://github.com/southliu/south-admin.git
+git clone https://github.com/southliu/south-admin-react.git
 ```
 
 - 选择目录
 
 ```bash
-cd south-admin
+cd south-admin-react
 ```
 
 - 安装全局依赖依赖，存在则不用安装
@@ -72,7 +72,7 @@ pnpm build
 ## 📁 项目结构
 
 ```tree
-south-admin
+south-admin-react
 ├── build                     # 构建相关配置
 │   ├── utils                 # 构建工具函数
 │   └── vite                  # vite 配置

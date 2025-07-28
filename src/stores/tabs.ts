@@ -33,6 +33,7 @@ interface TabsState {
   switchTabsLang: (label: string) => void;
   addTabs: (payload: TabsData) => void;
   setTabs: (key: string, searchParams?: string) => void;
+  sortTabs: (payload: TabsData[]) => void;
   closeTabs: (payload: string, dropScope: AliveController['dropScope']) => void;
   closeTabGoNext: (payload: TabsGoNext) => void;
   closeLeft: (payload: string, dropScope: AliveController['dropScope']) => void;
@@ -82,6 +83,9 @@ export const useTabsStore = create<TabsState>()(
             }
             return { tabs };
           }),
+        sortTabs: (payload) => {
+          set({ tabs: payload });
+        },
         closeTabs: (payload, dropScope) =>
           set((state) => {
             const { tabs } = state;
