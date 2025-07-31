@@ -2,7 +2,8 @@
 	<h1>South Admin React</h1>
 </div>
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+<img width="1702" height="956" alt="image" src="https://github.com/user-attachments/assets/3ec9a9e7-088d-4e50-be22-79db8595e2a2" />
+
 
 如果您觉得该项目对您有所帮助或者您喜欢我们的项目，请在 GitHub 上给我们一个 ⭐️。如果您有改进或新增功能的意愿欢迎提交 issues，感谢您的支持！
 
@@ -66,7 +67,7 @@ pnpm build
 - [x] 列筛选添加拖拽功能
 - [x] 列筛选添加重置功能
 - [x] 外链菜单
-- [ ] 优化代码，减少不必要的重渲染
+- [x] 优化代码，减少不必要的重渲染
 - [ ] 开发python后端
 
 ## 📁 项目结构
