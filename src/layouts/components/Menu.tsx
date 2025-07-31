@@ -24,8 +24,6 @@ function LayoutMenu() {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
   const [menus, setMenus] = useState<SideMenu[]>([]);
-  // 获取当前语言
-  const currentLanguage = i18n.language;
 
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
@@ -34,13 +32,6 @@ function LayoutMenu() {
   const [currentSelectedKeys, setCurrentSelectedKeys] = useState(
     selectedKeys ? [selectedKeys] : [],
   );
-
-  // 处理默认展开
-  useEffect(() => {
-    const newOpenKey = getOpenMenuByRouter(pathname);
-    setCurrentOpenKeys(newOpenKey);
-    setCurrentSelectedKeys([pathname]);
-  }, [pathname]);
 
   /**
    * 转换菜单icon格式
@@ -58,14 +49,20 @@ function LayoutMenu() {
     }
   }, []);
 
-  // 过滤没权限菜单
+  // 处理默认展开和过滤没权限菜单
   useEffect(() => {
+    // 处理默认展开
+    const newOpenKey = getOpenMenuByRouter(pathname);
+    setCurrentOpenKeys(newOpenKey);
+    setCurrentSelectedKeys([pathname]);
+
+    // 过滤没权限菜单
     if (permissions.length > 0) {
       const newMenus = filterMenus(menuList, permissions);
       filterMenuIcon(newMenus);
       setMenus(newMenus || []);
     }
-  }, [filterMenuIcon, permissions, currentLanguage, menuList]);
+  }, [pathname, permissions, menuList, filterMenuIcon, i18n.language]);
 
   /**
    * 处理跳转
