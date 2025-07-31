@@ -11,26 +11,21 @@ function Guards() {
   const location = useLocation();
   const token = getToken();
 
-  // 顶部进度条
   useEffect(() => {
     nprogress.start();
-  }, []);
 
-  useEffect(() => {
-    nprogress.done();
-
-    return () => {
-      nprogress.start();
-    };
-  }, [location]);
-
-  useEffect(() => {
     // 无权限退出
     if (location.pathname !== '/login' && !token) {
       const param =
         location.pathname?.length > 1 ? `?redirect=${location.pathname}${location.search}` : '';
       navigate(`/login${param}`);
     }
+
+    nprogress.done();
+
+    return () => {
+      nprogress.start();
+    };
   }, [location, navigate, token]);
 
   /** 渲染页面 */
