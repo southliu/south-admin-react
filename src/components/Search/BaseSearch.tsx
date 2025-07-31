@@ -1,5 +1,5 @@
 import type { ColProps, FormInstance } from 'antd';
-import type { BaseFormData, BaseFormList, BaseSearchList } from '#/form';
+import type { BaseFormData, BaseSearchList } from '#/form';
 import {
   type CSSProperties,
   type ReactNode,
@@ -7,6 +7,7 @@ import {
   forwardRef,
   useEffect,
   useState,
+  useMemo,
 } from 'react';
 import { type FormProps, Button, Col, Flex } from 'antd';
 import { Form } from 'antd';
@@ -63,21 +64,19 @@ const BaseSearch = forwardRef((props: Props, ref: Ref<FormInstance>) => {
   const [form] = Form.useForm();
   const [isExpand, setExpand] = useState(false);
   const [isFirst, setFirst] = useState(true);
-  const [isShowExpand, setShowExpand] = useState(isRowExpand);
 
-  useEffect(() => {
-    setShowExpand(isRowExpand);
+  // 是否展示展开按钮
+  const isShowExpand = useMemo(() => {
+    if (!isRowExpand) return false;
 
-    if (isRowExpand) {
-      const showNum = defaultColCount * defaultRowExpand;
-      setShowExpand(showNum < list.length);
-    }
-  }, [defaultColCount, defaultRowExpand, isPhone, isRowExpand, list.length]);
+    const showNum = defaultColCount * defaultRowExpand;
+    return showNum < list.length;
+  }, [defaultColCount, defaultRowExpand, isRowExpand, list.length]);
 
   // 初始化内容
   useEffect(() => {
     try {
-      if (Object.keys(data).length) {
+      if (Object.keys(data).length && isFirst) {
         setFirst(false);
         form.setFieldsValue({ ...data });
       }
