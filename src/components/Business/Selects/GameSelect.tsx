@@ -1,16 +1,16 @@
-import type { TreeSelectProps } from 'antd';
+import type { SelectProps } from 'antd';
 import { getGames } from '@/servers/platform/game';
-import { ApiTreeSelect } from '@/components/Selects';
+import { ApiSelect } from '@/components/Selects';
 
 /**
  * @description: 游戏下拉组件
  */
-function GameSelect(props: TreeSelectProps) {
+function GameSelect(props: SelectProps) {
   return (
     <>
-      <ApiTreeSelect
+      <ApiSelect
         {...props}
-        multiple={true}
+        mode="multiple"
         api={getGames}
         fieldNames={{ label: 'name', value: 'id' }}
       />

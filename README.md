@@ -2,7 +2,6 @@
 	<h1>South Admin React</h1>
 </div>
 
-[![license](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
 如果您觉得该项目对您有所帮助或者您喜欢我们的项目，请在 GitHub 上给我们一个 ⭐️。如果您有改进或新增功能的意愿欢迎提交 issues，感谢您的支持！
 
@@ -13,7 +12,7 @@
 ## 🚀 项目演示
 [演示地址](https://southliu.github.io/)，接口数据都为mock数据，无法进行新增和修改。
 
-![01.gif](https://github.com/southliu/github-static/blob/main/react-admin/01.gif)
+<img width="1920" height="922" alt="image" src="https://github.com/user-attachments/assets/943f1ca2-9ad3-45cc-83aa-7a3d18984653" />
 
 ![02.gif](https://github.com/southliu/github-static/blob/main/react-admin/02.gif)
 
@@ -66,7 +65,7 @@ pnpm build
 - [x] 列筛选添加拖拽功能
 - [x] 列筛选添加重置功能
 - [x] 外链菜单
-- [ ] 优化代码，减少不必要的重渲染
+- [x] 优化代码，减少不必要的重渲染
 - [ ] 开发python后端
 
 ## 📁 项目结构

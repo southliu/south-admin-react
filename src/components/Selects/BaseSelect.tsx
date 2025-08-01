@@ -8,25 +8,15 @@ import { MAX_TAG_COUNT } from './index';
 function BaseSelect(props: SelectProps) {
   const { options } = props;
   const { t } = useTranslation();
-  const [currentOptions, setCurrentOptions] = useState<SelectProps['options']>([]);
 
-  useEffect(() => {
-    if (!options) {
-      setCurrentOptions([]);
-      return;
-    }
-
-    for (let i = 0; i < options?.length; i++) {
-      const item = options[i];
-
+  const currentOptions =
+    options?.map((item) => {
       // 如果数组不是对象，则拼接数组
       if (typeof item !== 'object') {
-        options[i] = { label: item, value: item };
+        return { label: item, value: item };
       }
-    }
-
-    setCurrentOptions(options);
-  }, [options]);
+      return item;
+    }) || [];
 
   return (
     <Select
