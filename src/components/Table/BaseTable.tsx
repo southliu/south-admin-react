@@ -171,7 +171,7 @@ function BaseTable(props: Props) {
         if (!['object', 'function'].includes(typeof renderContent)) {
           return (
             <Tooltip title={showValue} placement="topLeft">
-              <span style={{ color }} className="break-all" title={showValue as string}>
+              <span style={{ color }} className="break-all">
                 {String(showValue ?? EMPTY_VALUE)}
               </span>
             </Tooltip>
