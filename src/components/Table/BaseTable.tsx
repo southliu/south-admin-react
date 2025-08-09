@@ -1,7 +1,7 @@
 import type { ResizeCallbackData } from 'react-resizable';
 import type { ColumnsType } from 'antd/es/table';
 import type { TableColumn } from '#/public';
-import { type TableProps, Table, Button, message, Tooltip } from 'antd';
+import { type TableProps, Table, Button, message } from 'antd';
 import { useMemo, useState, useEffect, useRef, type ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import { getTableHeight, handleRowHeight, filterTableColumns } from './utils/hel
 import ResizableTitle from './components/ResizableTitle';
 import useVirtualTable from './hooks/useVirtual';
 import TableFilter from './components/TableFilter';
+import EllipsisText from './components/EllipsisText';
 import './index.less';
 
 type Components = TableProps<object>['components'];
@@ -169,12 +170,20 @@ function BaseTable(props: Props) {
         }
 
         if (!['object', 'function'].includes(typeof renderContent)) {
+          const textContent = String(showValue ?? EMPTY_VALUE);
+
+          // 超出不省略则换行
+          if (col.ellipsis !== undefined && !col.ellipsis) {
+            return <div style={{ maxWidth: col.width }}>{textContent}</div>;
+          }
+
           return (
-            <Tooltip title={showValue} placement="topLeft">
-              <span style={{ color }} className="break-all">
-                {String(showValue ?? EMPTY_VALUE)}
-              </span>
-            </Tooltip>
+            <EllipsisText
+              width={col.width}
+              text={textContent}
+              color={color}
+              className="break-all"
+            />
           );
         }
 
