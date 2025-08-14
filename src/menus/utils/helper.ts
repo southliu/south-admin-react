@@ -389,6 +389,11 @@ export function handleFilterMenus(menus: SideMenu[], level = 0): SideMenu[] {
     const item = menus[i];
     let children: SideMenu[] = [];
 
+    // 如果菜单children为空数组则删除
+    if (item.children !== undefined && !item.children?.length) {
+      delete item.children;
+    }
+
     if (item.children?.length) {
       const newLevel = level + 1;
       children = handleFilterMenus(item.children, newLevel);
