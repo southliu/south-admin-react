@@ -153,38 +153,38 @@ function LayoutMenu() {
       <>
         <div
           className={`
-          transition-all
-          overflow-auto
-          z-2
-          ${styles.menu}
-          ${isCollapsed ? styles['menu-close'] : ''}
-          ${isMaximize || (isPhone && isCollapsed) ? styles['menu-none'] : ''}
-          ${isPhone ? '!z-1002' : ''}
+            transition-all
+            overflow-auto
+            z-2
+            ${styles.menu}
+            ${isCollapsed ? styles['menu-close'] : ''}
+            ${isMaximize || (isPhone && isCollapsed) ? styles['menu-none'] : ''}
+            ${isPhone ? '!z-1002' : ''}
         `}
         >
           <div
             className={`
-            text-white
-            flex
-            content-center
-            px-5
-            py-2
-            cursor-pointer
-            ${isCollapsed ? 'justify-center' : ''}
-          `}
+              text-white
+              flex
+              content-center
+              px-5
+              py-2
+              cursor-pointer
+              ${isCollapsed ? 'justify-center' : ''}
+            `}
             onClick={onClickLogo}
           >
             <img src={Logo} width={30} height={30} className="object-contain" alt="logo" />
 
             <span
               className={`
-            text-white
-            ml-3
-            text-xl
-            font-bold
-            truncate
-            ${isCollapsed ? 'hidden' : ''}
-          `}
+                text-white
+                ml-3
+                text-xl
+                font-bold
+                truncate
+                ${isCollapsed ? 'hidden' : ''}
+              `}
             >
               {t('public.currentName')}
             </span>
@@ -208,14 +208,14 @@ function LayoutMenu() {
         {isPhone && !isCollapsed && (
           <div
             className={`
-            ${styles.cover}
-            fixed
-            w-full
-            h-full
-            bg-gray-500
-            bg-opacity-10
-            z-1001
-          `}
+              ${styles.cover}
+              fixed
+              w-full
+              h-full
+              bg-gray-500
+              bg-opacity-10
+              z-1001
+            `}
             onClick={hiddenMenu}
           />
         )}

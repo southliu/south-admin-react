@@ -203,11 +203,11 @@ function Login() {
       {contextHolder}
       <div
         className={`
-        ${themeCache === 'dark' ? 'bg-black text-white' : 'bg-light-400'}
-        w-screen
-        h-screen
-        relative
-      `}
+          ${themeCache === 'dark' ? 'bg-black text-white' : 'bg-light-400'}
+          w-screen
+          h-screen
+          relative
+        `}
       >
         <div className="flex absolute top-5 right-5">
           <I18n />
@@ -215,18 +215,18 @@ function Login() {
         </div>
         <div
           className={`
-          ${themeCache === 'dark' ? 'bg-black bg-dark-200' : 'bg-white'}
-          w-340px
-          p-1.8rem
-          rounded-10px
-          box-border
-          absolute
-          left-1/2
-          top-1/2
-          -translate-x-1/2
-          -translate-y-1/2
-          shadow-[2px_5px_20px_rgba(0,0,0,0.1)]
-        `}
+            ${themeCache === 'dark' ? 'bg-black bg-dark-200' : 'bg-white'}
+            w-340px
+            p-1.8rem
+            rounded-10px
+            box-border
+            absolute
+            left-1/2
+            top-1/2
+            -translate-x-1/2
+            -translate-y-1/2
+            shadow-[2px_5px_20px_rgba(0,0,0,0.1)]
+          `}
         >
           <div className="pb-20px pt-10px flex items-center justify-center">
             <img className="mr-2 object-contain" width="32" height="32" src={Logo} alt="LOGO" />

@@ -16,19 +16,19 @@ function SubmitBottom(props: Props) {
   return (
     <div
       className={`
-      w-full
-      bg
-      fixed
-      flex
-      justify-end
-      left-0
-      right-0
-      bottom-0
-      py-5px
-      px-30px
-      box-border
-      shadow
-      shadow-gray-500
+        w-full
+        bg
+        fixed
+        flex
+        justify-end
+        left-0
+        right-0
+        bottom-0
+        py-5px
+        px-30px
+        box-border
+        shadow
+        shadow-gray-500
     `}
     >
       {children}

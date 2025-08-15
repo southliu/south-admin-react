@@ -312,14 +312,14 @@ function LayoutTabs() {
   return (
     <div
       className={`
-      w-[calc(100%-5px)]
-      flex
-      items-center
-      justify-between
-      mx-2
-      transition-all
-      ${isMaximize ? styles['con-maximize'] : ''}
-    `}
+        w-[calc(100%-5px)]
+        flex
+        items-center
+        justify-between
+        mx-2
+        transition-all
+        ${isMaximize ? styles['con-maximize'] : ''}
+      `}
     >
       {contextHolder}
       {tabs.length > 0 ? (

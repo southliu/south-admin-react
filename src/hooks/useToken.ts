@@ -12,7 +12,7 @@ export function useToken() {
 
   /**
    * 设置token
-   * @param value token值
+   * @param value - token值
    */
   const setToken = (value: string) => {
     setLocalInfo(TOKEN, value);

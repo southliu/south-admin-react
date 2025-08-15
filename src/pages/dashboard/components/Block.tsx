@@ -29,13 +29,13 @@ function Block() {
         >
           <div
             className={`
-                border
-                border-gray-200
-                px-30px
-                py-20px
-                box-border
-                rounded-10px
-              `}
+              border
+              border-gray-200
+              px-30px
+              py-20px
+              box-border
+              rounded-10px
+            `}
           >
             <div className="text-20px font-bold">{item.title}</div>
             <div className="flex items-center justify-between text-35px mb-15px">
