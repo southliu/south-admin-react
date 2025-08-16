@@ -1,6 +1,6 @@
 import type { DataNode } from 'antd/es/tree';
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
-import { type FormInstance, Button, message } from 'antd';
+import { type FormInstance, Button, Form, message } from 'antd';
 import { createList, searchList, tableColumns } from './model';
 import { getPermission, savePermission } from '@/servers/system/menu';
 import {
@@ -47,6 +47,7 @@ function Page() {
   const [promiseCheckedKeys, setPromiseCheckedKeys] = useState<Key[]>([]);
   const [promiseTreeData, setPromiseTreeData] = useState<DataNode[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [form] = Form.useForm();
 
   const { permissions } = useCommonStore();
 
@@ -265,19 +266,19 @@ function Page() {
    */
   function optionRender(_: unknown, record: object) {
     return (
-      <>
+      <div className="flex flex-wrap gap-5px">
         {pagePermission.permission === true && (
-          <Button className="mr-2 small-btn" onClick={() => openPermission((record as RowData).id)}>
+          <Button className="small-btn" onClick={() => openPermission((record as RowData).id)}>
             {t('system.permissions')}
           </Button>
         )}
         {pagePermission.update === true && (
-          <UpdateBtn className="mr-5px" onClick={() => onUpdate((record as RowData).id)} />
+          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
         )}
         {pagePermission.delete === true && (
-          <DeleteBtn className="mr-5px" handleDelete={() => onDelete((record as RowData).id)} />
+          <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
         )}
-      </>
+      </div>
     );
   }
 
@@ -334,6 +335,7 @@ function Page() {
         onCancel={closeCreate}
       >
         <BaseForm
+          form={form}
           ref={createFormRef}
           list={createList(t)}
           data={createData}

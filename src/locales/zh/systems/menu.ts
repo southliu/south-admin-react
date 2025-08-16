@@ -8,5 +8,7 @@ export default {
   catalog: '目录',
   menu: '菜单',
   button: '按钮',
+  parentMenu: '上级菜单',
+  addChildMenu: '新增下级',
   helpIcon: '点击问号可跳转查询icon，查询完将icon name值传入输入框中',
 };

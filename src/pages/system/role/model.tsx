@@ -27,12 +27,12 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     },
     {
       title: t('public.creationTime'),
-      dataIndex: 'created_at',
+      dataIndex: 'createdAt',
       width: 200,
     },
     {
       title: t('public.updateTime'),
-      dataIndex: 'updated_at',
+      dataIndex: 'updatedAt',
       width: 200,
     },
     {

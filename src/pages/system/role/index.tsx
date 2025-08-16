@@ -1,6 +1,6 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { type FormInstance, message } from 'antd';
+import { Form, type FormInstance, message } from 'antd';
 import { searchList, createList, tableColumns } from './model';
 import {
   getRolePage,
@@ -37,6 +37,7 @@ function Page() {
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const [form] = Form.useForm();
   const { permissions } = useCommonStore();
 
   // 权限前缀
@@ -177,14 +178,14 @@ function Page() {
    */
   function optionRender(_: unknown, record: object) {
     return (
-      <>
+      <div className="flex flex-wrap gap-5px">
         {pagePermission.update === true && (
-          <UpdateBtn className="mr-5px" onClick={() => onUpdate((record as RowData).id)} />
+          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
         )}
         {pagePermission.delete === true && (
-          <DeleteBtn className="mr-5px" handleDelete={() => onDelete((record as RowData).id)} />
+          <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
         )}
-      </>
+      </div>
     );
   }
 
@@ -228,6 +229,7 @@ function Page() {
         onCancel={closeCreate}
       >
         <BaseForm
+          form={form}
           ref={createFormRef}
           list={createList(t, createId)}
           data={createData}

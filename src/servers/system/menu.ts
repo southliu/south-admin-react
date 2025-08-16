@@ -27,7 +27,7 @@ export function getMenuById(id: string) {
  * @param data - 请求数据
  */
 export function createMenu(data: BaseFormData) {
-  return request.post(API.URL, data);
+  return request.post(`${API.URL}/create`, data);
 }
 
 /**
@@ -36,7 +36,7 @@ export function createMenu(data: BaseFormData) {
  * @param data - 请求数据
  */
 export function updateMenu(id: string, data: BaseFormData) {
-  return request.put(`${API.URL}/${id}`, data);
+  return request.put(`${API.URL}/update/${id}`, data);
 }
 
 /**

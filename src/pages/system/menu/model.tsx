@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils/constants';
+import { getMenuList } from '@/servers/system/menu';
 import { Icon } from '@iconify/react';
 import { Tag } from 'antd';
 import IconInput from './components/IconInput';
@@ -18,7 +19,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
   },
   {
     label: t('system.state'),
-    name: 'is_visible',
+    name: 'isVisible',
     wrapperWidth: 100,
     component: 'Select',
     componentProps: {
@@ -72,7 +73,7 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     },
     {
       title: t('system.status'),
-      dataIndex: 'is_visible',
+      dataIndex: 'isVisible',
       width: 80,
       render: (text: number) => (
         <Tag color={text ? 'green' : 'red'}>{text ? t('public.show') : t('public.hide')}</Tag>
@@ -90,18 +91,18 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     },
     {
       title: t('public.creationTime'),
-      dataIndex: 'created_at',
+      dataIndex: 'createdAt',
       width: 200,
     },
     {
       title: t('public.updateTime'),
-      dataIndex: 'updated_at',
+      dataIndex: 'updatedAt',
       width: 200,
     },
     {
       title: t('public.operate'),
       dataIndex: 'operate',
-      width: 200,
+      width: 210,
       fixed: 'right',
       render: (value: unknown, record: object) => optionRender(value, record),
     },
@@ -109,7 +110,16 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
 };
 
 // 新增数据
-export const createList = (t: TFunction, id: string): BaseFormList[] => [
+export const createList = (t: TFunction, id: string, type?: number): BaseFormList[] => [
+  {
+    label: t('systems:menu.parentMenu'),
+    name: 'parentId',
+    component: 'ApiTreeSelect',
+    componentProps: {
+      api: getMenuList,
+      fieldNames: { label: 'label', value: 'id' },
+    },
+  },
   {
     label: t('systems:menu.label'),
     name: 'label',
@@ -134,12 +144,12 @@ export const createList = (t: TFunction, id: string): BaseFormList[] => [
   {
     label: t('systems:menu.router'),
     name: 'router',
-    rules: FORM_REQUIRED,
+    rules: [{ required: type !== 3 }],
     component: 'Input',
   },
   {
     label: t('system.state'),
-    name: 'is_visible',
+    name: 'isVisible',
     rules: FORM_REQUIRED,
     component: 'Select',
     componentProps: {
@@ -148,13 +158,14 @@ export const createList = (t: TFunction, id: string): BaseFormList[] => [
   },
   {
     label: t('systems:menu.sort'),
-    name: 'sort',
+    name: 'order',
     rules: FORM_REQUIRED,
     component: 'InputNumber',
   },
   {
     label: t('systems:menu.rule'),
     name: 'rule',
+    rules: [{ required: type === 3 }],
     component: 'Input',
   },
   {
@@ -166,7 +177,7 @@ export const createList = (t: TFunction, id: string): BaseFormList[] => [
   {
     label: t('system.permissionButton'),
     name: 'actions',
-    hidden: !!id,
+    hidden: !!id && type !== 3,
     component: 'CheckboxGroup',
     componentProps: {
       options: MENU_ACTIONS(t),

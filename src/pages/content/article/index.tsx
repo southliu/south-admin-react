@@ -128,14 +128,14 @@ function Page() {
    * @param record - 当前行参数
    */
   const optionRender: TableOptions<object> = (_, record) => (
-    <>
+    <div className="flex flex-wrap gap-5px">
       {pagePermission.update === true && (
-        <UpdateBtn className="mr-5px" onClick={() => onUpdate((record as RowData).id)} />
+        <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
       )}
       {pagePermission.delete === true && (
-        <DeleteBtn className="mr-5px" handleDelete={() => onDelete((record as RowData).id)} />
+        <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
       )}
-    </>
+    </div>
   );
 
   return (

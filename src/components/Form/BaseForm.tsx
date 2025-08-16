@@ -12,6 +12,7 @@ import { filterDayjs } from '../Dates/utils/helper';
 interface Props extends FormProps {
   list: BaseFormList[];
   data: BaseFormData;
+  form: FormInstance<object>;
   style?: CSSProperties;
   className?: string;
   children?: ReactNode;
@@ -21,9 +22,9 @@ interface Props extends FormProps {
 }
 
 const BaseForm = forwardRef((props: Props, ref: Ref<FormInstance>) => {
-  const { list, data, style, className, children, labelCol, wrapperCol, handleFinish } = props;
+  const { list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
+    props;
   const { t } = useTranslation();
-  const [form] = Form.useForm();
 
   // 清除多余参数
   const formProps: Partial<Props> = { ...props };

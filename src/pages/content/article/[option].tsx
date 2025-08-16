@@ -1,4 +1,4 @@
-import { type FormInstance, message, Spin } from 'antd';
+import { Form, type FormInstance, message, Spin } from 'antd';
 import { createList } from './model';
 import { getUrlParam } from '@/utils/helper';
 import { useActivate, useAliveController } from 'react-activation';
@@ -33,6 +33,7 @@ function Page() {
   const id = getUrlParam(search, 'id');
   const currentId = useRef(id);
   const createFormRef = useRef<FormInstance>(null);
+  const [form] = Form.useForm();
   const [isLoading, setLoading] = useState(false);
   const [createId, setCreateId] = useState('');
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
@@ -152,6 +153,7 @@ function Page() {
           <div className="mb-50px">
             <Spin spinning={isLoading}>
               <BaseForm
+                form={form}
                 ref={createFormRef}
                 list={createList(t)}
                 data={createData}

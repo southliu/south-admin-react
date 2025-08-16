@@ -1,6 +1,6 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { type FormInstance, message } from 'antd';
+import { Button, Form, type FormInstance, message } from 'antd';
 import { searchList, createList, tableColumns } from './model';
 import {
   getMenuPage,
@@ -13,11 +13,12 @@ import {
 // 当前行数据
 interface RowData {
   id: string;
+  type: number;
 }
 
 // 初始化新增数据
 const initCreate = {
-  is_visible: 1,
+  isVisible: 1,
   sort: 0,
 };
 
@@ -38,6 +39,8 @@ function Page() {
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const [form] = Form.useForm();
+  const type = Form.useWatch('type', form);
   const { permissions } = useCommonStore();
 
   // 权限前缀
@@ -90,12 +93,18 @@ function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagePermission.page]);
 
-  /** 点击新增 */
-  const onCreate = () => {
+  /**
+   * 点击新增
+   * @param record - 当前行数据
+   */
+  const onCreate = (record?: RowData) => {
+    const id = record?.id;
+    let type = record?.id ? record?.type : undefined;
+    if (type && type < 3) type = type + 1;
     setCreateOpen(true);
     setCreateTitle(ADD_TITLE(t));
     setCreateId('');
-    setCreateData(initCreate);
+    setCreateData({ ...initCreate, parentId: id, type });
   };
 
   /**
@@ -183,14 +192,19 @@ function Page() {
    */
   function optionRender(_: unknown, record: object) {
     return (
-      <>
+      <div className="flex flex-wrap gap-5px">
+        {pagePermission.create === true && (record as RowData)?.type <= 2 && (
+          <Button className="small-btn" type="primary" onClick={() => onCreate(record as RowData)}>
+            {t('systems:menu.addChildMenu')}
+          </Button>
+        )}
         {pagePermission.update === true && (
-          <UpdateBtn className="mr-5px" onClick={() => onUpdate((record as RowData).id)} />
+          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
         )}
         {pagePermission.delete === true && (
-          <DeleteBtn className="mr-5px" handleDelete={() => onDelete((record as RowData).id)} />
+          <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
         )}
-      </>
+      </div>
     );
   }
 
@@ -229,13 +243,15 @@ function Page() {
         width={600}
         title={createTitle}
         open={isCreateOpen}
+        style={{ top: 20 }}
         confirmLoading={isCreateLoading}
         onOk={createSubmit}
         onCancel={closeCreate}
       >
         <BaseForm
           ref={createFormRef}
-          list={createList(t, createId)}
+          form={form}
+          list={createList(t, createId, type)}
           data={createData}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 19 }}
