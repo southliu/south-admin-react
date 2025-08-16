@@ -6,7 +6,7 @@ export default {
   state: 'state',
   module: 'module',
   controller: 'Controller',
-  createMenu: 'Create menu',
+  permissionButton: 'Permission Button',
   age: 'age',
   role: 'role',
   phone: 'phone',

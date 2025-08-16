@@ -3,12 +3,12 @@ import type { PagePermission } from '#/public';
 import { type FormInstance, message } from 'antd';
 import { searchList, createList, tableColumns } from './model';
 import {
-  getMenuPage,
-  getMenuById,
-  createMenu,
-  updateMenu,
-  deleteMenu,
-} from '@/servers/system/menu';
+  getRolePage,
+  getRoleById,
+  createRole,
+  updateRole,
+  deleteRole,
+} from '@/servers/system/role';
 
 // 当前行数据
 interface RowData {
@@ -17,8 +17,7 @@ interface RowData {
 
 // 初始化新增数据
 const initCreate = {
-  is_visible: 1,
-  sort: 0,
+  status: 1,
 };
 
 function Page() {
@@ -41,7 +40,7 @@ function Page() {
   const { permissions } = useCommonStore();
 
   // 权限前缀
-  const permissionPrefix = '/authority/menu';
+  const permissionPrefix = '/authority/role';
 
   // 权限
   const pagePermission: PagePermission = {
@@ -57,7 +56,7 @@ function Page() {
 
     try {
       setLoading(true);
-      const res = await getMenuPage(params);
+      const res = await getRolePage(params);
       const { code, data } = res;
       if (Number(code) !== 200) return;
       const { items, total } = data;
@@ -78,7 +77,6 @@ function Page() {
    * @param values - 表单返回数据
    */
   const onSearch = (values: BaseFormData) => {
-    values.is_visible = values.is_visible !== undefined ? values.is_visible === 1 : undefined;
     setPage(1);
     setSearchData(values);
     setFetch(true);
@@ -108,7 +106,7 @@ function Page() {
       setCreateTitle(EDIT_TITLE(t, id));
       setCreateId(id);
       setCreateLoading(true);
-      const { code, data } = await getMenuById(id);
+      const { code, data } = await getRoleById(id);
       if (Number(code) !== 200) return;
       setCreateData(data);
     } finally {
@@ -131,18 +129,14 @@ function Page() {
    * @param values - 表单返回数据
    */
   const handleCreate = async (values: BaseFormData) => {
-    values.is_visible = values.is_visible !== undefined ? values.is_visible === 1 : undefined;
-
     try {
       setCreateLoading(true);
-      const functions = () => (createId ? updateMenu(createId, values) : createMenu(values));
+      const functions = () => (createId ? updateRole(createId, values) : createRole(values));
       const { code, message } = await functions();
       if (Number(code) !== 200) return;
       messageApi.success(message || t('public.successfulOperation'));
       setCreateOpen(false);
       getPage();
-    } catch (e) {
-      console.log(e);
     } finally {
       setCreateLoading(false);
     }
@@ -155,7 +149,7 @@ function Page() {
   const onDelete = async (id: string) => {
     try {
       setLoading(true);
-      const { code, message } = await deleteMenu(id);
+      const { code, message } = await deleteRole(id);
       if (Number(code) === 200) {
         messageApi.success(message || t('public.successfullyDeleted'));
         getPage();

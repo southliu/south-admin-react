@@ -42,11 +42,14 @@ export interface PagePermission {
   [key: string]: boolean | undefined;
 }
 
+export type EnumShowType = 'text' | 'tag';
+
 // 表格列表枚举
 export interface ColumnsEnum {
   label: string;
   value: unknown;
   color?: string;
+  type?: EnumShowType;
 }
 
 // 表格列数据

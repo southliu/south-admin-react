@@ -59,6 +59,7 @@
     "locize",
     "zustand",
     "wechat",
-    "unplugin"
+    "unplugin",
+    "geekblue",
   ]
 }

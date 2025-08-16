@@ -57,7 +57,8 @@ export default {
   notSearchContent: 'There is no search content',
   switch: 'Switch',
   content: 'Content',
-  title: 'title',
+  title: 'Title',
+  type: 'Type',
   returnHome: 'Return home',
   notPermissionMessage:
     'The current page cannot be accessed, it may not have permission or has been deleted!',

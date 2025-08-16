@@ -14,11 +14,23 @@ export enum colors {
   warning = '#E6A23C',
   danger = 'red',
   info = '#909399',
+  magenta = 'magenta',
+  red = 'red',
+  volcano = 'volcano',
+  orange = 'orange',
+  gold = 'gold',
+  lime = 'lime',
+  green = 'green',
+  cyan = 'cyan',
+  blue = 'blue',
+  geekblue = 'geekblue',
+  purple = 'purple',
 }
 
 export interface Constant extends Omit<DefaultOptionType, 'children'> {
   value: string | number;
   label: string;
+  type?: EnumShowType;
   color?: colors;
   children?: Constant[];
 }
@@ -40,15 +52,12 @@ export const MENU_STATUS = (t: TFunction): Constant[] => [
 ];
 
 /**
- * 菜单模块
+ * 菜单类型
  */
-export const MENU_MODULE = (t: TFunction): Constant[] => [
-  { value: 'authority', label: t('system.authority') },
-  { value: 'platform', label: t('system.platform') },
-  { value: 'stat', label: t('system.stat') },
-  { value: 'ad', label: t('system.ad') },
-  { value: 'cs', label: t('system.cs') },
-  { value: 'log', label: t('system.log') },
+export const MENU_TYPES = (t: TFunction): Constant[] => [
+  { label: t('systems:menu.catalog'), value: 1, type: 'tag', color: colors.success },
+  { label: t('systems:menu.menu'), value: 2, type: 'tag', color: colors.blue },
+  { label: t('systems:menu.button'), value: 3, type: 'tag', color: colors.cyan },
 ];
 
 /**

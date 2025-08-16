@@ -1,0 +1,13 @@
+export default {
+  label: 'Label',
+  labelEn: 'LabelEn',
+  icon: 'Icon',
+  router: 'Router',
+  sort: 'Sort',
+  rule: 'Rule',
+  catalog: 'Catalog',
+  menu: 'Menu',
+  button: 'Button',
+  helpIcon:
+    'Click the question mark to jump to the icon query, and after the query, pass the icon name value into the input box',
+};

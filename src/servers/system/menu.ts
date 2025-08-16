@@ -3,7 +3,7 @@ import type { DataNode } from 'antd/es/tree';
 import { request } from '@/utils/request';
 
 enum API {
-  URL = '/authority/menu',
+  URL = '/menu',
 }
 
 /**
@@ -72,5 +72,5 @@ export function savePermission(data: object) {
  * @param data - 请求数据
  */
 export function getMenuList() {
-  return request.get<SideMenu[]>(`/menu/list`);
+  return request.get<SideMenu[]>(`${API.URL}/list`);
 }

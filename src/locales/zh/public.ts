@@ -58,6 +58,7 @@ export default {
   switch: '切换',
   content: '内容',
   title: '标题',
+  type: '类型',
   returnHome: '返回首页',
   notPermissionMessage: '当前页面无法访问，可能没权限或已删除!',
   notFindMessage: '当前页面无法访问，可能没权限或已删除',

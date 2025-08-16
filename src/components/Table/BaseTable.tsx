@@ -1,7 +1,7 @@
 import type { ResizeCallbackData } from 'react-resizable';
 import type { ColumnsType } from 'antd/es/table';
-import type { TableColumn } from '#/public';
-import { type TableProps, Table, Button, message } from 'antd';
+import type { EnumShowType, TableColumn } from '#/public';
+import { type TableProps, Table, Button, message, Tag } from 'antd';
 import { useMemo, useState, useEffect, useRef, type ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
 import { useTranslation } from 'react-i18next';
@@ -146,6 +146,7 @@ function BaseTable(props: Props) {
       render: (value: unknown, record: object, index: number) => {
         const renderContent = col?.render?.(value, record, index);
         let showValue: ReactNode | string = renderContent as ReactNode;
+        let showType: EnumShowType = 'text';
         let color: string | undefined = undefined;
         const enumList = (col as TableColumn)?.enum;
 
@@ -156,6 +157,7 @@ function BaseTable(props: Props) {
               if (String(item.value) === String(showValue)) {
                 showValue = item.label;
                 color = item.color;
+                showType = item?.type || 'text';
                 break;
               }
             }
@@ -171,6 +173,11 @@ function BaseTable(props: Props) {
 
         if (!['object', 'function'].includes(typeof renderContent)) {
           const textContent = String(showValue ?? EMPTY_VALUE);
+
+          // 如果显示类型为标签
+          if (showType === 'tag') {
+            return <Tag color={color}>{textContent}</Tag>;
+          }
 
           // 超出不省略则换行
           if (col.ellipsis !== undefined && !col.ellipsis) {
