@@ -182,7 +182,7 @@ function BaseTable(props: Props) {
               width={col.width}
               text={textContent}
               color={color}
-              className="break-all"
+              className="break-all inline-block"
             />
           );
         }
