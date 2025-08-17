@@ -18,8 +18,8 @@ interface RowData {
 
 // 初始化新增数据
 const initCreate = {
-  isVisible: 1,
-  sort: 0,
+  state: 1,
+  order: 0,
 };
 
 function Page() {

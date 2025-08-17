@@ -58,6 +58,7 @@ function BaseTable(props: Props) {
   const tableRef = useRef<HTMLDivElement>(null);
   const [tableFilters, setTableFilters] = useState<string[]>([]);
   const [sortList, setSortList] = useState<string[]>([]);
+  const rows = tableRef.current?.querySelectorAll('.ant-table-row');
 
   // 清除自定义属性
   const params: Partial<Props> = { ...props };
@@ -204,7 +205,7 @@ function BaseTable(props: Props) {
   // 虚拟滚动操作值
   const virtualOptions = useVirtualTable({
     height: tableHeight, // 设置可视高度
-    size: size || 'small',
+    rowHeight: rows?.[0]?.clientHeight || handleRowHeight(size),
     total: props.dataSource?.length || 0,
   });
 
@@ -247,9 +248,8 @@ function BaseTable(props: Props) {
   ) => {
     const className =
       typeof rowClassName === 'string' ? rowClassName : rowClassName?.(record, index, indent);
-    const rowSize = `!h-${handleRowHeight(size)}px`;
 
-    return `${className || ''} ${rowSize}`;
+    return `${className || ''}`;
   };
 
   return (

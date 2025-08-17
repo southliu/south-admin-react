@@ -2,8 +2,8 @@ import type { TFunction } from 'i18next';
 import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils/constants';
 import { getMenuList } from '@/servers/system/menu';
 import { Icon } from '@iconify/react';
-import { Tag } from 'antd';
 import IconInput from './components/IconInput';
+import StateSwitch from './components/StateSwitch';
 
 // 搜索数据
 export const searchList = (t: TFunction): BaseSearchList[] => [
@@ -19,7 +19,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
   },
   {
     label: t('system.state'),
-    name: 'isVisible',
+    name: 'state',
     wrapperWidth: 100,
     component: 'Select',
     componentProps: {
@@ -73,11 +73,9 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     },
     {
       title: t('system.status'),
-      dataIndex: 'isVisible',
+      dataIndex: 'state',
       width: 80,
-      render: (text: number) => (
-        <Tag color={text ? 'green' : 'red'}>{text ? t('public.show') : t('public.hide')}</Tag>
-      ),
+      render: (text: number, record) => <StateSwitch value={text} record={record} />,
     },
     {
       title: t('systems:menu.sort'),
@@ -149,7 +147,7 @@ export const createList = (t: TFunction, id: string, type?: number): BaseFormLis
   },
   {
     label: t('system.state'),
-    name: 'isVisible',
+    name: 'state',
     rules: FORM_REQUIRED,
     component: 'Select',
     componentProps: {

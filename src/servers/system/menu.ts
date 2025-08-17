@@ -74,3 +74,11 @@ export function savePermission(data: object) {
 export function getMenuList() {
   return request.get<SideMenu[]>(`${API.URL}/list`);
 }
+
+/**
+ * 更改菜单状态
+ * @param data - 请求数据
+ */
+export function changeMenuState(data: object) {
+  return request.put(`${API.URL}/changeState`, data);
+}

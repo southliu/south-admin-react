@@ -11,4 +11,6 @@ export default {
   parentMenu: '上级菜单',
   addChildMenu: '新增下级',
   helpIcon: '点击问号可跳转查询icon，查询完将icon name值传入输入框中',
+  changeState: '切换状态',
+  changeStateMsg: '是否将{{name}}改为【{{state}}】状态？',
 };
