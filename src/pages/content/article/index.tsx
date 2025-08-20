@@ -5,6 +5,7 @@ import { getArticlePage, deleteArticle } from '@/servers/content/article';
 // 当前行数据
 interface RowData {
   id: string;
+  title: string;
 }
 
 function Page() {
@@ -133,7 +134,10 @@ function Page() {
         <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
       )}
       {pagePermission.delete === true && (
-        <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
+        <DeleteBtn
+          name={(record as RowData).title}
+          handleDelete={() => onDelete((record as RowData).id)}
+        />
       )}
     </div>
   );

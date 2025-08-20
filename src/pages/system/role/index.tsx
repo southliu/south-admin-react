@@ -1,6 +1,6 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Form, type FormInstance, message } from 'antd';
+import { Button, Drawer, Form, type FormInstance, message, Spin } from 'antd';
 import { searchList, createList, tableColumns } from './model';
 import {
   getRolePage,
@@ -13,6 +13,7 @@ import {
 // 当前行数据
 interface RowData {
   id: string;
+  name: string;
 }
 
 // 初始化新增数据
@@ -183,7 +184,10 @@ function Page() {
           <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
         )}
         {pagePermission.delete === true && (
-          <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
+          <DeleteBtn
+            name={(record as RowData).name}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
         )}
       </div>
     );
@@ -220,24 +224,33 @@ function Page() {
         />
       </BaseCard>
 
-      <BaseModal
+      <Drawer
         width={600}
         title={createTitle}
+        maskClosable={false}
         open={isCreateOpen}
-        confirmLoading={isCreateLoading}
-        onOk={createSubmit}
-        onCancel={closeCreate}
+        onClose={closeCreate}
+        footer={
+          <div className="flex justify-end gap-10px">
+            <Button onClick={closeCreate}>{t('public.cancel')}</Button>
+            <Button type="primary" onClick={createSubmit}>
+              {t('public.confirm')}
+            </Button>
+          </div>
+        }
       >
-        <BaseForm
-          form={form}
-          ref={createFormRef}
-          list={createList(t, createId)}
-          data={createData}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 19 }}
-          handleFinish={handleCreate}
-        />
-      </BaseModal>
+        <Spin spinning={isCreateLoading}>
+          <BaseForm
+            form={form}
+            ref={createFormRef}
+            list={createList(t, createId)}
+            data={createData}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 19 }}
+            handleFinish={handleCreate}
+          />
+        </Spin>
+      </Drawer>
     </BaseContent>
   );
 }

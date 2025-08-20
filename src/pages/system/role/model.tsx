@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import AuthorizeSelect from './components/AuthorizeSelect';
 
 // 搜索数据
 export const searchList = (t: TFunction): BaseSearchList[] => [
@@ -23,6 +24,11 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     {
       title: t('public.name'),
       dataIndex: 'name',
+      width: 200,
+    },
+    {
+      title: t('system.description'),
+      dataIndex: 'description',
       width: 200,
     },
     {
@@ -52,5 +58,17 @@ export const createList = (t: TFunction, id: string): BaseFormList[] => [
     name: 'name',
     rules: FORM_REQUIRED,
     component: 'Input',
+  },
+  {
+    label: t('system.description'),
+    name: 'description',
+    component: 'TextArea',
+  },
+  {
+    label: t('system.authorize'),
+    name: 'authorize',
+    rules: FORM_REQUIRED,
+    component: 'customize',
+    render: AuthorizeSelect,
   },
 ];

@@ -1,7 +1,7 @@
 import { request } from '@/utils/request';
 
 enum API {
-  URL = '/authority/user',
+  URL = '/user',
 }
 
 /**
@@ -25,7 +25,7 @@ export function getUserById(id: string) {
  * @param data - 请求数据
  */
 export function createUser(data: BaseFormData) {
-  return request.post(API.URL, data);
+  return request.post(`${API.URL}/create`, data);
 }
 
 /**
@@ -34,7 +34,7 @@ export function createUser(data: BaseFormData) {
  * @param data - 请求数据
  */
 export function updateUser(id: string, data: BaseFormData) {
-  return request.put(`${API.URL}/${id}`, data);
+  return request.put(`${API.URL}/update/${id}`, data);
 }
 
 /**
@@ -51,12 +51,4 @@ export function deleteUser(id: string) {
  */
 export function batchDeleteUser(data: BaseFormData) {
   return request.post(`${API.URL}/batchDelete`, data);
-}
-
-/**
- * 获取分页下拉框数据
- * @param data - 请求数据
- */
-export function getUserPageSelect(data: { page: number; pageSize: number; query: string }) {
-  return request.get(`${API.URL}/pageList`, { params: data });
 }

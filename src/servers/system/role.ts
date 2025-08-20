@@ -25,7 +25,7 @@ export function getRoleById(id: string) {
  * @param data - 请求数据
  */
 export function createRole(data: BaseFormData) {
-  return request.post(API.URL, data);
+  return request.post(`${API.URL}/create`, data);
 }
 
 /**
@@ -34,7 +34,7 @@ export function createRole(data: BaseFormData) {
  * @param data - 请求数据
  */
 export function updateRole(id: string, data: BaseFormData) {
-  return request.put(`${API.URL}/${id}`, data);
+  return request.put(`${API.URL}/update/${id}`, data);
 }
 
 /**
@@ -51,4 +51,9 @@ export function deleteRole(id: string) {
  */
 export function batchDeleteRole(data: BaseFormData) {
   return request.post(`${API.URL}/batchDelete`, data);
+}
+
+/** 获取全部角色 */
+export function getRoleList() {
+  return request.get<BaseFormData[]>(`${API.URL}/list`);
 }

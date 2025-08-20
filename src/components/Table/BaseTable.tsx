@@ -149,6 +149,7 @@ function BaseTable(props: Props) {
         let showValue: ReactNode | string = renderContent as ReactNode;
         let showType: EnumShowType = 'text';
         let color: string | undefined = undefined;
+        let isStringArr = false; // 是否是字符串数组
         const enumList = (col as TableColumn)?.enum;
 
         if (enumList && typeof enumList === 'object') {
@@ -172,7 +173,13 @@ function BaseTable(props: Props) {
           }
         }
 
-        if (!['object', 'function'].includes(typeof renderContent)) {
+        // 如果是字符串数组则用逗号分隔
+        if (Array.isArray(showValue)) {
+          isStringArr = showValue?.every((item) => typeof item === 'string');
+          if (isStringArr) showValue = showValue?.join(', ') || EMPTY_VALUE;
+        }
+
+        if (!['object', 'function'].includes(typeof renderContent) || isStringArr) {
           const textContent = String(showValue ?? EMPTY_VALUE);
 
           // 如果显示类型为标签

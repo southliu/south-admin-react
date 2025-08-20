@@ -16,6 +16,7 @@ import PermissionDrawer from './components/PermissionDrawer';
 // 当前行数据
 interface RowData {
   id: string;
+  username: string;
 }
 
 // 初始化新增数据
@@ -276,7 +277,10 @@ function Page() {
           <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
         )}
         {pagePermission.delete === true && (
-          <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
+          <DeleteBtn
+            name={(record as RowData).username}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
         )}
       </div>
     );
@@ -287,7 +291,7 @@ function Page() {
     <DeleteBtn
       isIcon
       isLoading={isLoading}
-      name={t('public.batchDelete')}
+      btnType="batchDelete"
       handleDelete={handleBatchDelete}
     />
   );
@@ -337,7 +341,7 @@ function Page() {
         <BaseForm
           form={form}
           ref={createFormRef}
-          list={createList(t)}
+          list={createList(t, !createId)}
           data={createData}
           labelCol={{ span: 5 }}
           wrapperCol={{ span: 17 }}

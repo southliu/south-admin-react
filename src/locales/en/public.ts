@@ -16,6 +16,8 @@ export default {
   pleaseEnter: 'Enter {{name}}',
   pleaseSelect: 'Select {{name}}',
   confirmMessage: 'Are you sure you want to {{name}}?',
+  deleteConfirmMessage: 'Are you sure you want to delete {{name}}?',
+  batchDeleteConfirmMessage: 'Are you sure you want to batch delete {{name}}?',
   successfulOperation: 'Successful operation',
   successfullyDeleted: 'Successfully deleted',
   checkAll: 'Check all',
@@ -72,4 +74,5 @@ export default {
   getPageWarning: 'Missing page acquisition method',
   tableSelectWarning: 'Please select table data',
   menuSearchPlaceholder: 'Please enter the menu name',
+  noMoreData: 'No more data',
 };

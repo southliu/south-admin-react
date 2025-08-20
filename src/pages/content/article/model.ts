@@ -4,11 +4,6 @@ import CustomizeInput from './components/CustomizeInput';
 // 搜索数据
 export const searchList = (t: TFunction): BaseSearchList[] => [
   {
-    label: t('login.username'),
-    name: 'username',
-    component: 'Input',
-  },
-  {
     label: t('public.title'),
     name: 'title',
     component: 'Input',
@@ -24,11 +19,6 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     {
       title: 'ID',
       dataIndex: 'id',
-      width: 400,
-    },
-    {
-      title: t('login.username'),
-      dataIndex: 'username',
       width: 400,
     },
     {

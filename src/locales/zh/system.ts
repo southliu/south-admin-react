@@ -9,6 +9,7 @@ export default {
   age: '年龄',
   role: '角色',
   phone: '手机',
+  email: '邮箱',
   rightsProfile: '权限配置',
   create: '创建',
   update: '更新',
@@ -16,4 +17,6 @@ export default {
   detail: '详情',
   export: '导出',
   status: '状态',
+  description: '描述',
+  authorize: '授权',
 };

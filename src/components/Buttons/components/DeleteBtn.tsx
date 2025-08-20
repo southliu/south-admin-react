@@ -1,19 +1,29 @@
 import type { ButtonProps } from 'antd';
-import { Button, App } from 'antd';
+import { Button, Popconfirm } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 
 interface Props extends ButtonProps {
   isLoading?: boolean;
+  btnType?: 'delete' | 'batchDelete';
   name?: string;
+  customizeTitle?: string;
   isIcon?: boolean;
   handleDelete: () => void;
 }
 
 function DeleteBtn(props: Props) {
-  const { isLoading, loading, isIcon, name, className, handleDelete } = props;
+  const {
+    isLoading,
+    loading,
+    isIcon,
+    customizeTitle,
+    name,
+    btnType = 'delete',
+    className,
+    handleDelete,
+  } = props;
   const { t } = useTranslation();
-  const { modal } = App.useApp();
 
   // 清除自定义属性
   const params: Partial<Props> = { ...props };
@@ -21,32 +31,26 @@ function DeleteBtn(props: Props) {
   delete params.isLoading;
   delete params.handleDelete;
 
-  const showConfirm = () => {
-    modal.confirm({
-      title: t('public.kindTips'),
-      icon: <ExclamationCircleOutlined />,
-      content: t('public.confirmMessage', { name: name || t('public.delete') }),
-      okText: t('public.confirm'),
-      okType: 'danger',
-      cancelText: t('public.cancel'),
-      onOk() {
-        handleDelete();
-      },
-    });
-  };
-
   return (
-    <Button
-      danger
-      type="primary"
-      {...params}
-      className={`${className} small-btn`}
-      icon={params?.icon || (isIcon && <DeleteOutlined />)}
-      loading={!!isLoading || loading}
-      onClick={showConfirm}
+    <Popconfirm
+      title={t('public.kindTips')}
+      description={t(
+        btnType === 'delete' ? 'public.deleteConfirmMessage' : 'public.batchDeleteConfirmMessage',
+        { name: ` ${name} ` || '' },
+      )}
+      onConfirm={handleDelete}
     >
-      {name || t('public.delete')}
-    </Button>
+      <Button
+        danger
+        type="primary"
+        {...params}
+        className={`${className} small-btn`}
+        icon={params?.icon || (isIcon && <DeleteOutlined />)}
+        loading={!!isLoading || loading}
+      >
+        {customizeTitle || btnType === 'delete' ? t('public.delete') : t('public.batchDelete')}
+      </Button>
+    </Popconfirm>
   );
 }
 

@@ -15,7 +15,9 @@ export default {
   editTitle: '编辑{{title}}',
   pleaseEnter: '请输入{{name}}',
   pleaseSelect: '请选择{{name}}',
-  confirmMessage: '确定要{{name}}吗',
+  confirmMessage: '确定要{{name}}吗？',
+  deleteConfirmMessage: '确定要删除{{name}}吗？',
+  batchDeleteConfirmMessage: '确定要批量删除{{name}}吗？',
   successfulOperation: '操作成功',
   successfullyDeleted: '删除成功',
   checkAll: '全选',
@@ -70,4 +72,5 @@ export default {
   getPageWarning: '缺少获取页面方法',
   tableSelectWarning: '请勾选表格数据',
   menuSearchPlaceholder: '请输入菜单名称',
+  noMoreData: '没有更多数据',
 };

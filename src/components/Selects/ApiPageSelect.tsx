@@ -21,10 +21,10 @@ function ApiPageSelect(props: ApiPageSelectProps) {
   const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(page);
-  const [hasMore, setMore] = useState(true);
   const [options, setOptions] = useState<DefaultOptionType[]>([]);
   const [isFetch, setFetch] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const hasMore = useRef(true);
 
   // 清除自定义属性
   const params: Partial<ApiPageSelectProps> = { ...props };
@@ -44,7 +44,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
 
   /** 获取接口数据 */
   const getApiData = useCallback(async () => {
-    if (!props.api || !hasMore) return;
+    if (!props.api || !hasMore.current) return;
     try {
       const { api, params, apiResultKey } = props;
 
@@ -76,7 +76,24 @@ function ApiPageSelect(props: ApiPageSelectProps) {
           const newOption = options.concat(result);
           setOptions(newOption);
         }
-        setMore(!!result?.length);
+        hasMore.current = !!result?.length;
+
+        // 如果不存在更多数据，尾部显示没有更多数据且居中
+        if (!hasMore.current) {
+          setOptions((prev) => {
+            if (prev.length) {
+              return prev.concat([
+                {
+                  [props?.fieldNames?.label || 'label']: t('public.noMoreData'),
+                  [props?.fieldNames?.value || 'value']: t('public.noMoreData'),
+                  disabled: true,
+                  className: 'text-center',
+                },
+              ]);
+            }
+            return prev;
+          });
+        }
       }
     } finally {
       setLoading(false);
@@ -131,7 +148,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
   const handleInit = () => {
     setOptions([]);
     setCurrentPage(page);
-    setMore(true);
+    hasMore.current = true;
   };
 
   /** 处理搜索 */

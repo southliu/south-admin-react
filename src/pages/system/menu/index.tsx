@@ -14,6 +14,8 @@ import {
 interface RowData {
   id: string;
   type: number;
+  label: string;
+  labelEn: string;
 }
 
 // 初始化新增数据
@@ -23,7 +25,7 @@ const initCreate = {
 };
 
 function Page() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
   const columns = tableColumns(t, optionRender);
   const [isFetch, setFetch] = useState(false);
@@ -202,7 +204,10 @@ function Page() {
           <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
         )}
         {pagePermission.delete === true && (
-          <DeleteBtn handleDelete={() => onDelete((record as RowData).id)} />
+          <DeleteBtn
+            name={i18n.language === 'zh' ? (record as RowData).label : (record as RowData).labelEn}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
         )}
       </div>
     );

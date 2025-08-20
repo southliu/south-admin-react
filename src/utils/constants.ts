@@ -9,10 +9,10 @@ import { DefaultOptionType } from 'antd/es/select';
  * 颜色
  */
 export enum colors {
-  success = 'green',
+  success = '#87d068',
   primary = '#409EFF',
   warning = '#E6A23C',
-  danger = 'red',
+  danger = '#f50',
   info = '#909399',
   magenta = 'magenta',
   red = 'red',
@@ -39,23 +39,23 @@ export interface Constant extends Omit<DefaultOptionType, 'children'> {
  * 开启状态
  */
 export const OPEN_CLOSE = (t: TFunction): Constant[] => [
-  { label: t('public.open'), value: 1 },
-  { label: t('public.close'), value: 0 },
+  { label: t('public.open'), value: 1, color: colors.green, type: 'tag' },
+  { label: t('public.close'), value: 0, color: colors.red, type: 'tag' },
 ];
 
 /**
  * 菜单状态
  */
 export const MENU_STATUS = (t: TFunction): Constant[] => [
-  { label: t('public.show'), value: 1 },
-  { label: t('public.hide'), value: 0 },
+  { label: t('public.show'), value: 1, color: colors.green, type: 'tag' },
+  { label: t('public.hide'), value: 0, color: colors.red, type: 'tag' },
 ];
 
 /**
  * 菜单类型
  */
 export const MENU_TYPES = (t: TFunction): Constant[] => [
-  { label: t('systems:menu.catalog'), value: 1, type: 'tag', color: colors.success },
+  { label: t('systems:menu.catalog'), value: 1, type: 'tag', color: colors.green },
   { label: t('systems:menu.menu'), value: 2, type: 'tag', color: colors.blue },
   { label: t('systems:menu.button'), value: 3, type: 'tag', color: colors.cyan },
 ];

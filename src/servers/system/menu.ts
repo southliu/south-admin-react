@@ -82,3 +82,8 @@ export function getMenuList() {
 export function changeMenuState(data: object) {
   return request.put(`${API.URL}/changeState`, data);
 }
+
+/** 获取菜单权限列表 */
+export function getMenuPermissionList() {
+  return request.get(`${API.URL}/permissionList`);
+}
