@@ -61,7 +61,12 @@ export default {
   content: 'Content',
   title: 'Title',
   type: 'Type',
+  refreshPage: 'Refresh page',
   returnHome: 'Return home',
+  pageErrorTitle: 'Page error',
+  reloadPageMsg: 'New content found, automatically updating...',
+  pagepageErrorSubTitle:
+    'Sorry, an error has occurred on this page and the content cannot be displayed properly.',
   notPermissionMessage:
     'The current page cannot be accessed, it may not have permission or has been deleted!',
   notFindMessage:

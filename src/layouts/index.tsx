@@ -15,10 +15,12 @@ import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
 import Forbidden from '@/pages/403';
+import ErrorBoundary from './components/ErrorBoundary';
 import styles from './index.module.less';
 
 function Layout() {
   const [getToken] = useToken();
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const token = getToken();
   const outlet = useOutlet();
@@ -70,7 +72,7 @@ function Layout() {
 
   // 监测是否需要刷新
   useEffect(() => {
-    versionCheck(messageApi);
+    versionCheck(t, messageApi);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
@@ -141,23 +143,26 @@ function Layout() {
             </div>
           )}
           {permissions.length > 0 && (
-            <KeepAlive id={pathname} name={pathname}>
-              <div
-                className={`
+            <ErrorBoundary key={pathname}>
+              {/* 限制最多缓存10个页面，避免过多页面导致卡顿 */}
+              <KeepAlive id={pathname} name={pathname} max={10} strategy="LRU">
+                <div
+                  className={`
                   content-transition
                 `}
-              >
-                <Suspense
-                  fallback={
-                    <div className="p-30px">
-                      <Skeleton active paragraph={{ rows: 10 }} />
-                    </div>
-                  }
                 >
-                  {outlet}
-                </Suspense>
-              </div>
-            </KeepAlive>
+                  <Suspense
+                    fallback={
+                      <div className="p-30px">
+                        <Skeleton active paragraph={{ rows: 10 }} />
+                      </div>
+                    }
+                  >
+                    {outlet}
+                  </Suspense>
+                </div>
+              </KeepAlive>
+            </ErrorBoundary>
           )}
         </div>
       </div>
