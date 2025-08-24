@@ -83,8 +83,6 @@ function Page() {
    * @param values - 表单返回数据
    */
   const onSearch = (values: BaseFormData) => {
-    values.is_visible = values.is_visible !== undefined ? values.is_visible === 1 : undefined;
-    setPage(1);
     setSearchData(values);
     setFetch(true);
   };
@@ -142,8 +140,6 @@ function Page() {
    * @param values - 表单返回数据
    */
   const handleCreate = async (values: BaseFormData) => {
-    values.is_visible = values.is_visible !== undefined ? values.is_visible === 1 : undefined;
-
     try {
       setCreateLoading(true);
       const functions = () => (createId ? updateMenu(createId, values) : createMenu(values));

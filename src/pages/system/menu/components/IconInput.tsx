@@ -16,7 +16,17 @@ function IconInput(props: InputProps) {
         }}
       />
 
-      <div className="w-30px h-30px ml-10px flex items-center justify-center b b-#d9d9d9 rd-6px">
+      <div
+        className="w-30px h-30px ml-10px flex items-center justify-center b b-#d9d9d9 rd-6px"
+        style={
+          !value
+            ? {
+                backgroundImage:
+                  'repeating-linear-gradient(-45deg, #ececec, #ececec 2px, transparent 2px, transparent 5px)',
+              }
+            : {}
+        }
+      >
         <Icon icon={value as string} className="text-16px" />
       </div>
 

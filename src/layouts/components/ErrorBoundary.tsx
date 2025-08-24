@@ -1,6 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Button, Result, Tooltip } from 'antd';
-import { useAliveController } from 'react-activation';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/stores/user';
 import axios from 'axios';
@@ -17,27 +16,12 @@ interface State {
 
 // 错误内容组件
 const ErrorContent = ({ error }: { error: Error | null }) => {
-  const [, , removeToken] = useToken();
+  const [handleLogout] = useLogout();
   const { t } = useTranslation();
-  const { clear } = useAliveController();
-  const { closeAllTab, setActiveKey } = useTabsStore((state) => state);
-  const clearInfo = useUserStore((state) => state.clearInfo);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   /** 刷新当前页面 */
   const handleRefresh = () => {
     window.location.reload();
-  };
-
-  /** 退出登录 */
-  const handleLogout = () => {
-    clearInfo();
-    closeAllTab();
-    setActiveKey('');
-    removeToken();
-    clear(); // 清除keepalive缓存
-    navigate(`/login?redirect=${location.pathname}${location.search}`);
   };
 
   return (

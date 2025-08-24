@@ -1,13 +1,10 @@
 import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
 import { useMemo, useRef } from 'react';
-import { useAliveController } from 'react-activation';
-import { useNavigate } from 'react-router-dom';
-import { useToken } from '@/hooks/useToken';
 import { App, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import { useMenuStore, useTabsStore, useUserStore } from '@/stores';
+import { useMenuStore } from '@/stores';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -28,17 +25,13 @@ import Nav from './Nav';
 type MenuKey = 'password' | 'logout';
 
 function Header() {
-  const [, , removeToken] = useToken();
+  const [handleLogout] = useLogout();
   const { t } = useTranslation();
-  const { clear } = useAliveController();
   const { modal } = App.useApp();
   const { isCollapsed, isMaximize, username, nav } = useCommonStore();
   // 是否窗口最大化
   const passwordRef = useRef<PasswordModal>(null);
-  const navigate = useNavigate();
   const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);
-  const clearInfo = useUserStore((state) => state.clearInfo);
-  const { closeAllTab, setActiveKey } = useTabsStore((state) => state);
 
   // 下拉菜单内容
   const items: MenuProps['items'] = [
@@ -62,7 +55,7 @@ function Header() {
         break;
 
       case 'logout':
-        handleLogout();
+        onLogout();
         break;
 
       default:
@@ -71,18 +64,13 @@ function Header() {
   };
 
   /** 退出登录 */
-  const handleLogout = () => {
+  const onLogout = () => {
     modal.confirm({
       title: t('public.kindTips'),
       icon: <ExclamationCircleOutlined />,
       content: t('public.signOutMessage'),
       onOk() {
-        clearInfo();
-        closeAllTab();
-        setActiveKey('');
-        removeToken();
-        clear(); // 清除keepalive缓存
-        navigate('/login');
+        handleLogout();
       },
     });
   };

@@ -65,6 +65,11 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
       fixed: 'left',
     },
     {
+      title: t('public.name'),
+      dataIndex: 'name',
+      width: 100,
+    },
+    {
       title: t('system.state'),
       dataIndex: 'status',
       width: 80,

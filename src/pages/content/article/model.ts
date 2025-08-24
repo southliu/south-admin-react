@@ -32,6 +32,16 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
       width: 400,
     },
     {
+      title: t('content.creator'),
+      dataIndex: 'creator',
+      width: 200,
+    },
+    {
+      title: t('content.updater'),
+      dataIndex: 'updater',
+      width: 200,
+    },
+    {
       title: t('public.operate'),
       dataIndex: 'operate',
       width: 200,

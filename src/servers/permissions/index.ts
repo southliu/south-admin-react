@@ -6,5 +6,5 @@ import { request } from '@/utils/request';
  * @param data - 请求数据
  */
 export function getPermissions(data: object) {
-  return request.get<LoginResult>('/user/refresh-permissions', { params: data });
+  return request.get<LoginResult>('/system/user/refreshPermissions', { params: data });
 }

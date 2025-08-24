@@ -3,7 +3,7 @@ import type { DataNode } from 'antd/es/tree';
 import { request } from '@/utils/request';
 
 enum API {
-  URL = '/menu',
+  URL = '/system/menu',
 }
 
 /**

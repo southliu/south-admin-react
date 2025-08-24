@@ -36,7 +36,7 @@ function DeleteBtn(props: Props) {
       title={t('public.kindTips')}
       description={t(
         btnType === 'delete' ? 'public.deleteConfirmMessage' : 'public.batchDeleteConfirmMessage',
-        { name: ` ${name} ` || '' },
+        { name: name ? ` ${name} ` : '' },
       )}
       onConfirm={handleDelete}
     >

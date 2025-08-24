@@ -1,7 +1,8 @@
 import type { FormProps } from 'antd/es/form/Form';
 import { Ref, useImperativeHandle } from 'react';
 import { useState } from 'react';
-import { Form, message } from 'antd';
+import { Form } from 'antd';
+import { message } from '@south/message';
 import { useTranslation } from 'react-i18next';
 import { updatePassword } from '@/servers/login';
 import { PASSWORD_RULE } from '@/utils/config';
@@ -20,7 +21,7 @@ function UpdatePassword(props: Props) {
   const { passwordRef } = props;
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
+  const [handleLogout] = useLogout();
   const [isOpen, setOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
@@ -49,17 +50,18 @@ function UpdatePassword(props: Props) {
   const onFinish: FormProps['onFinish'] = async (values) => {
     // 当密码和确认密码不同时则提示错误
     if (values.newPassword !== values.confirmPassword) {
-      return messageApi.warning({
+      return message.warning({
         content: t('login.confirmPasswordMessage'),
         key: 'confirmPassword',
       });
     }
     try {
       setLoading(true);
-      const { code, message } = await updatePassword(values);
+      const { code, message: messageInfo } = await updatePassword(values);
       if (Number(code) === 200) {
         onClose();
-        messageApi.success(message);
+        message.success(messageInfo);
+        handleLogout();
       }
     } finally {
       setLoading(false);
@@ -67,61 +69,58 @@ function UpdatePassword(props: Props) {
   };
 
   return (
-    <>
-      {contextHolder}
-      <BaseModal
-        title={t('public.changePassword')}
-        open={isOpen}
-        confirmLoading={isLoading}
-        onOk={onOk}
-        onCancel={() => onClose()}
+    <BaseModal
+      title={t('public.changePassword')}
+      open={isOpen}
+      confirmLoading={isLoading}
+      onOk={onOk}
+      onCancel={() => onClose()}
+    >
+      <Form
+        name="UpdatePassword"
+        form={form}
+        labelWrap
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 19 }}
+        onFinish={onFinish}
+        autoComplete="off"
       >
-        <Form
-          name="UpdatePassword"
-          form={form}
-          labelWrap
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 19 }}
-          onFinish={onFinish}
-          autoComplete="off"
+        <Form.Item
+          label={t('login.oldPassword')}
+          name="oldPassword"
+          rules={[
+            { required: true, message: t('public.pleaseEnter', { name: t('login.password') }) },
+            PASSWORD_RULE(t),
+          ]}
         >
-          <Form.Item
-            label={t('login.oldPassword')}
-            name="oldPassword"
-            rules={[
-              { required: true, message: t('public.pleaseEnter', { name: t('login.password') }) },
-              PASSWORD_RULE(t),
-            ]}
-          >
-            <PasswordStrength />
-          </Form.Item>
-          <Form.Item
-            label={t('login.newPassword')}
-            name="newPassword"
-            rules={[
-              { required: true, message: t('public.pleaseEnter', { name: t('login.password') }) },
-              PASSWORD_RULE(t),
-            ]}
-          >
-            <PasswordStrength />
-          </Form.Item>
+          <PasswordStrength />
+        </Form.Item>
+        <Form.Item
+          label={t('login.newPassword')}
+          name="newPassword"
+          rules={[
+            { required: true, message: t('public.pleaseEnter', { name: t('login.password') }) },
+            PASSWORD_RULE(t),
+          ]}
+        >
+          <PasswordStrength />
+        </Form.Item>
 
-          <Form.Item
-            label={t('login.confirmPassword')}
-            name="confirmPassword"
-            rules={[
-              {
-                required: true,
-                message: t('public.pleaseEnter', { name: t('login.confirmPassword') }),
-              },
-              PASSWORD_RULE(t),
-            ]}
-          >
-            <PasswordStrength />
-          </Form.Item>
-        </Form>
-      </BaseModal>
-    </>
+        <Form.Item
+          label={t('login.confirmPassword')}
+          name="confirmPassword"
+          rules={[
+            {
+              required: true,
+              message: t('public.pleaseEnter', { name: t('login.confirmPassword') }),
+            },
+            PASSWORD_RULE(t),
+          ]}
+        >
+          <PasswordStrength />
+        </Form.Item>
+      </Form>
+    </BaseModal>
   );
 }
 

@@ -6,7 +6,7 @@ import { request } from '@/utils/request';
  * @param data - 请求数据
  */
 export function login(data: LoginData) {
-  return request.post<LoginResult>('/user/login', data);
+  return request.post<LoginResult>('/system/user/login', data);
 }
 
 /**
@@ -14,7 +14,7 @@ export function login(data: LoginData) {
  * @param data - 请求数据
  */
 export function updatePassword(data: object) {
-  return request.post('/update-password', data);
+  return request.post('/system/user/updatePassword', data);
 }
 
 /**
@@ -22,5 +22,5 @@ export function updatePassword(data: object) {
  * @param data - 请求数据
  */
 export function forgetPassword(data: object) {
-  return request.post('/forget-password', data);
+  return request.post('/system/user/forgetPassword', data);
 }
