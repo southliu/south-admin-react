@@ -15,4 +15,5 @@ export default {
   sensitiveInfo: 'Note: The title cannot contain sensitive information!',
   creator: 'Creator',
   updater: 'Updater',
+  author: 'Author',
 };
