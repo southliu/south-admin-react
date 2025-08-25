@@ -15,4 +15,5 @@ export default {
   sensitiveInfo: '注：标题不能含有敏感信息!',
   creator: '创建者',
   updater: '更新者',
+  author: '作者',
 };
