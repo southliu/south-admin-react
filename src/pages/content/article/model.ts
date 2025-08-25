@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import { getUserPage } from '@/servers/system/user';
 import CustomizeInput from './components/CustomizeInput';
 
 // 搜索数据
@@ -25,6 +26,11 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
       title: t('public.title'),
       dataIndex: 'title',
       width: 400,
+    },
+    {
+      title: t('content.author'),
+      dataIndex: 'author',
+      width: 100,
     },
     {
       title: t('public.content'),
@@ -54,12 +60,29 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
 // 新增数据
 export const createList = (t: TFunction): BaseFormList[] => [
   {
-    label: t('login.username'),
-    name: 'username',
+    label: t('public.title'),
+    name: 'title',
     rules: FORM_REQUIRED,
-    extra: '这是描述，这是描述，这是描述。',
-    component: 'Input',
+    component: 'customize',
+    render: CustomizeInput,
     componentProps: {
+      style: {
+        width: '80%',
+      },
+    },
+  },
+  {
+    label: t('content.author'),
+    name: 'author',
+    component: 'ApiSelect',
+    componentProps: {
+      api: getUserPage as ApiFn,
+      apiResultKey: 'items',
+      fieldNames: { label: 'name', value: 'name' },
+      params: {
+        page: 1,
+        pageSize: 10,
+      },
       style: {
         width: '80%',
       },
@@ -67,22 +90,10 @@ export const createList = (t: TFunction): BaseFormList[] => [
   },
   {
     label: t('content.nestedData'),
-    name: ['user', 'name', 'test'],
-    rules: FORM_REQUIRED,
+    name: ['demo', 'name', 'test'],
     component: 'Input',
+    extra: '这是描述，这是描述，这是描述。',
     unit: '单位',
-    componentProps: {
-      style: {
-        width: '80%',
-      },
-    },
-  },
-  {
-    label: t('public.title'),
-    name: 'title',
-    rules: FORM_REQUIRED,
-    component: 'customize',
-    render: CustomizeInput,
     componentProps: {
       style: {
         width: '80%',
