@@ -342,8 +342,8 @@ function Page() {
           form={form}
           ref={createFormRef}
           list={createList(t, !createId)}
+          labelCol={{ span: 4 }}
           data={createData}
-          labelCol={{ style: { width: 'max-content' } }}
           handleFinish={handleCreate}
         />
       </BaseModal>
