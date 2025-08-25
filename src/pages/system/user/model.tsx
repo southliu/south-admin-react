@@ -21,7 +21,6 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
   {
     label: t('login.username'),
     name: 'username',
-    wrapperWidth: 200,
     component: 'ApiPageSelect',
     componentProps: {
       api: getUserPage as ApiFn,
@@ -119,6 +118,12 @@ export const createList = (t: TFunction, isCreate: boolean): BaseFormList[] => [
     hidden: !isCreate,
     rules: isCreate ? FORM_REQUIRED : undefined,
     component: 'InputPassword',
+  },
+  {
+    label: t('public.name'),
+    name: 'name',
+    rules: FORM_REQUIRED,
+    component: 'Input',
   },
   {
     label: t('system.role'),
