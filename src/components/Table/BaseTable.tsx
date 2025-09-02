@@ -189,7 +189,7 @@ function BaseTable(props: Props) {
 
           // 超出不省略则换行
           if (col.ellipsis !== undefined && !col.ellipsis) {
-            return <div style={{ maxWidth: col.width }}>{textContent}</div>;
+            return <span className="break-all break-words whitespace-pre-wrap">{textContent}</span>;
           }
 
           return (
@@ -197,7 +197,7 @@ function BaseTable(props: Props) {
               width={col.width}
               text={textContent}
               color={color}
-              className="break-all inline-block"
+              className="break-all break-words whitespace-pre-wrap"
             />
           );
         }
