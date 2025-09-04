@@ -244,7 +244,7 @@ const BaseSearch = forwardRef((props: Props, ref: Ref<FormInstance>) => {
                 wrapperCol={getWrapperCol(item)}
                 valuePropName={handleValuePropName(item.component)}
               >
-                {getComponent(t, item)}
+                {getComponent(t, item, form)}
               </Form.Item>
             ))}
             {renderBtnList}
@@ -265,7 +265,7 @@ const BaseSearch = forwardRef((props: Props, ref: Ref<FormInstance>) => {
                   wrapperCol={getWrapperCol(item)}
                   valuePropName={handleValuePropName(item.component)}
                 >
-                  {getComponent(t, item)}
+                  {getComponent(t, item, form)}
                 </Form.Item>
               </div>
             ))}
