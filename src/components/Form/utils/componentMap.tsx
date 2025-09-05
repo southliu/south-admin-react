@@ -103,6 +103,10 @@ lazyComponents.set(
   'PasswordStrength',
   lazy(() => import('@/components/PasswordStrength')),
 );
+lazyComponents.set(
+  'RichEditor',
+  lazy(() => import('@/components/WangEditor')),
+);
 
 // 创建一个包装组件，确保在Suspense加载期间也能保持表单数据
 function LazyComponentWrapper({
