@@ -81,11 +81,6 @@ function Page() {
     }
   });
 
-  // 异步添加富文本组件
-  useLayoutEffect(() => {
-    addComponent('RichEditor', WangEditor);
-  }, []);
-
   /** 处理新增 */
   const handleCreate = () => {
     setCreateId('');

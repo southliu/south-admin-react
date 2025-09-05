@@ -197,7 +197,7 @@ function BaseTable(props: Props) {
               width={col.width}
               text={textContent}
               color={color}
-              className="break-all break-words whitespace-pre-wrap"
+              className="break-all"
             />
           );
         }
