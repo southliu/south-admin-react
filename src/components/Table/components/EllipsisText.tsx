@@ -36,7 +36,7 @@ const EllipsisText = (props: EllipsisTextProps) => {
   const content = (
     <span
       ref={textRef}
-      className={`block w-full overflow-hidden text-ellipsis whitespace-nowrap ${className}`}
+      className={`inline-block w-full overflow-hidden text-ellipsis whitespace-nowrap ${className}`}
       style={textStyle}
     >
       {text}
