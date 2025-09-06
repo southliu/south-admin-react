@@ -27,6 +27,13 @@ export function handleValuePropName(component: ComponentType): string {
  */
 export function initCompProps(t: TFunction, component: ComponentType): ComponentProps {
   switch (component) {
+    // 输入框
+    case 'Input':
+      return {
+        allowClear: true,
+        placeholder: t('public.inputPleaseEnter'),
+      };
+
     // 下拉框
     case 'Select':
       return {
@@ -88,7 +95,6 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
     default:
       return {
         allowClear: true,
-        placeholder: t('public.inputPleaseEnter'),
       };
   }
 }

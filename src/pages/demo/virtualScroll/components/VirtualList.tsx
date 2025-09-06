@@ -1,37 +1,32 @@
-import type { CSSProperties } from 'react';
-import { FixedSizeList as List } from 'react-window';
+import { List, type RowComponentProps } from 'react-window';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import AutoSizer from 'react-virtualized-auto-sizer';
 
 function VirtualList() {
   const { theme } = useCommonStore();
 
-  const Row = ({ index, style }: { index: number; style: CSSProperties }) => (
-    <div
-      className={`
-        text-center
-        ${index % 2 ? 'bg-#f8f8f0' : ''}
-        ${theme === 'dark' && index % 2 ? '!bg-#141414' : ''}
-      `}
-      style={style}
-    >
-      Row {index + 1}
-    </div>
-  );
+  const names = useMemo(() => {
+    return Array.from({ length: 10000 }, (_, i) => `Name ${i + 1}`);
+  }, []);
 
-  return (
-    <AutoSizer>
-      {({ height, width }: { height: number; width: number }) => (
-        <>
-          {height && (
-            <List height={height} itemCount={10000} itemSize={35} width={width}>
-              {Row}
-            </List>
-          )}
-        </>
-      )}
-    </AutoSizer>
-  );
+  function RowComponent({
+    index,
+    names,
+    style,
+  }: RowComponentProps<{
+    names: string[];
+  }>) {
+    return (
+      <div
+        className={`flex items-center justify-between px-10px box-border ${theme === 'dark' && index % 2 ? '!bg-#141414' : ''}`}
+        style={style}
+      >
+        {names[index]}
+        <div className="text-slate-500 text-xs">{`${index + 1} of ${names.length}`}</div>
+      </div>
+    );
+  }
+
+  return <List rowCount={10000} rowHeight={35} rowComponent={RowComponent} rowProps={{ names }} />;
 }
 
 export default VirtualList;

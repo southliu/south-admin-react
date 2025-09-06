@@ -29,6 +29,7 @@ function DeleteBtn(props: Props) {
   const params: Partial<Props> = { ...props };
   delete params.isIcon;
   delete params.isLoading;
+  delete params.btnType;
   delete params.handleDelete;
 
   return (

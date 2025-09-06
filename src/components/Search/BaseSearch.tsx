@@ -1,14 +1,6 @@
 import type { ColProps, FormInstance } from 'antd';
 import type { BaseFormData, BaseSearchList } from '#/form';
-import {
-  type CSSProperties,
-  type ReactNode,
-  type Ref,
-  forwardRef,
-  useEffect,
-  useState,
-  useMemo,
-} from 'react';
+import { type CSSProperties, type ReactNode, type Ref, useEffect, useState, useMemo } from 'react';
 import { type FormProps, Button, Col, Flex } from 'antd';
 import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +23,7 @@ interface Props extends FormProps {
   style?: CSSProperties;
   className?: string;
   type?: 'default' | 'grid';
+  ref?: Ref<FormInstance>;
   children?: ReactNode;
   labelCol?: Partial<ColProps>;
   wrapperCol?: Partial<ColProps>;
@@ -40,8 +33,9 @@ interface Props extends FormProps {
   handleFinish: FormProps['onFinish'];
 }
 
-const BaseSearch = forwardRef((props: Props, ref: Ref<FormInstance>) => {
+const BaseSearch = (props: Props) => {
   const {
+    ref,
     list,
     data,
     initialValues,
@@ -278,6 +272,6 @@ const BaseSearch = forwardRef((props: Props, ref: Ref<FormInstance>) => {
       </Form>
     </div>
   );
-});
+};
 
 export default BaseSearch;

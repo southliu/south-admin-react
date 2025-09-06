@@ -177,7 +177,6 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
     // 获取组件自定义渲染失败直接返回空标签
     if (!render) return renderInput;
     addComponent('customize', render);
-    return renderInput;
   }
 
   // 对于Input组件，直接返回

@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode, Ref } from 'react';
 import type { BaseFormData, BaseFormList } from '#/form';
 import type { ColProps, FormInstance } from 'antd';
-import { forwardRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import { FormProps } from 'antd';
 import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ interface Props extends FormProps {
   data: BaseFormData;
   form: FormInstance<object>;
   style?: CSSProperties;
+  ref?: Ref<FormInstance>;
   className?: string;
   children?: ReactNode;
   labelCol?: Partial<ColProps>;
@@ -21,8 +22,8 @@ interface Props extends FormProps {
   handleFinish: FormProps['onFinish'];
 }
 
-const BaseForm = forwardRef((props: Props, ref: Ref<FormInstance>) => {
-  const { list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
+const BaseForm = (props: Props) => {
+  const { ref, list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
     props;
   const { t } = useTranslation();
 
@@ -112,6 +113,6 @@ const BaseForm = forwardRef((props: Props, ref: Ref<FormInstance>) => {
       </Form>
     </div>
   );
-});
+};
 
 export default BaseForm;
