@@ -135,12 +135,19 @@ function LazyComponentWrapper({
 
   /** 使用setFieldValue设置表单字段的值，改为非受控组件 */
   const handleChange = (newValue: unknown) => {
+    // 处理e.target.value情况
+    let actualValue = newValue;
+    if (newValue && typeof newValue === 'object' && 'target' in newValue) {
+      const event = newValue as React.ChangeEvent<HTMLInputElement>;
+      actualValue = event.target.value;
+    }
+
     if (form && name) {
-      form.setFieldValue(name, newValue);
+      form.setFieldValue(name, actualValue);
     }
     // 如果有onChange回调，也调用它
     if (componentProps?.onChange) {
-      componentProps.onChange(newValue);
+      componentProps.onChange(actualValue);
     }
   };
 

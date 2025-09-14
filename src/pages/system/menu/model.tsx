@@ -134,7 +134,7 @@ export const createList = (t: TFunction, id: string, type?: number): BaseFormLis
     label: t('public.type'),
     name: 'type',
     rules: FORM_REQUIRED,
-    component: 'Select',
+    component: 'RadioGroup',
     componentProps: {
       options: MENU_TYPES(t),
     },
