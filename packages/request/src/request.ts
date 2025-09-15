@@ -37,7 +37,12 @@ class AxiosRequest {
         }
 
         // 如果存在post数据
-        if (res.data && res.data?.[0] === '{' && res.data?.[res.data?.length - 1] === '}') {
+        if (
+          res.data &&
+          typeof res.data === 'string' &&
+          res.data?.[0] === '{' &&
+          res.data?.[res.data?.length - 1] === '}'
+        ) {
           const obj = JSON.parse(res.data);
           for (const key in obj) {
             url += `#${key}=${obj[key]}`;
@@ -128,6 +133,173 @@ class AxiosRequest {
    */
   delete<T = object>(url: string, options = {}) {
     return this.instance.delete(url, options) as Promise<ServerResult<T>>;
+  }
+
+  /**
+   * SSE请求
+   * @param url - 链接
+   * @param onMessage - 接收数据回调函数
+   * @param onError - 错误回调函数
+   * @param options - 参数
+   */
+  sse<T = unknown>({
+    url,
+    onMessage,
+    onError,
+    options = {},
+  }: {
+    url: string;
+    onMessage: (data: T) => void;
+    onError?: (error: Event) => void;
+    options?: AxiosRequestConfig;
+  }): () => void {
+    // 检查是否需要使用 fetch 实现 SSE（例如 POST 请求）
+    const method = options.method?.toUpperCase() || 'GET';
+    const isGetRequest = method === 'GET';
+
+    // 获取 token
+    let tokenLocal = '';
+    try {
+      const config = this.interceptorsObj?.requestInterceptors?.({
+        headers: {},
+      } as InternalAxiosRequestConfig);
+      if (config?.headers?.Authorization) {
+        tokenLocal = String(config.headers.Authorization).replace('Bearer ', '');
+      }
+    } catch (error) {
+      console.warn('获取 token 失败:', error);
+    }
+
+    if (isGetRequest) {
+      // 使用原生 EventSource 处理 GET 请求
+      const fullUrl = this.instance.getUri({ url, ...options });
+
+      // EventSource 不直接支持自定义 headers，需要通过其他方式传递 token
+      // 可以通过 URL 参数或者后端支持的其他方式
+      const urlWithToken = tokenLocal
+        ? `${fullUrl}${fullUrl.includes('?') ? '&' : '?'}token=${tokenLocal}`
+        : fullUrl;
+
+      const source = new EventSource(urlWithToken, { withCredentials: true });
+
+      source.onmessage = (event) => {
+        try {
+          const data: T = JSON.parse(event.data);
+          onMessage(data);
+        } catch {
+          // 忽略解析错误，直接传递原始数据
+          onMessage(event.data as unknown as T);
+        }
+      };
+
+      source.onerror = (error) => {
+        if (onError) {
+          onError(error);
+        } else {
+          console.error('SSE连接错误:', error);
+        }
+        // 出错时关闭连接
+        source.close();
+      };
+
+      // 返回关闭连接的函数
+      return () => {
+        source.close();
+      };
+    }
+    // 使用 fetch 处理非 GET 请求（如 POST）
+    let isCanceled = false;
+    const abortController = new AbortController();
+
+    const createSSEConnection = async () => {
+      try {
+        const config: RequestInit = {
+          method,
+          signal: abortController.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            ...((options.headers as Record<string, string>) || {}),
+          } as Record<string, string>,
+        };
+
+        // 添加认证头
+        if (tokenLocal) {
+          config.headers = {
+            ...config.headers,
+            Authorization: `Bearer ${tokenLocal}`,
+          };
+        }
+
+        // 添加请求体
+        if (options.data) {
+          config.body = JSON.stringify(options.data);
+        }
+
+        // 构建完整 URL
+        const fullUrl = this.instance.getUri({ url, ...options });
+
+        const response = await fetch(fullUrl, config);
+
+        if (!response.ok) {
+          throw new Error(`SSE请求错误: ${response.status}`);
+        }
+
+        if (!response.body) {
+          throw new Error('SSE请求没有响应体');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (!isCanceled) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // 处理接收到的数据（按行分割）
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // 保留不完整的行
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.slice(6); // 移除 'data: ' 前缀
+              // eslint-disable-next-line max-depth
+              try {
+                const data: T = JSON.parse(dataStr);
+                onMessage(data);
+              } catch {
+                // 如果不是 JSON 格式，直接传递原始数据
+                onMessage(dataStr as unknown as T);
+              }
+            }
+          }
+        }
+
+        reader.releaseLock();
+      } catch (error) {
+        if (!isCanceled) {
+          if (onError) {
+            onError(error as Event);
+          } else {
+            console.error('SSE连接错误:', error);
+          }
+        }
+      }
+    };
+
+    // 启动连接
+    createSSEConnection();
+
+    // 返回关闭连接的函数
+    return () => {
+      isCanceled = true;
+      abortController.abort();
+    };
   }
 }
 
