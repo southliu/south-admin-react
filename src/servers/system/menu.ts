@@ -1,5 +1,3 @@
-import type { Key } from 'react';
-import type { DataNode } from 'antd/es/tree';
 import { request } from '@/utils/request';
 
 enum API {
@@ -45,26 +43,6 @@ export function updateMenu(id: string, data: BaseFormData) {
  */
 export function deleteMenu(id: string) {
   return request.delete(`${API.URL}/${id}`);
-}
-
-/**
- * 获取权限列表
- * @param data - 搜索数据
- */
-interface PermissionResult {
-  treeData: DataNode[];
-  defaultCheckedKeys: Key[];
-}
-export function getPermission(data: object) {
-  return request.get<PermissionResult>(`${API.URL}/tree`, { params: data });
-}
-
-/**
- * 保存权限列表
- * @param data - 权限数据
- */
-export function savePermission(data: object) {
-  return request.put(`${API.URL}/authorize/save`, data);
 }
 
 /**

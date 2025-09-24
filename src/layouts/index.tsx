@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 import { versionCheck } from './utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { useMenuStore, useUserStore } from '@/stores';
-import { getPermissions } from '@/servers/permissions';
+import { getUserRefreshPermissions } from '@/servers/system/user';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import KeepAlive from 'react-activation';
 import Menu from './components/Menu';
@@ -35,7 +35,7 @@ function Layout() {
   const getUserInfo = useCallback(async () => {
     try {
       setLoading(true);
-      const { code, data } = await getPermissions({ refresh_cache: false });
+      const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
       if (Number(code) !== 200) return;
       const { user, permissions } = data;
       setUserInfo(user);

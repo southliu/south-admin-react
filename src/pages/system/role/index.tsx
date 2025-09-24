@@ -39,7 +39,7 @@ function Page() {
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
-  const { permissions } = useCommonStore();
+  const { permissions, roles } = useCommonStore();
 
   // 权限前缀
   const permissionPrefix = '/authority/role';
@@ -243,7 +243,7 @@ function Page() {
           <BaseForm
             form={form}
             ref={createFormRef}
-            list={createList(t, createId)}
+            list={createList(t, roles?.join(','))}
             data={createData}
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 19 }}

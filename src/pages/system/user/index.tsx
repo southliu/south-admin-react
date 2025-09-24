@@ -1,8 +1,6 @@
-import type { DataNode } from 'antd/es/tree';
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import { type FormInstance, Button, Form, message } from 'antd';
 import { createList, searchList, tableColumns } from './model';
-import { getPermission, savePermission } from '@/servers/system/menu';
 import {
   batchDeleteUser,
   createUser,
@@ -44,9 +42,7 @@ function Page() {
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
 
   const [promiseId, setPromiseId] = useState('');
-  const [isPromiseVisible, setPromiseVisible] = useState(false);
-  const [promiseCheckedKeys, setPromiseCheckedKeys] = useState<Key[]>([]);
-  const [promiseTreeData, setPromiseTreeData] = useState<DataNode[]>([]);
+  const [isPromiseOpen, setPromiseOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [form] = Form.useForm();
 
@@ -104,43 +100,13 @@ function Page() {
 
   /** 开启权限 */
   const openPermission = async (id: string) => {
-    try {
-      setLoading(true);
-      const params = { userId: id };
-      const { code, data } = await getPermission(params);
-      if (Number(code) !== 200) return;
-      const { defaultCheckedKeys, treeData } = data;
-      setPromiseId(id);
-      setPromiseTreeData(treeData);
-      setPromiseCheckedKeys(defaultCheckedKeys);
-      setPromiseVisible(true);
-    } finally {
-      setLoading(false);
-    }
+    setPromiseId(id);
+    setPromiseOpen(true);
   };
 
   /** 关闭权限 */
   const closePermission = () => {
-    setPromiseVisible(false);
-  };
-
-  /**
-   * 权限提交
-   */
-  const permissionSubmit = async (checked: Key[]) => {
-    try {
-      setLoading(true);
-      const params = {
-        menuIds: checked,
-        userId: promiseId,
-      };
-      const { code, message } = await savePermission(params);
-      if (Number(code) !== 200) return;
-      messageApi.success(message || t('system.authorizationSuccessful'));
-      setPromiseVisible(false);
-    } finally {
-      setLoading(false);
-    }
+    setPromiseOpen(false);
   };
 
   /** 点击新增 */
@@ -348,13 +314,7 @@ function Page() {
         />
       </BaseModal>
 
-      <PermissionDrawer
-        isVisible={isPromiseVisible}
-        treeData={promiseTreeData}
-        checkedKeys={promiseCheckedKeys}
-        onClose={closePermission}
-        onSubmit={permissionSubmit}
-      />
+      <PermissionDrawer isOpen={isPromiseOpen} id={promiseId} onClose={closePermission} />
     </BaseContent>
   );
 }

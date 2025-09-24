@@ -10,6 +10,7 @@ interface User {
   username: string;
   phone: string;
   email: string;
+  roles: number[];
 }
 
 // 用户权限数据

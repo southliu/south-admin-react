@@ -5,7 +5,7 @@ import { Form, Button, Input } from 'antd';
 import { login } from '@/servers/login';
 import { setTitle } from '@/utils/helper';
 import { getMenuList } from '@/servers/system/menu';
-import { getPermissions } from '@/servers/permissions';
+import { getUserRefreshPermissions } from '@/servers/system/user';
 import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus/utils/helper';
 import Logo from '@/assets/images/logo.svg';
@@ -76,7 +76,7 @@ function Login() {
   const getUserPermissions = async () => {
     try {
       setLoading(true);
-      const { code, data } = await getPermissions({ refresh_cache: false });
+      const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
       if (Number(code) !== 200) return;
       const { user, permissions } = data;
       setUserInfo(user);

@@ -69,6 +69,9 @@ export const createList = (t: TFunction, id: string): BaseFormList[] => [
     name: 'authorize',
     rules: FORM_REQUIRED,
     component: 'customize',
-    render: AuthorizeSelect,
+    render: AuthorizeSelect as unknown as CustomizeRender,
+    componentProps: {
+      id,
+    },
   },
 ];

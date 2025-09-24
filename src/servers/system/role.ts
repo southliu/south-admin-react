@@ -1,3 +1,5 @@
+import type { Key, ReactNode } from 'react';
+import type { DataNode } from 'antd/es/tree';
 import { request } from '@/utils/request';
 
 enum API {
@@ -56,4 +58,21 @@ export function batchDeleteRole(data: BaseFormData) {
 /** 获取全部角色 */
 export function getRoleList() {
   return request.get<BaseFormData[]>(`${API.URL}/list`);
+}
+
+/**
+ * 获取权限列表
+ * @param data - 搜索数据
+ */
+export interface PermissionData extends DataNode {
+  icon: string | ReactNode;
+  type: number;
+  children?: PermissionData[];
+}
+export interface PermissionResult {
+  treeData: PermissionData[];
+  defaultCheckedKeys: Key[];
+}
+export function getRolePermission(data: object) {
+  return request.get<PermissionResult>(`${API.URL}/authorize`, { params: data });
 }

@@ -8,6 +8,8 @@ export const useCommonStore = () => {
   const permissions = useUserStore((state) => state.permissions);
   // 用户ID
   const userId = useUserStore((state) => state.userInfo.id);
+  // 角色
+  const roles = useUserStore((state) => state.userInfo.roles);
   // 用户名
   const username = useUserStore((state) => state.userInfo.username);
   // 是否窗口最大化
@@ -48,5 +50,6 @@ export const useCommonStore = () => {
     tabs,
     theme,
     menuList,
+    roles,
   } as const;
 };

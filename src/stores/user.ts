@@ -6,6 +6,7 @@ interface UserInfo {
   username: string;
   email: string;
   phone: string;
+  roles: number[];
 }
 
 interface UserState {
@@ -25,6 +26,7 @@ export const useUserStore = create<UserState>()(
         username: '',
         email: '',
         phone: '',
+        roles: [],
       },
       /** 设置用户信息 */
       setPermissions: (permissions) => set({ permissions }),
@@ -33,7 +35,7 @@ export const useUserStore = create<UserState>()(
       /** 清除用户信息 */
       clearInfo: () =>
         set({
-          userInfo: { id: 0, username: '', email: '', phone: '' },
+          userInfo: { id: 0, username: '', email: '', phone: '', roles: [] },
         }),
     }),
     {
