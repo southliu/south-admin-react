@@ -244,7 +244,9 @@ function MenuAuthorize(props: Props) {
   };
 
   // 计算是否全选
-  const isAllChecked = checkedKeys.length > 0 && checkedKeys.length === getAllKeys(list).length;
+  const allKeys = getAllKeys(list);
+  const isAllChecked =
+    checkedKeys.length > 0 && allKeys.every((item) => checkedKeys.includes(item));
   const hasCheckedKeys = checkedKeys.length > 0;
 
   return (
