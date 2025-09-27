@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
+import { message } from '@south/message';
 import { useToken } from '@/hooks/useToken';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import nprogress from 'nprogress';
 import Layout from '@/layouts';
 
 function Guards() {
+  const { t } = useTranslation();
   const [getToken] = useToken();
   const outlet = useOutlet();
   const navigate = useNavigate();
@@ -19,6 +21,10 @@ function Guards() {
       const param =
         location.pathname?.length > 1 ? `?redirect=${location.pathname}${location.search}` : '';
       navigate(`/login${param}`);
+      message.warning({
+        content: t('public.noLoginVisit'),
+        key: 'noLoginVisit',
+      });
     }
 
     nprogress.done();
@@ -26,7 +32,7 @@ function Guards() {
     return () => {
       nprogress.start();
     };
-  }, [location, navigate, token]);
+  }, [location, navigate]);
 
   /** 渲染页面 */
   const renderPage = () => {

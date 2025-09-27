@@ -80,4 +80,5 @@ export default {
   tableSelectWarning: 'Please select table data',
   menuSearchPlaceholder: 'Please enter the menu name',
   noMoreData: 'No more data',
+  noLoginVisit: 'Cannot access without login',
 };
