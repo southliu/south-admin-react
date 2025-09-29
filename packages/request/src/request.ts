@@ -7,6 +7,10 @@ import type {
 } from 'axios';
 import type { RequestInterceptors, CreateRequestConfig, ServerResult } from './types';
 
+interface NewAxiosRequestConfig extends AxiosRequestConfig {
+  _mapKey?: string;
+}
+
 class AxiosRequest {
   // axios 实例
   instance: AxiosInstance;
@@ -24,13 +28,13 @@ class AxiosRequest {
     this.instance.interceptors.request.use(
       (res: InternalAxiosRequestConfig) => {
         const controller = new AbortController();
-        
+
         res.signal = controller.signal;
-        
+
         const mapKey = this.generateMapKey(res);
         // 保存key到请求配置中，供响应拦截器使用
-        (res as any)._mapKey = mapKey;
-        
+        (res as NewAxiosRequestConfig)._mapKey = mapKey;
+
         // 如果存在则删除该请求
         if (this.abortControllerMap.get(mapKey)) {
           console.warn('取消重复请求：', mapKey);
@@ -58,7 +62,7 @@ class AxiosRequest {
       // 因为我们接口的数据都在res.data下，所以我们直接返回res.data
       (res: AxiosResponse) => {
         // 从请求配置中获取之前保存的key
-        const mapKey = (res.config as any)._mapKey || '';
+        const mapKey = (res.config as NewAxiosRequestConfig)._mapKey || '';
         this.abortControllerMap.delete(mapKey);
         return res.data;
       },
@@ -121,7 +125,7 @@ class AxiosRequest {
   /**
    * 生成请求的唯一key（考虑参数）
    */
-  private generateMapKey(requestConfig: any) {
+  private generateMapKey(requestConfig: NewAxiosRequestConfig) {
     let url = requestConfig.method || '';
     if (requestConfig.url) url += `^${requestConfig.url}`;
     // 如果存在参数
@@ -131,7 +135,11 @@ class AxiosRequest {
       }
     }
     // 如果存在post数据
-    if (requestConfig.data && requestConfig.data?.[0] === '{' && requestConfig.data?.[requestConfig.data?.length - 1] === '}') {
+    if (
+      requestConfig.data &&
+      requestConfig.data?.[0] === '{' &&
+      requestConfig.data?.[requestConfig.data?.length - 1] === '}'
+    ) {
       const obj = JSON.parse(requestConfig.data);
       for (const key in obj) {
         url += `#${key}=${obj[key]}`;
