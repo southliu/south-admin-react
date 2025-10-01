@@ -65,7 +65,7 @@ function Guards() {
       setRedirected(true);
 
       // 如果是跳转到登录页，显示提示信息
-      if (redirectPath.startsWith('/login')) {
+      if (redirectPath.startsWith('/login') && location.pathname !== '/') {
         message.warning({
           content: t('public.noLoginVisit'),
           key: 'noLoginVisit',
