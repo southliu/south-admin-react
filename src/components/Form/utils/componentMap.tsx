@@ -4,7 +4,7 @@ import { initCompProps } from './helper';
 import { CreateBusiness } from '@/components/Business';
 import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
-import { lazy, Suspense } from 'react';
+import { type KeyboardEvent, lazy, Suspense } from 'react';
 
 // 存储已加载的组件
 const loadedComponents = new Map<string, React.ComponentType<any>>();
@@ -173,9 +173,24 @@ function LazyComponentWrapper({
 export function getComponent(t: TFunction, item: BaseFormList, form: FormInstance) {
   const { component, componentProps, name } = item;
 
+  const handlePressEnter = (e: KeyboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const onPressEnter = (componentProps as InputProps)?.onPressEnter;
+
+    if (onPressEnter) {
+      onPressEnter?.(e);
+    } else {
+      form.submit();
+    }
+  };
+
   // 输入框渲染
   const renderInput = (
-    <Input {...(initCompProps(t, 'Input') as InputProps)} {...(componentProps as InputProps)} />
+    <Input
+      {...(initCompProps(t, 'Input') as InputProps)}
+      {...(componentProps as InputProps)}
+      onPressEnter={handlePressEnter}
+    />
   );
 
   // 当组件类型为自定义时
@@ -215,9 +230,11 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
   if (!Comp) return renderInput;
 
   return (
-    <>
-      <Comp {...initCompProps(t, component as ComponentType)} {...componentProps} />
-    </>
+    <Comp
+      {...initCompProps(t, component as ComponentType)}
+      {...componentProps}
+      onPressEnter={handlePressEnter}
+    />
   );
 }
 
