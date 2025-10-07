@@ -5,6 +5,7 @@ import { CreateBusiness } from '@/components/Business';
 import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
 import { type KeyboardEvent, lazy, Suspense } from 'react';
+import { cloneDeep } from 'lodash';
 
 // 存储已加载的组件
 const loadedComponents = new Map<string, React.ComponentType<any>>();
@@ -127,7 +128,7 @@ function LazyComponentWrapper({
   const LazyComponent = lazyComponents.get(componentType as ComponentType);
 
   if (!LazyComponent) {
-    return fallback;
+    return <Spin>{fallback}</Spin>;
   }
 
   // 使用getFieldValue获取表单字段的当前值，否则在懒加载中会获取不到值
@@ -143,7 +144,7 @@ function LazyComponentWrapper({
     }
 
     if (form && name) {
-      form.setFieldValue(name, actualValue);
+      form?.setFieldValue?.(name, actualValue);
     }
     // 如果有onChange回调，也调用它
     if (componentProps?.onChange) {
@@ -164,6 +165,27 @@ function LazyComponentWrapper({
     </Suspense>
   );
 }
+
+/**
+ * 处理输入框组件多余参数
+ * @param componentProps - 组件参数
+ */
+const handleInputProps = (componentProps?: ComponentProps) => {
+  interface CurrentInputProps {
+    children: unknown;
+    api: unknown;
+    apiResultKey: unknown;
+    fieldNames: unknown;
+  }
+
+  const newComponentProps = cloneDeep(componentProps) as unknown as CurrentInputProps;
+  delete newComponentProps?.children;
+  delete newComponentProps?.api;
+  delete newComponentProps?.apiResultKey;
+  delete newComponentProps?.fieldNames;
+
+  return (newComponentProps || {}) as unknown as InputProps;
+};
 
 /**
  * 获取组件
@@ -188,7 +210,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
   const renderInput = (
     <Input
       {...(initCompProps(t, 'Input') as InputProps)}
-      {...(componentProps as InputProps)}
+      {...handleInputProps(componentProps)}
       onPressEnter={handlePressEnter}
     />
   );
@@ -216,7 +238,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
         componentType={component}
         t={t}
         componentProps={componentProps}
-        fallback={<Spin>{renderInput}</Spin>}
+        fallback={<LoadingComponent />}
         form={form}
         name={name}
       />

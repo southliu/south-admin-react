@@ -81,4 +81,5 @@ export default {
   menuSearchPlaceholder: 'Please enter the menu name',
   noMoreData: 'No more data',
   noLoginVisit: 'Cannot access without login',
+  loading: 'Loading',
 };

@@ -78,4 +78,5 @@ export default {
   menuSearchPlaceholder: '请输入菜单名称',
   noMoreData: '没有更多数据',
   noLoginVisit: '未登录无法访问',
+  loading: '加载中',
 };

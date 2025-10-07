@@ -74,18 +74,8 @@ class ErrorBoundary extends Component<Props, State> {
       // 获取用户信息
       const userInfo = useUserStore.getState().userInfo;
 
-      // 获取客户端IP
-      let ip = 'unknown';
-      try {
-        const ipResponse = await axios.get('https://httpbin.org/ip');
-        ip = ipResponse.data.origin || 'unknown';
-      } catch (e) {
-        console.error('获取IP失败:', e);
-      }
-
       // 准备日志数据
       const logData = {
-        ip,
         userInfo,
         error: error.toString(),
         errorInfo: JSON.stringify(errorInfo),
