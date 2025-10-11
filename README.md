@@ -63,6 +63,13 @@ pnpm build
 ## 后端项目
 python: [south-admin-django](https://github.com/southliu/south-admin-django)
 
+## 快速编码
+使用vscode的代码片段，在`.vscode/south.code-snippets`文件中预设了`demoPage`、`demoModel`、`demoApi`等常用代码片段，后续对代码片段不满意可以修改对应的body代码。
+1. 打开vscode，在`src/pages`目录下创建你所需的文件夹，以log为例，创建一个`log`文件夹。
+2. 在`log`文件夹下创建`model.ts`文件，在该文件下输入`demoModel`后回车，会出现对应的代码片段。
+3. 在`src/servers`文件夹下面创建一个`log.ts`文件，在该文件下输入`demoApi`后回车，将XXX改为Log，将xxx改为接口路由。
+4. 在`log`文件夹下创建`index.ts`文件，在该文件下输入`demoPage`后回车，将XXX改为Log，将xxx改为对应权限表示。
+
 ## TODO
 - [x] 分页下拉框，触底加载下一页
 - [x] 列筛选添加拖拽功能
