@@ -82,4 +82,5 @@ export default {
   noMoreData: 'No more data',
   noLoginVisit: 'Cannot access without login',
   loading: 'Loading',
+  uploadFile: 'Upload File',
 };

@@ -67,7 +67,6 @@
     "@typescript-eslint/parser": "^8.42.0",
     "@unocss/preset-attributify": "66.5.0",
     "@unocss/preset-icons": "66.5.0",
-    "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react-swc": "^4.0.1",
     "cross-env": "^10.0.0",
     "eslint": "^9.35.0",

@@ -79,4 +79,5 @@ export default {
   noMoreData: '没有更多数据',
   noLoginVisit: '未登录无法访问',
   loading: '加载中',
+  uploadFile: '上传文件',
 };

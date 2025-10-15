@@ -64,7 +64,7 @@ lazyComponents.set(
 );
 lazyComponents.set(
   'Upload',
-  lazy(() => import('antd').then((module) => ({ default: module.Upload }))),
+  lazy(() => import('@/components/Upload/BaseUpload')),
 );
 lazyComponents.set(
   'Transfer',
