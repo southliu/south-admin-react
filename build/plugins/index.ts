@@ -6,6 +6,7 @@ import { versionUpdatePlugin } from './version';
 import react from '@vitejs/plugin-react-swc';
 import unocss from 'unocss/vite';
 import viteCompression from 'vite-plugin-compression';
+import { nojekyllPlugin } from './nojekyll';
 
 export function createVitePlugins() {
   // 插件参数
@@ -25,6 +26,8 @@ export function createVitePlugins() {
     timePlugin(),
     // 压缩包
     viteCompression(),
+    // 生成 .nojekyll 空文件
+    nojekyllPlugin(),
   ];
 
   return vitePlugins;
