@@ -21,8 +21,7 @@ const EllipsisText = (props: EllipsisTextProps) => {
       // 检查文本是否溢出
       setIsOverflowed(element.scrollWidth > element.clientWidth);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, width]);
+  }, [text, width, textRef.current]);
 
   useEffect(() => {
     calculateOverflow();
