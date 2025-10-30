@@ -145,7 +145,7 @@ function Page() {
       {contextHolder}
       <div className="!h-[calc(100vh-98px)] ">
         <BaseCard>
-          <div className="mb-50px">
+          <div className="mt-20px mb-50px">
             <Spin spinning={isLoading}>
               <BaseForm
                 form={form}
