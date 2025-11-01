@@ -20,7 +20,7 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
     {
       title: 'ID',
       dataIndex: 'id',
-      width: 400,
+      width: 200,
     },
     {
       title: t('public.title'),
