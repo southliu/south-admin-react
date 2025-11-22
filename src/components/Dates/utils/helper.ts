@@ -28,10 +28,16 @@ export function dayjs2String(value: Dayjs | string, format = DATE_FORMAT): strin
  * 字符串类型转dayjs类型
  * @param value - 字符串
  */
-export function string2Dayjs(value: Dayjs | string): Dayjs {
+export function string2Dayjs(value: Dayjs | string | number): Dayjs {
   if (dayjs.isDayjs(value)) {
     return value;
   }
+
+  // 如果是时间戳
+  if (typeof value === 'number' && isFinite(value)) {
+    return dayjs.unix(value);
+  }
+
   return dayjs(value);
 }
 
@@ -53,22 +59,42 @@ export function dayjsRang2StringRang(value: RangeValue<Dayjs>, format = DATE_FOR
  * @param value - 字符串
  */
 export function stringRang2DayjsRang(
-  value: RangeValueType<string> | RangeValueType<Dayjs>,
+  value: RangeValueType<string | number> | RangeValueType<Dayjs>,
 ): RangeValue<Dayjs> | undefined {
   if (!value) return undefined;
 
   // 当第一个数据都不为Dayjs
   if (value?.length > 1 && !dayjs.isDayjs(value?.[0]) && dayjs.isDayjs(value?.[1])) {
+    // 判断是否是时间戳
+    if (typeof value[0] === 'number' && isFinite(value[0])) {
+      return [dayjs.unix(value[0]), value[1]];
+    }
+
     return [dayjs(value[0]), value[1]];
   }
 
   // 当最后一个数据都不为Dayjs
   if (value?.length > 1 && dayjs.isDayjs(value?.[0]) && !dayjs.isDayjs(value?.[1])) {
+    // 判断是否是时间戳
+    if (typeof value[1] === 'number' && isFinite(value[1])) {
+      return [value[0], dayjs.unix(value[1])];
+    }
+
     return [value[0], dayjs(value[1])];
   }
 
   // 当两个数据都不为Dayjs
   if (value?.length > 1 && !dayjs.isDayjs(value?.[0]) && !dayjs.isDayjs(value?.[1])) {
+    // 判断是否是时间戳
+    if (
+      typeof value[0] === 'number' &&
+      isFinite(value[0]) &&
+      typeof value[1] === 'number' &&
+      isFinite(value[1])
+    ) {
+      return [dayjs.unix(value[0]), dayjs.unix(value[1])];
+    }
+
     return [dayjs(value[0]), dayjs(value[1])];
   }
   return value as RangeValue<Dayjs>;
