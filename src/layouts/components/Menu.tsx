@@ -24,10 +24,9 @@ function LayoutMenu() {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
   const [menus, setMenus] = useState<SideMenu[]>([]);
-
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
-  const { toggleCollapsed } = useMenuStore((state) => state);
+  const { toggleCollapsed, setSelectedKeys } = useMenuStore((state) => state);
   const [currentOpenKeys, setCurrentOpenKeys] = useState(openKeys || []);
   const [currentSelectedKeys, setCurrentSelectedKeys] = useState(
     selectedKeys ? [selectedKeys] : [],
@@ -55,6 +54,7 @@ function LayoutMenu() {
     const newOpenKey = getOpenMenuByRouter(pathname);
     setCurrentOpenKeys(newOpenKey);
     setCurrentSelectedKeys([pathname]);
+    setSelectedKeys(pathname);
 
     // 过滤没权限菜单
     if (permissions.length > 0) {
@@ -63,6 +63,13 @@ function LayoutMenu() {
       setMenus(newMenus || []);
     }
   }, [pathname, permissions, menuList, filterMenuIcon, i18n.language]);
+
+  // 菜单选中值更新而变化
+  useEffect(() => {
+    if (selectedKeys) {
+      setCurrentSelectedKeys([selectedKeys]);
+    }
+  }, [selectedKeys]);
 
   /**
    * 处理跳转
@@ -88,6 +95,7 @@ function LayoutMenu() {
     }
 
     setCurrentSelectedKeys([e.key]);
+    setSelectedKeys(e.key);
     goPath(e.key);
   };
 
