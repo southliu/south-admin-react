@@ -105,6 +105,7 @@ function Layout() {
           className={`
             border-bottom
             transition-all
+            z-15
             ${styles.header}
             ${isCollapsed ? styles['header-close-menu'] : ''}
             ${isMaximize ? styles['header-none'] : ''}
