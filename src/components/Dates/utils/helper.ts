@@ -108,7 +108,17 @@ export function stringRang2DayjsRang(
 function getListKeyParam(list: BaseFormList[], key: string): string {
   for (let i = 0; i < list.length; i++) {
     if (list[i].name === key) {
-      return ((list[i].componentProps as DatePickerProps)?.format as string) || DATE_FORMAT;
+      let format = DATE_FORMAT; // 默认日期选择器格式
+      // 时间选择器则为HH:mm:ss
+      if (['TimePicker', 'TimeRangePicker'].includes(list[i].component)) {
+        format = TIME_PICKER_FORMAT;
+      }
+      // 有格式化数据则用格式化数据
+      if ((list[i].componentProps as DatePickerProps)?.format) {
+        format = (list[i].componentProps as DatePickerProps)?.format as string;
+      }
+
+      return format;
     }
   }
 

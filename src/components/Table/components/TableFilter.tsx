@@ -162,7 +162,7 @@ function TableFilter(props: Props) {
       trigger="click"
       placement="bottom"
       styles={{
-        body: {
+        container: {
           padding: '8px 0 5px',
         },
       }}

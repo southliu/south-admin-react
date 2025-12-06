@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import type { FormItemProps } from 'antd';
 import type { ComponentProps, ComponentType, BaseFormList } from '#/form';
 import { cloneDeep } from 'lodash';
-import { DATE_FORMAT, TIME_FORMAT } from '@/utils/config';
+import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils/config';
 
 /**
  * 处理子节点的值的属性
@@ -82,14 +82,14 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
     case 'TimePicker':
       return {
         placeholder: t('public.inputPleaseSelect'),
-        format: TIME_FORMAT,
+        format: TIME_PICKER_FORMAT,
       };
 
     // 时间区间
     case 'TimeRangePicker':
       return {
         placeholder: [t('public.inputPleaseSelect'), t('public.inputPleaseSelect')],
-        format: [TIME_FORMAT, TIME_FORMAT],
+        format: [TIME_PICKER_FORMAT, TIME_PICKER_FORMAT],
       };
 
     default:
