@@ -1,7 +1,7 @@
 import { Form, type FormInstance, message, Spin } from 'antd';
 import { createList } from './model';
 import { getUrlParam } from '@/utils/helper';
-import { useActivate, useAliveController } from 'react-activation';
+import { useEffectOnActive, useKeepAliveRef } from 'keepalive-for-react';
 import { getArticleById, createArticle, updateArticle } from '@/servers/content/article';
 
 interface RecordType {
@@ -39,7 +39,7 @@ function Page() {
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [messageApi, contextHolder] = message.useMessage();
   const { permissions } = useCommonStore();
-  const { dropScope } = useAliveController();
+  const aliveRef = useKeepAliveRef();
   const closeTabGoNext = useTabsStore((state) => state.closeTabGoNext);
   const setRefreshPage = usePublicStore((state) => state.setRefreshPage);
   useSingleTab({
@@ -66,7 +66,7 @@ function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useActivate(() => {
+  useEffectOnActive(() => {
     const { href } = window.location;
     const newId = href.split('?')[1]?.split('=')[1];
 
@@ -79,7 +79,7 @@ function Page() {
       }
       currentId.current = newId || '';
     }
-  });
+  }, []);
 
   /** 处理新增 */
   const handleCreate = () => {
@@ -118,7 +118,7 @@ function Page() {
     closeTabGoNext({
       key: pathname,
       nextPath: fatherPath,
-      dropScope,
+      dropScope: aliveRef.current?.destroy,
     });
   };
 

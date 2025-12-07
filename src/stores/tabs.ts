@@ -1,6 +1,6 @@
 import type { TabPaneProps } from 'antd';
 import type { NavData } from '@/menus/utils/helper';
-import type { AliveController } from 'react-activation';
+import type { KeepAliveRef } from 'keepalive-for-react';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
@@ -17,7 +17,7 @@ export interface TabsData extends Omit<TabPaneProps, 'tab'> {
 interface TabsGoNext {
   key: string;
   nextPath: string;
-  dropScope: AliveController['dropScope'];
+  dropScope: KeepAliveRef['destroy'] | undefined;
 }
 
 interface TabsState {
@@ -34,11 +34,11 @@ interface TabsState {
   addTabs: (payload: TabsData) => void;
   setTabs: (key: string, searchParams?: string) => void;
   sortTabs: (payload: TabsData[]) => void;
-  closeTabs: (payload: string, dropScope: AliveController['dropScope']) => void;
+  closeTabs: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
   closeTabGoNext: (payload: TabsGoNext) => void;
-  closeLeft: (payload: string, dropScope: AliveController['dropScope']) => void;
-  closeRight: (payload: string, dropScope: AliveController['dropScope']) => void;
-  closeOther: (payload: string, dropScope: AliveController['dropScope']) => void;
+  closeLeft: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
+  closeRight: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
+  closeOther: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
   closeAllTab: () => void;
 }
 
@@ -105,7 +105,7 @@ export const useTabsStore = create<TabsState>()(
             if (tabs.length) tabs[0].closable = tabs.length > 1;
 
             // 清除当前标签的keepalive缓存
-            dropScope(payload);
+            dropScope?.(payload);
 
             return { tabs };
           }),
@@ -123,7 +123,7 @@ export const useTabsStore = create<TabsState>()(
             if (tabs.length) tabs[0].closable = tabs.length > 1;
 
             // 清除非当前的keepalive缓存
-            dropScope(key);
+            dropScope?.(key);
 
             return { tabs };
           }),
@@ -145,7 +145,7 @@ export const useTabsStore = create<TabsState>()(
             for (let i = 0; i < tabs?.length; i++) {
               const item = tabs[i];
               if (item.key !== payload) {
-                dropScope(item.key);
+                dropScope?.(item.key);
               }
             }
 
@@ -159,7 +159,7 @@ export const useTabsStore = create<TabsState>()(
             for (let i = 0; i < tabs?.length; i++) {
               const item = tabs[i];
               if (item.key !== payload) {
-                dropScope(item.key);
+                dropScope?.(item.key);
               }
             }
 
@@ -190,7 +190,7 @@ export const useTabsStore = create<TabsState>()(
                 filteredTabs.push(item);
               } else {
                 // 清除非当前的keepalive缓存
-                dropScope(item.key);
+                dropScope?.(item.key);
               }
             }
 

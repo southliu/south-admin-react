@@ -7,7 +7,7 @@ import {
   VerticalAlignTopOutlined,
   VerticalAlignMiddleOutlined,
 } from '@ant-design/icons';
-import { useAliveController } from 'react-activation';
+import { useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useTabsStore } from '@/stores';
 
@@ -29,9 +29,9 @@ export function useDropdownMenu(props: Props) {
   const { t } = useTranslation();
   const { activeKey, onOpenChange, handleRefresh } = props;
   const { pathname } = useLocation();
-  const { dropScope } = useAliveController();
   const { tabs } = useCommonStore();
   const { closeLeft, closeOther, closeRight, closeTabs } = useTabsStore((state) => state);
+  const aliveRef = useKeepAliveRef();
 
   // 菜单项
   const items: (key?: string) => MenuProps['items'] = (key = activeKey) => {
@@ -83,22 +83,22 @@ export function useDropdownMenu(props: Props) {
 
       // 关闭当前
       case ITabEnums.CLOSE_CURRENT:
-        closeTabs(key, dropScope);
+        closeTabs(key, aliveRef.current?.destroy);
         break;
 
       // 关闭其他
       case ITabEnums.CLOSE_OTHER:
-        closeOther(key, dropScope);
+        closeOther(key, aliveRef.current?.destroy);
         break;
 
       // 关闭左侧
       case ITabEnums.CLOSE_LEFT:
-        closeLeft(key, dropScope);
+        closeLeft(key, aliveRef.current?.destroy);
         break;
 
       // 关闭右侧
       case ITabEnums.CLOSE_RIGHT:
-        closeRight(key, dropScope);
+        closeRight(key, aliveRef.current?.destroy);
         break;
 
       default:

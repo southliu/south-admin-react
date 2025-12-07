@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getMenuByKey } from '@/menus/utils/helper';
 import { message, Tabs, Dropdown } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAliveController } from 'react-activation';
+import { useKeepAliveRef } from 'keepalive-for-react';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -27,8 +27,8 @@ import TabOptions from './TabOptions';
 function LayoutTabs() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const aliveRef = useKeepAliveRef();
   const { pathname } = useLocation();
-  const { refresh, dropScope } = useAliveController();
   const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } });
   const [messageApi, contextHolder] = message.useMessage();
   const [isChangeLang, setChangeLang] = useState(false); // 是否切换语言
@@ -197,7 +197,7 @@ function LayoutTabs() {
    * @param targetKey - 目标key值
    */
   const remove = (targetKey: string) => {
-    closeTabs(targetKey, dropScope);
+    closeTabs(targetKey, aliveRef.current?.destroy);
   };
 
   /**
@@ -223,7 +223,7 @@ function LayoutTabs() {
       // 定时器没有执行时运行
       if (!timer.current) {
         setRefresh(true);
-        refresh(key);
+        aliveRef.current?.refresh(key);
 
         timer.current = setTimeout(() => {
           messageApi.success({

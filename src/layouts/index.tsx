@@ -1,5 +1,5 @@
 import { useToken } from '@/hooks/useToken';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useOutlet } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { Icon } from '@iconify/react';
@@ -9,8 +9,8 @@ import { versionCheck } from './utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { useMenuStore, useUserStore } from '@/stores';
 import { getUserRefreshPermissions } from '@/servers/system/user';
+import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import KeepAlive from 'react-activation';
 import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
@@ -24,12 +24,18 @@ function Layout() {
   const { pathname } = useLocation();
   const token = getToken();
   const outlet = useOutlet();
+  const aliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
   const { setPermissions, setUserInfo } = useUserStore((state) => state);
   const { setMenuList, toggleCollapsed, togglePhone } = useMenuStore((state) => state);
 
   const { permissions, userId, isMaximize, isCollapsed, isPhone, isRefresh } = useCommonStore();
+
+  /** Keepalive当前路由缓存 */
+  const currentCacheKey = useMemo(() => {
+    return pathname;
+  }, [pathname]);
 
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
@@ -143,10 +149,9 @@ function Layout() {
               <Icon className="text-40px animate-spin" icon="ri:loader-2-fill" />
             </div>
           )}
-          {permissions.length > 0 && (
-            <ErrorBoundary key={pathname}>
-              {/* 限制最多缓存10个页面，避免过多页面导致卡顿 */}
-              <KeepAlive id={pathname} name={pathname} max={10} strategy="LRU">
+          <KeepAlive transition aliveRef={aliveRef} activeCacheKey={currentCacheKey} max={18}>
+            {permissions.length > 0 && (
+              <ErrorBoundary key={pathname}>
                 <div
                   className={`
                   content-transition
@@ -162,9 +167,9 @@ function Layout() {
                     {outlet}
                   </Suspense>
                 </div>
-              </KeepAlive>
-            </ErrorBoundary>
-          )}
+              </ErrorBoundary>
+            )}
+          </KeepAlive>
         </div>
       </div>
     </div>
