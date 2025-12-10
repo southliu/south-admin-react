@@ -177,7 +177,7 @@ const BaseSearch = (props: Props) => {
 
   /** 渲染按钮列表 */
   const renderBtnList = (
-    <div className="flex items-center flex-wrap gap-10px">
+    <div className="flex flex-wrap gap-10px">
       {!!isSearch && (
         <Button
           type="primary"
@@ -204,7 +204,7 @@ const BaseSearch = (props: Props) => {
 
       {type === 'grid' && !!isShowExpand && (
         <div
-          className="text-12px cursor-pointer color-#1677ff hover:color-#69b1ff"
+          className="text-12px cursor-pointer color-#1677ff hover:color-#69b1ff mt-8px"
           onClick={() => {
             setExpand(!isExpand);
           }}

@@ -26,6 +26,7 @@ import type { RuleObject } from 'antd/lib/form';
 import type { ServerResult } from '@south/request';
 import type { BusinessComponents } from '@/components/Business';
 import type { EditorProps } from '@/components/WangEditor';
+import type { TextAreaProps } from 'antd/es/input';
 
 // 数据类型
 export type BaseFormData = Record<string, unknown>;
@@ -103,6 +104,7 @@ export type ApiFn = {
 export type ComponentProps =
   | InputProps
   | InputNumberProps
+  | TextAreaProps
   | SelectProps
   | TreeSelectProps
   | CheckboxProps
@@ -123,6 +125,7 @@ export type ComponentProps =
 // 组件参数
 export type RenderComponentProps = InputProps &
   InputNumberProps &
+  TextAreaProps &
   SelectProps &
   TreeSelectProps &
   CheckboxProps &
