@@ -14,7 +14,6 @@ import '@/assets/css/theme-color.less';
 import './locales/config';
 
 // antd
-import '@ant-design/v5-patch-for-react-19';
 import '@/assets/css/antd.less';
 
 // 时间设为中文
