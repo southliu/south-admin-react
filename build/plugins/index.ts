@@ -16,6 +16,20 @@ export function createVitePlugins() {
     unocss(),
     // 自动导入
     autoImportPlugin(),
+    // 压缩包
+    viteCompression(),
+    // 兼容低版本
+    legacy({
+      targets: [ 
+          'Android > 39', 
+          'Chrome >= 60', 
+          'Safari >= 10.1', 
+          'iOS >= 10.3', 
+          'Firefox >= 54', 
+          'Edge >= 15', 
+        ], 
+        additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+    }),
   ];
 
   if (process.env.NODE_ENV === 'production') {
@@ -23,9 +37,7 @@ export function createVitePlugins() {
       // 版本控制
       versionUpdatePlugin(),
       // 生成 .nojekyll 空文件
-      nojekyllPlugin(),// 兼容低版本
-      // 压缩包
-      viteCompression(),
+      nojekyllPlugin(),
       // 包分析
       visualizer({
         gzipSize: true,
@@ -33,18 +45,6 @@ export function createVitePlugins() {
       }),
       // 打包时间
       timePlugin(),
-      // 兼容低版本
-      legacy({
-        targets: [ 
-            'Android > 39', 
-            'Chrome >= 60', 
-            'Safari >= 10.1', 
-            'iOS >= 10.3', 
-            'Firefox >= 54', 
-            'Edge >= 15', 
-          ], 
-          additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-      }),
     )
   }
 
