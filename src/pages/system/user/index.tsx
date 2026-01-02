@@ -25,7 +25,6 @@ const initCreate = {
 function Page() {
   const { t } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
-  const [handleSetSearchParams] = useSearchUrlParams();
   const columns = tableColumns(t, optionRender);
   const [messageApi, contextHolder] = message.useMessage();
   const [isFetch, setFetch] = useState(false);
@@ -40,11 +39,12 @@ function Page() {
   const [pageSize, setPageSize] = useState(INIT_PAGINATION.pageSize);
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
-
   const [promiseId, setPromiseId] = useState('');
   const [isPromiseOpen, setPromiseOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [form] = Form.useForm();
+  const [searchForm] = Form.useForm(); 
+  const [handleSetSearchParams] = useSearchUrlParams(searchForm);
 
   const { permissions } = useCommonStore();
 
@@ -268,6 +268,7 @@ function Page() {
       <BaseCard>
         <BaseSearch
           list={searchList(t)}
+          searchForm={searchForm}
           data={searchData}
           type="grid"
           isLoading={isLoading}

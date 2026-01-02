@@ -24,6 +24,7 @@ interface Props extends FormProps {
   className?: string;
   type?: 'default' | 'grid';
   ref?: Ref<FormInstance>;
+  searchForm?: FormInstance;
   children?: ReactNode;
   labelCol?: Partial<ColProps>;
   wrapperCol?: Partial<ColProps>;
@@ -39,6 +40,7 @@ const BaseSearch = (props: Props) => {
     list,
     data,
     initialValues,
+    searchForm,
     isLoading,
     isSearch = true,
     isReset = true,
@@ -55,9 +57,13 @@ const BaseSearch = (props: Props) => {
   } = props;
   const { t } = useTranslation();
   const { isPhone } = useCommonStore();
-  const [form] = Form.useForm();
+  let [form] = Form.useForm();
   const [isExpand, setExpand] = useState(false);
   const [isFirst, setFirst] = useState(true);
+
+  if (searchForm) {
+    form = searchForm;
+  }
 
   // 是否展示展开按钮
   const isShowExpand = useMemo(() => {
