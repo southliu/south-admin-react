@@ -8,7 +8,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import DraggableTabNode, { type DraggableTabPaneProps } from './DraggableTabNode';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo, useRef, startTransition } from 'react';
 import { getMenuByKey } from '@/menus/utils/helper';
 import { message, Tabs, Dropdown } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -83,15 +83,37 @@ function LayoutTabs() {
     [permissions, menuList],
   );
 
+  // 只在权限和菜单列表变化时添加标签
   useEffect(() => {
-    handleAddTab();
+    if (permissions.length > 0 && menuList.length > 0) {
+      handleAddTab();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [permissions, menuList]);
 
+  // 监听 pathname 变化，添加标签（使用 startTransition 标记为非紧急更新）
+  useEffect(() => {
+    if (permissions.length > 0 && menuList.length > 0 && pathname) {
+      startTransition(() => {
+        handleAddTab(pathname);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+  
+  /**
+   * 设置浏览器标签
+   * @param list - 菜单列表
+   * @param path - 路径
+   */
+  const handleSetTitle = useCallback(() => {
+    const title = getTabTitle(tabs, pathname);
+    if (title) setTitle(t, title);
+  }, [pathname]);
+
   useEffect(() => {
     switchTabsLang(currentLanguage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLanguage]);
+  }, [currentLanguage, switchTabsLang]);
 
   useEffect(() => {
     if (isChangeLang) {
@@ -133,45 +155,40 @@ function LayoutTabs() {
 
   /** 跳转页面 */
   const handleNavigateTo = (key: string) => {
-    const urlParams = getUrlParamsByRouterKey(key);
-    navigate(`${key}${urlParams}`);
+    startTransition(() => {
+      const urlParams = getUrlParamsByRouterKey(key);
+      navigate(`${key}${urlParams}`);
+    });
   };
 
   useEffect(() => {
-    // 当选中贴标签不等于当前路由则跳转
+    // 当选中标签不等于当前路由则跳转（使用 startTransition 标记为非紧急更新）
     if (activeKey !== pathname) {
-      const key = isCloseTabsLock ? activeKey : pathname;
-      handleSetTitle();
+      startTransition(() => {
+        const key = isCloseTabsLock ? activeKey : pathname;
+        handleSetTitle();
 
-      // 如果是关闭标签则直接跳转
-      if (isCloseTabsLock) {
-        toggleCloseTabsLock(false);
-        handleUpdateBreadcrumb(key);
-        handleNavigateTo(key);
-      } else {
-        handleAddTab(key);
-      }
+        // 如果是关闭标签则直接跳转
+        if (isCloseTabsLock) {
+          toggleCloseTabsLock(false);
+          handleUpdateBreadcrumb(key);
+          handleNavigateTo(key);
+        } else {
+          handleAddTab(key);
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey, pathname]);
-
-  /**
-   * 设置浏览器标签
-   * @param list - 菜单列表
-   * @param path - 路径
-   */
-  const handleSetTitle = useCallback(() => {
-    const title = getTabTitle(tabs, pathname);
-    if (title) setTitle(t, title);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
 
   /**
    * 处理更改
    * @param key - 唯一值
    */
   const onChange = (key: string) => {
-    handleNavigateTo(key);
+    startTransition(() => {
+      handleNavigateTo(key);
+    });
   };
 
   /**
@@ -361,4 +378,4 @@ function LayoutTabs() {
   );
 }
 
-export default LayoutTabs;
+export default memo(LayoutTabs);

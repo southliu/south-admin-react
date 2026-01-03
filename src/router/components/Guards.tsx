@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { message } from '@south/message';
 import { getLocalInfo } from '@south/utils';
 import { TOKEN } from '@/utils/config';
@@ -57,9 +58,8 @@ function Guards() {
   const [redirected, setRedirected] = useState(false);
 
   useEffect(() => {
-    nprogress.start();
-
     if (shouldRedirect) {
+      nprogress.start();
       // 执行重定向
       navigate(redirectPath, { replace: true });
       setRedirected(true);
@@ -71,16 +71,25 @@ function Guards() {
           key: 'noLoginVisit',
         });
       }
-      nprogress.done();
-      return;
+      // 延迟关闭进度条，确保路由切换完成
+      const timer = setTimeout(() => {
+        nprogress.done();
+      }, 100);
+      return () => {
+        clearTimeout(timer);
+        nprogress.done();
+      };
+    } else {
+      // 正常路由切换，延迟关闭进度条以避免闪烁
+      const timer = setTimeout(() => {
+        nprogress.done();
+      }, 50);
+      return () => {
+        clearTimeout(timer);
+        nprogress.done();
+      };
     }
-
-    nprogress.done();
-
-    return () => {
-      nprogress.start();
-    };
-  }, [shouldRedirect, redirectPath, navigate]);
+  }, [shouldRedirect, redirectPath, navigate, location.pathname, t]);
 
   // 重定向时不渲染任何内容
   if (shouldRedirect || redirected) {
@@ -91,23 +100,24 @@ function Guards() {
     );
   }
 
-  /** 渲染页面 */
-  const renderPage = () => {
-    // 访问登录页且有token，但useEffect还没执行跳转时
-    if (location.pathname === '/login' && token) {
-      return <div>{outlet}</div>;
-    }
-
-    // 有权限访问其他页面，渲染布局
+  // 使用 useMemo 缓存 Layout 组件，只在 token 和 isValid 变化时重新渲染
+  const layoutElement = useMemo(() => {
     if (isValid && token) {
       return <Layout />;
     }
+    return null;
+  }, [token, isValid]);
 
-    // 无权限或跳转情况，渲染登录页
+  // 渲染页面内容
+  if (location.pathname === '/login' && token) {
     return <div>{outlet}</div>;
-  };
+  }
 
-  return <>{renderPage()}</>;
+  if (layoutElement) {
+    return layoutElement;
+  }
+
+  return <div>{outlet}</div>;
 }
 
 export default Guards;

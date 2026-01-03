@@ -4,24 +4,9 @@ import { getUrlParam } from '@/utils/helper';
 import { useEffectOnActive, useKeepAliveRef } from 'keepalive-for-react';
 import { getArticleById, createArticle, updateArticle } from '@/servers/content/article';
 
-interface RecordType {
-  key: string;
-  title: string;
-  description: string;
-}
-
-const mockData: RecordType[] = Array.from({ length: 20 }).map((_, i) => ({
-  key: i.toString(),
-  title: `content${i + 1}`,
-  description: `description of content${i + 1}`,
-}));
-
-const initialTargetKeys = mockData.filter((item) => Number(item.key) > 10).map((item) => item.key);
-
 // 初始化新增数据
 const initCreate = {
   content: '<h4>初始化内容</h4>',
-  transfer: initialTargetKeys,
 };
 
 // 父路径

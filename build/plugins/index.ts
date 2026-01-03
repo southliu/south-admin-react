@@ -10,17 +10,28 @@ import legacy from '@vitejs/plugin-legacy';
 import viteCompression from 'vite-plugin-compression';
 
 export function createVitePlugins() {
+  const isDev = process.env.NODE_ENV === 'development';
+  
   // 插件参数
   const vitePlugins: PluginOption[] = [
-    react(),
+    // React SWC 插件，配置以支持 React 19
+    react({
+      // 确保使用正确的 JSX 运行时
+      tsDecorators: false,
+    }),
     unocss(),
     // 自动导入
     autoImportPlugin(),
-    // 压缩包
-    viteCompression(),
-    // 兼容低版本
-    legacy({
-      targets: [ 
+  ];
+
+  // 生产环境才启用这些插件
+  if (!isDev) {
+    vitePlugins.push(
+      // 压缩包
+      viteCompression(),
+      // 兼容低版本
+      legacy({
+        targets: [ 
           'Android > 39', 
           'Chrome >= 60', 
           'Safari >= 10.1', 
@@ -29,11 +40,7 @@ export function createVitePlugins() {
           'Edge >= 15', 
         ], 
         additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-    }),
-  ];
-
-  if (process.env.NODE_ENV === 'production') {
-    vitePlugins.push(
+      }),
       // 版本控制
       versionUpdatePlugin(),
       // 生成 .nojekyll 空文件
@@ -45,7 +52,7 @@ export function createVitePlugins() {
       }),
       // 打包时间
       timePlugin(),
-    )
+    );
   }
 
   return vitePlugins;

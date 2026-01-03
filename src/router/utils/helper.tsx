@@ -1,8 +1,6 @@
 import type { RouteObject } from 'react-router-dom';
-import type { DefaultComponent } from '@loadable/component';
-import { Skeleton } from 'antd';
+import { lazy } from 'react';
 import { ROUTER_EXCLUDE } from './config';
-import loadable from '@loadable/component';
 
 /**
  * 路由添加layout
@@ -26,9 +24,7 @@ export function layoutRoutes(routes: RouteObject[]): RouteObject[] {
  * 处理路由
  * @param routes - 路由数据
  */
-export function handleRoutes(
-  routes: Record<string, () => Promise<DefaultComponent<unknown>>>,
-): RouteObject[] {
+export function handleRoutes(routes: Record<string, () => Promise<any>>): RouteObject[] {
   const layouts: RouteObject[] = []; // layout内部组件
 
   for (const key in routes) {
@@ -39,13 +35,19 @@ export function handleRoutes(
     const path = getRouterPage(key);
     if (path === '/login') continue;
 
-    const ComponentNode = loadable(routes[key], {
-      fallback: <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />,
+    // 使用 React.lazy 包装动态导入的组件
+    const LazyComponent = lazy(async () => {
+      const module = await routes[key]();
+      // 处理不同的模块导出格式
+      const Component = module?.default || module;
+      return {
+        default: Component,
+      };
     });
 
     layouts.push({
       path,
-      element: <ComponentNode />,
+      element: <LazyComponent />,
     });
   }
 

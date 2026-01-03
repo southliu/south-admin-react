@@ -1,7 +1,7 @@
 import type { MenuProps } from 'antd';
 import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo, startTransition } from 'react';
 import { Menu } from 'antd';
 import { isUrl } from '@/utils/is';
 import { Icon } from '@iconify/react';
@@ -23,7 +23,6 @@ function LayoutMenu() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
-  const [menus, setMenus] = useState<SideMenu[]>([]);
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
   const { toggleCollapsed, setSelectedKeys } = useMenuStore((state) => state);
@@ -37,32 +36,38 @@ function LayoutMenu() {
    * @param menus - 菜单
    */
   const filterMenuIcon = useCallback((menus: SideMenu[]) => {
-    for (let i = 0; i < menus.length; i++) {
-      if (menus[i]?.icon) {
-        menus[i].icon = <Icon icon={menus[i].icon as string} />;
+    const newMenus = [...menus];
+    for (let i = 0; i < newMenus.length; i++) {
+      if (newMenus[i]?.icon) {
+        newMenus[i] = { ...newMenus[i], icon: <Icon icon={newMenus[i].icon as string} /> };
       }
 
-      if (menus[i]?.children?.length) {
-        filterMenuIcon(menus[i].children as SideMenu[]);
+      if (newMenus[i]?.children?.length) {
+        newMenus[i] = {
+          ...newMenus[i],
+          children: filterMenuIcon(newMenus[i].children as SideMenu[]),
+        };
       }
     }
+    return newMenus;
   }, []);
 
-  // 处理默认展开和过滤没权限菜单
-  useEffect(() => {
-    // 处理默认展开
-    const newOpenKey = getOpenMenuByRouter(pathname);
-    setCurrentOpenKeys(newOpenKey);
-    setCurrentSelectedKeys([pathname]);
-    setSelectedKeys(pathname);
+  // 使用 useMemo 缓存过滤后的菜单，只在 menuList 或 permissions 变化时重新计算
+  const filteredMenus = useMemo(() => {
+    if (permissions.length === 0 || menuList.length === 0) return [];
+    const newMenus = filterMenus(menuList, permissions);
+    return filterMenuIcon(newMenus);
+  }, [menuList, permissions, filterMenuIcon, i18n.language]);
 
-    // 过滤没权限菜单
-    if (permissions.length > 0) {
-      const newMenus = filterMenus(menuList, permissions);
-      filterMenuIcon(newMenus);
-      setMenus(newMenus || []);
-    }
-  }, [pathname, permissions, menuList, filterMenuIcon, i18n.language]);
+  // 只在 pathname 变化时更新选中状态和展开状态（使用 startTransition 标记为非紧急更新）
+  useEffect(() => {
+    startTransition(() => {
+      const newOpenKey = getOpenMenuByRouter(pathname);
+      setCurrentOpenKeys(newOpenKey);
+      setCurrentSelectedKeys([pathname]);
+      setSelectedKeys(pathname);
+    });
+  }, [pathname, setSelectedKeys]);
 
   // 菜单选中值更新而变化
   useEffect(() => {
@@ -76,7 +81,9 @@ function LayoutMenu() {
    * @param path - 路径
    */
   const goPath = (path: string) => {
-    navigate(path);
+    startTransition(() => {
+      navigate(path);
+    });
   };
 
   /**
@@ -94,9 +101,11 @@ function LayoutMenu() {
       return;
     }
 
-    setCurrentSelectedKeys([e.key]);
-    setSelectedKeys(e.key);
-    goPath(e.key);
+    startTransition(() => {
+      setCurrentSelectedKeys([e.key]);
+      setSelectedKeys(e.key);
+      navigate(e.key);
+    });
   };
 
   /**
@@ -146,7 +155,7 @@ function LayoutMenu() {
 
   /** 点击logo */
   const onClickLogo = () => {
-    const firstMenu = getFirstMenu(menus, permissions);
+    const firstMenu = getFirstMenu(filteredMenus, permissions);
     goPath(firstMenu);
     if (isPhone) hiddenMenu();
   };
@@ -207,7 +216,7 @@ function LayoutMenu() {
             theme="dark"
             forceSubMenuRender
             inlineCollapsed={isPhone ? false : isCollapsed}
-            items={handleFilterMenus(menus) as ItemType<MenuItemType>[]}
+            items={handleFilterMenus(filteredMenus) as ItemType<MenuItemType>[]}
             onClick={onClickMenu}
             onOpenChange={onOpenChange}
           />
@@ -230,8 +239,8 @@ function LayoutMenu() {
       </>
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentOpenKeys, currentSelectedKeys, isCollapsed, isMaximize, isPhone, menus],
+    [currentOpenKeys, currentSelectedKeys, isCollapsed, isMaximize, isPhone, filteredMenus],
   );
 }
 
-export default LayoutMenu;
+export default memo(LayoutMenu);

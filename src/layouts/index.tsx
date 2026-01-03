@@ -1,10 +1,11 @@
 import { useToken } from '@/hooks/useToken';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState, memo } from 'react';
 import { useOutlet } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { Icon } from '@iconify/react';
 import { debounce } from 'lodash';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { versionCheck } from './utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { useMenuStore, useUserStore } from '@/stores';
@@ -32,10 +33,13 @@ function Layout() {
 
   const { permissions, userId, isMaximize, isCollapsed, isPhone, isRefresh } = useCommonStore();
 
+  // 使用 useDeferredValue 延迟非关键的路由更新，提升响应性
+  const deferredPathname = useDeferredValue(pathname);
+
   /** Keepalive当前路由缓存 */
   const currentCacheKey = useMemo(() => {
-    return pathname;
-  }, [pathname]);
+    return deferredPathname;
+  }, [deferredPathname]);
 
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
@@ -101,37 +105,44 @@ function Layout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 使用 useMemo 缓存 className，避免每次渲染都重新计算
+  const headerClassName = useMemo(
+    () =>
+      `
+        border-bottom
+        transition-all
+        z-15
+        ${styles.header}
+        ${isCollapsed ? styles['header-close-menu'] : ''}
+        ${isMaximize ? styles['header-none'] : ''}
+        ${isPhone ? `!left-0 z-999` : ''}
+      `,
+    [isCollapsed, isMaximize, isPhone],
+  );
+
+  const contentClassName = useMemo(
+    () =>
+      `
+        overflow-auto
+        transition-all
+        ${styles.con}
+        ${isMaximize ? styles['con-maximize'] : ''}
+        ${isCollapsed ? styles['con-close-menu'] : ''}
+        ${isPhone ? `!left-0 !w-full` : ''}
+      `,
+    [isMaximize, isCollapsed, isPhone],
+  );
+
   return (
     <div id="layout">
       {contextHolder}
       <Menu />
       <div className={styles.layout_right}>
-        <div
-          id="header"
-          className={`
-            border-bottom
-            transition-all
-            z-15
-            ${styles.header}
-            ${isCollapsed ? styles['header-close-menu'] : ''}
-            ${isMaximize ? styles['header-none'] : ''}
-            ${isPhone ? `!left-0 z-999` : ''}
-          `}
-        >
+        <div id="header" className={headerClassName}>
           <Header />
           <Tabs />
         </div>
-        <div
-          id="layout-content"
-          className={`
-            overflow-auto
-            transition-all
-            ${styles.con}
-            ${isMaximize ? styles['con-maximize'] : ''}
-            ${isCollapsed ? styles['con-close-menu'] : ''}
-            ${isPhone ? `!left-0 !w-full` : ''}
-          `}
-        >
+        <div id="layout-content" className={contentClassName}>
           {isLoading && permissions.length === 0 && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
@@ -149,24 +160,18 @@ function Layout() {
               <Icon className="text-40px animate-spin" icon="ri:loader-2-fill" />
             </div>
           )}
-          <KeepAlive transition aliveRef={aliveRef} activeCacheKey={currentCacheKey} max={18}>
+          <KeepAlive aliveRef={aliveRef} activeCacheKey={currentCacheKey} max={18}>
             {permissions.length > 0 && (
-              <ErrorBoundary key={pathname}>
-                <div
-                  className={`
-                  content-transition
-                `}
+              <ErrorBoundary>
+                <Suspense
+                  fallback={
+                    <div className="p-30px">
+                      <Skeleton active paragraph={{ rows: 10 }} />
+                    </div>
+                  }
                 >
-                  <Suspense
-                    fallback={
-                      <div className="p-30px">
-                        <Skeleton active paragraph={{ rows: 10 }} />
-                      </div>
-                    }
-                  >
-                    {outlet}
-                  </Suspense>
-                </div>
+                  {outlet}
+                </Suspense>
               </ErrorBoundary>
             )}
           </KeepAlive>
@@ -176,4 +181,4 @@ function Layout() {
   );
 }
 
-export default Layout;
+export default memo(Layout);

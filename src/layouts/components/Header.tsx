@@ -1,6 +1,6 @@
 import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, memo } from 'react';
 import { App, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks/useCommonStore';
@@ -149,4 +149,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default memo(Header);
