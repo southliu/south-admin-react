@@ -1,4 +1,5 @@
 import type { TabsProps } from 'antd';
+import type { KeepAliveRef } from 'keepalive-for-react';
 import {
   type DragEndEvent,
   closestCenter,
@@ -8,13 +9,22 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import DraggableTabNode, { type DraggableTabPaneProps } from './DraggableTabNode';
-import { useCallback, useEffect, useMemo, useState, memo, useRef, startTransition } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  memo,
+  useRef,
+  startTransition,
+  type RefObject,
+} from 'react';
 import { getMenuByKey } from '@/menus/utils/helper';
 import { message, Tabs, Dropdown } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useKeepAliveRef } from 'keepalive-for-react';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
 import { useCommonStore } from '@/hooks/useCommonStore';
+import { useTabsStore, usePublicStore } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
 import { useTranslation } from 'react-i18next';
 import { getTabTitle } from '../utils/helper';
@@ -24,11 +34,14 @@ import TabRefresh from './TabRefresh';
 import TabMaximize from './TabMaximize';
 import TabOptions from './TabOptions';
 
-function LayoutTabs() {
+interface LayoutTabsProps {
+  aliveRef: RefObject<KeepAliveRef | null>;
+}
+
+function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const aliveRef = useKeepAliveRef();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } });
   const [messageApi, contextHolder] = message.useMessage();
   const [isChangeLang, setChangeLang] = useState(false); // 是否切换语言
@@ -100,7 +113,7 @@ function LayoutTabs() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-  
+
   /**
    * 设置浏览器标签
    * @param list - 菜单列表

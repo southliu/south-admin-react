@@ -7,9 +7,9 @@ import {
   VerticalAlignTopOutlined,
   VerticalAlignMiddleOutlined,
 } from '@ant-design/icons';
-import { useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useTabsStore } from '@/stores';
+import { useShallow } from 'zustand/shallow';
 
 enum ITabEnums {
   REFRESH = 'refresh', // 重新加载
@@ -31,7 +31,7 @@ export function useDropdownMenu(props: Props) {
   const { pathname } = useLocation();
   const { tabs } = useCommonStore();
   const { closeLeft, closeOther, closeRight, closeTabs } = useTabsStore((state) => state);
-  const aliveRef = useKeepAliveRef();
+  const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
 
   // 菜单项
   const items: (key?: string) => MenuProps['items'] = (key = activeKey) => {

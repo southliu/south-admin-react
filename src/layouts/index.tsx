@@ -1,9 +1,10 @@
 import { useToken } from '@/hooks/useToken';
-import { Suspense, useCallback, useEffect, useMemo, useState, memo } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import { useOutlet } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { Icon } from '@iconify/react';
 import { debounce } from 'lodash';
+import { useShallow } from 'zustand/shallow';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { versionCheck } from './utils/helper';
@@ -25,11 +26,13 @@ function Layout() {
   const { pathname } = useLocation();
   const token = getToken();
   const outlet = useOutlet();
-  const aliveRef = useKeepAliveRef();
+  const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
+  const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const { setPermissions, setUserInfo } = useUserStore((state) => state);
   const { setMenuList, toggleCollapsed, togglePhone } = useMenuStore((state) => state);
+  const setAliveRef = usePublicStore((state) => state.setAliveRef);
 
   const { permissions, userId, isMaximize, isCollapsed, isPhone, isRefresh } = useCommonStore();
 
@@ -40,6 +43,10 @@ function Layout() {
   const currentCacheKey = useMemo(() => {
     return deferredPathname;
   }, [deferredPathname]);
+
+  useEffect(() => {
+    if (keepaliveRef.current && !aliveRef.current) setAliveRef(keepaliveRef);
+  }, [keepaliveRef]);
 
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
@@ -140,7 +147,7 @@ function Layout() {
       <div className={styles.layout_right}>
         <div id="header" className={headerClassName}>
           <Header />
-          <Tabs />
+          <Tabs aliveRef={keepaliveRef} />
         </div>
         <div id="layout-content" className={contentClassName}>
           {isLoading && permissions.length === 0 && (
@@ -160,7 +167,7 @@ function Layout() {
               <Icon className="text-40px animate-spin" icon="ri:loader-2-fill" />
             </div>
           )}
-          <KeepAlive aliveRef={aliveRef} activeCacheKey={currentCacheKey} max={18}>
+          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={18}>
             {permissions.length > 0 && (
               <ErrorBoundary>
                 <Suspense

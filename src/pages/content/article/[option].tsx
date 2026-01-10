@@ -1,7 +1,8 @@
 import { Form, type FormInstance, message, Spin } from 'antd';
 import { createList } from './model';
+import { useShallow } from 'zustand/shallow';
 import { getUrlParam } from '@/utils/helper';
-import { useEffectOnActive, useKeepAliveRef } from 'keepalive-for-react';
+import { useEffectOnActive } from 'keepalive-for-react';
 import { getArticleById, createArticle, updateArticle } from '@/servers/content/article';
 
 // 初始化新增数据
@@ -24,7 +25,7 @@ function Page() {
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [messageApi, contextHolder] = message.useMessage();
   const { permissions } = useCommonStore();
-  const aliveRef = useKeepAliveRef();
+  const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const closeTabGoNext = useTabsStore((state) => state.closeTabGoNext);
   const setRefreshPage = usePublicStore((state) => state.setRefreshPage);
   useSingleTab({
