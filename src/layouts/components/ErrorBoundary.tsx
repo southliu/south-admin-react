@@ -2,8 +2,7 @@ import { Component, ErrorInfo, ReactNode } from 'react';
 import { Button, Result, Tooltip } from 'antd';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/stores/user';
-import axios from 'axios';
-import dayjs from 'dayjs';
+import { createLog } from '@/servers/log/log';
 
 interface Props {
   children: ReactNode;
@@ -74,17 +73,25 @@ class ErrorBoundary extends Component<Props, State> {
       // 获取用户信息
       const userInfo = useUserStore.getState().userInfo;
 
-      // 准备日志数据
+      // 准备日志数据（根据后端 Log 实体字段）
       const logData = {
-        userInfo,
+        username: userInfo?.username || 'anonymous',
+        ip: '',
+        method: '',
+        url: window.location.href,
+        params: JSON.stringify({
+          componentStack: errorInfo.componentStack,
+          content: JSON.stringify(errorInfo),
+        }),
+        userAgent: navigator.userAgent,
+        status: '500',
         error: error.toString(),
-        errorInfo: JSON.stringify(errorInfo),
-        createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        type: 'frontError',
+        latency: 0,
+        type: 3, // 0=error, 1=success, 3=frontend
       };
 
       // 发送错误日志到服务器
-      await axios.post('/log/create', logData);
+      await createLog(logData);
     } catch (e) {
       console.error('发送错误日志失败:', e);
     }

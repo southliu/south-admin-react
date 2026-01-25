@@ -1,5 +1,6 @@
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import { type FormInstance, Button, Form, message } from 'antd';
+import { useEffectOnActive } from 'keepalive-for-react';
 import { createList, searchList, tableColumns } from './model';
 import {
   batchDeleteUser,
@@ -43,7 +44,7 @@ function Page() {
   const [isPromiseOpen, setPromiseOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [form] = Form.useForm();
-  const [searchForm] = Form.useForm(); 
+  const [searchForm] = Form.useForm();
   const [handleSetSearchParams] = useSearchUrlParams(searchForm);
 
   const { permissions } = useCommonStore();
@@ -53,7 +54,7 @@ function Page() {
 
   // 权限
   const pagePermission: PagePermission = {
-    page: checkPermission(`${permissionPrefix}/index`, permissions),
+    page: checkPermission(permissionPrefix, permissions),
     create: checkPermission(`${permissionPrefix}/create`, permissions),
     update: checkPermission(`${permissionPrefix}/update`, permissions),
     delete: checkPermission(`${permissionPrefix}/delete`, permissions),
@@ -81,6 +82,17 @@ function Page() {
     if (isFetch) getPage();
   }, [getPage, isFetch]);
 
+  // 首次进入自动加载接口数据
+  useEffect(() => {
+    if (pagePermission.page) getPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagePermission.page]);
+
+  // 每次进入调用
+  useEffectOnActive(() => {
+    getPage();
+  }, []);
+
   /**
    * 点击搜索
    * @param values - 表单返回数据
@@ -91,12 +103,6 @@ function Page() {
     handleSetSearchParams(values);
     setFetch(true);
   };
-
-  // 首次进入自动加载接口数据
-  useEffect(() => {
-    if (pagePermission.page) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagePermission.page]);
 
   /** 开启权限 */
   const openPermission = async (id: string) => {

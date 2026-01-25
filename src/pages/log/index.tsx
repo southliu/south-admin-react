@@ -1,18 +1,20 @@
+import type { BaseFormData } from '#/form';
+import type { Key, TableRowSelection } from 'antd/es/table/interface';
+import type { PagePermission } from '#/public';
 import { useEffectOnActive } from 'keepalive-for-react';
-import { searchList, tableColumns } from './model';
 import { message } from 'antd';
-import { getArticlePage, deleteArticle } from '@/servers/content/article';
+import { searchList, tableColumns } from './model';
+import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/log/log';
 
 // 当前行数据
 interface RowData {
   id: string;
-  title: string;
+  name: string;
 }
 
 function Page() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { permissions } = useCommonStore();
+  const columns = tableColumns(t, optionRender);
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -20,12 +22,12 @@ function Page() {
   const [pageSize, setPageSize] = useState(INIT_PAGINATION.pageSize);
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const setRefreshPage = usePublicStore((state) => state.setRefreshPage);
-  const isRefreshPage = usePublicStore((state) => state.isRefreshPage);
+  const { permissions } = useCommonStore();
 
   // 权限前缀
-  const permissionPrefix = '/content/article';
+  const permissionPrefix = '/log';
 
   // 权限
   const pagePermission: PagePermission = {
@@ -41,13 +43,12 @@ function Page() {
 
     try {
       setLoading(true);
-      const { code, data } = await getArticlePage(params);
-
-      if (Number(code) === 200) {
-        const { items, total } = data;
-        setTotal(total);
-        setTableData(items);
-      }
+      const res = await getLogPage(params);
+      const { code, data } = res;
+      if (Number(code) !== 200) return;
+      const { items, total } = data;
+      setTotal(total || 0);
+      setTableData(items || []);
     } finally {
       setFetch(false);
       setLoading(false);
@@ -56,11 +57,12 @@ function Page() {
 
   useEffect(() => {
     if (isFetch) getPage();
-  }, [getPage, isFetch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFetch]);
 
   // 首次进入自动加载接口数据
-  useEffectOnActive(() => {
-    if (pagePermission.page && !isRefreshPage) getPage();
+  useEffect(() => {
+    if (pagePermission.page) getPage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagePermission.page]);
 
@@ -79,28 +81,6 @@ function Page() {
     setFetch(true);
   };
 
-  // 如果是新增或编辑成功重新加载页面
-  useEffect(() => {
-    if (isRefreshPage) {
-      setRefreshPage(false);
-      getPage();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRefreshPage]);
-
-  /** 点击新增 */
-  const onCreate = () => {
-    navigate('/content/article/create');
-  };
-
-  /**
-   * 点击编辑
-   * @param id - 唯一值
-   */
-  const onUpdate = (id: string) => {
-    navigate(`/content/article/update?id=${id}`);
-  };
-
   /**
    * 点击删除
    * @param id - 唯一值
@@ -108,7 +88,7 @@ function Page() {
   const onDelete = async (id: string) => {
     try {
       setLoading(true);
-      const { code, message } = await deleteArticle(id);
+      const { code, message } = await deleteLog(id);
       if (Number(code) === 200) {
         messageApi.success(message || t('public.successfullyDeleted'));
         getPage();
@@ -118,34 +98,79 @@ function Page() {
     }
   };
 
+  /** 处理批量删除 */
+  const handleBatchDelete = async () => {
+    try {
+      if (!selectedRowKeys.length) {
+        return messageApi.warning({
+          content: t('public.tableSelectWarning'),
+          key: 'pleaseSelect',
+        });
+      }
+      setLoading(true);
+      const params = { ids: selectedRowKeys };
+      const { code, message } = await batchDeleteLog(params);
+      if (Number(code) === 200) {
+        messageApi.success(message || t('public.successfullyDeleted'));
+        setSelectedRowKeys([]);
+        getPage();
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 监听表格多选变化
+   * @param newSelectedRowKeys - 勾选值
+   */
+  const onSelectChange = (newSelectedRowKeys: Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  /** 表格多选  */
+  const rowSelection: TableRowSelection<object> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   /**
    * 处理分页
    * @param page - 当前页数
    * @param pageSize - 每页条数
    */
-  const onChangePagination = (page: number, pageSize: number) => {
+  const onChangePagination = useCallback((page: number, pageSize: number) => {
     setPage(page);
     setPageSize(pageSize);
     setFetch(true);
-  };
+  }, []);
 
   /**
    * 渲染操作
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender: TableOptions<object> = (_, record) => (
-    <div className="flex flex-wrap gap-5px">
-      {pagePermission.update === true && (
-        <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
-      )}
-      {pagePermission.delete === true && (
-        <DeleteBtn
-          name={(record as RowData).title}
-          handleDelete={() => onDelete((record as RowData).id)}
-        />
-      )}
-    </div>
+  function optionRender(_: unknown, record: object) {
+    return (
+      <div className="flex flex-wrap gap-5px">
+        {pagePermission.delete === true && (
+          <DeleteBtn
+            name={(record as RowData).name}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  /** 左侧渲染 */
+  const leftContentRender = (
+    <DeleteBtn
+      isIcon
+      isLoading={isLoading}
+      btnType="batchDelete"
+      handleDelete={handleBatchDelete}
+    />
   );
 
   return (
@@ -164,10 +189,11 @@ function Page() {
         <BaseTable
           isLoading={isLoading}
           isCreate={pagePermission.create}
-          columns={tableColumns(t, optionRender)}
+          columns={columns}
           dataSource={tableData}
+          rowSelection={rowSelection}
+          leftContent={leftContentRender}
           getPage={getPage}
-          onCreate={onCreate}
         />
 
         <BasePagination
