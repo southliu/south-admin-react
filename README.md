@@ -60,11 +60,11 @@ pnpm dev
 pnpm build
 ```
 
-## 后端项目
-nest: [south-admin-nest](https://github.com/southliu/south-admin-nest)<br/>
-python: [south-admin-django](https://github.com/southliu/south-admin-django)
+## 🌐 后端项目
+![Nest](https://img.shields.io/badge/-Nest-black?style=plastic&logo=node.js) [south-admin-nest](https://github.com/southliu/south-admin-nest)<br/>
+![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-django](https://github.com/southliu/south-admin-django)
 
-## 快速编码
+## ✈️ 快速编码
 使用vscode的代码片段，在`.vscode/south.code-snippets`文件中预设了`demoPage`、`demoModel`、`demoApi`等常用代码片段，后续对代码片段不满意可以修改对应的body代码。
 1. 打开vscode，在`src/pages`目录下创建你所需的文件夹，以log为例，创建一个`log`文件夹。
 2. 在`log`文件夹下创建`model.ts`文件，在该文件下输入`demoModel`后回车，会出现对应的代码片段。
@@ -187,6 +187,9 @@ const menuList = defaultMenus;
 
 #### 5. 安装新依赖时报错？
 使用了monorepo项目安装新依赖时需要在后面添加`-w`或`--workspace`，否则会报错，比如：`pnpm i mobx -w`。
+
+#### 6. 无法执行build？
+首先检查是否存在`types/autoImports.d.ts`，如果不存在执行`pnpm dev`，之后再执行`pnpm build`。
 
 ## 🧡 捐赠
 如果您觉得这个项目对您有帮助，您可以帮作者买一杯咖啡表示支持!
