@@ -62,7 +62,7 @@ function MenuAuthorize(props: Props) {
       const { key } = item;
       const childrenKeys = getChildKeys(item);
 
-      let newKeys = [...checkedKeys];
+      const newKeys = [...checkedKeys];
 
       if (checked) {
         // 添加选中项
@@ -113,9 +113,8 @@ function MenuAuthorize(props: Props) {
     setExpandedKeys((prev) => {
       if (prev.includes(key)) {
         return prev.filter((k) => k !== key);
-      } else {
-        return [...prev, key];
       }
+      return [...prev, key];
     });
   }, []);
 
@@ -189,7 +188,7 @@ function MenuAuthorize(props: Props) {
             item?.children?.length && !isEmptyChildrenKeys ? !isAllCheckedChildrenKeys : undefined;
           const hasChildren = item.children && item.children.length > 0;
           let marginLeft = step * 20;
-          let isAuthorizeBtn = item.type === 3;
+          const isAuthorizeBtn = item.type === 3;
 
           // 如果有子节点，判断子数据是否为空
           if (hasChildren) {

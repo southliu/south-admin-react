@@ -61,7 +61,7 @@ function Page() {
   // 首次进入自动加载接口数据
   useEffectOnActive(() => {
     if (pagePermission.page && !isRefreshPage) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [pagePermission.page]);
 
   // 每次进入调用
