@@ -107,17 +107,77 @@ src/servers/{modulePath}.ts # API 接口（demoApi 模板）
 
 ### 5. 文件生成要求
 
-**重要**：执行完代码生成后，必须使用 Write 工具将生成的代码写入实际文件，而不仅仅是输出代码块。
+**重要**：使用 Python 脚本生成代码，而不是手动输出代码块。
 
-生成文件时：
-1. 使用 Write 工具创建/覆盖文件
-2. 如果目录不存在，使用 Bash 工具先创建目录
-3. 按照输出顺序依次生成所有文件
-4. **运行 prettier 格式化所有生成的文件**：
+#### 5.1 使用 Python 脚本生成
+
+1. 准备配置 JSON，包含所有收集的信息
+2. 调用 Python 脚本生成文件：
    ```bash
-   npx prettier --write src/servers/{modulePath}.ts src/pages/{modulePath}/index.tsx src/pages/{modulePath}/model.ts src/locales/zh/{moduleName}.ts src/locales/en/{moduleName}.ts
+   python3 .claude/skills/demo-create/scripts/generate.py '<config_json>'
    ```
-5. 生成完成后告知用户文件已创建的路径
+   或使用包装脚本：
+   ```bash
+   bash .claude/skills/demo-create/scripts/run.sh '<config_json>'
+   ```
+
+3. 脚本会自动：
+   - 创建必要的目录
+   - 生成所有文件内容
+   - 写入文件到正确位置
+   - 运行 prettier 格式化
+   - 输出生成进度
+
+#### 5.2 配置 JSON 格式
+
+```json
+{
+  "module_name": "Product",
+  "api_path": "/product",
+  "permission_prefix": "/product",
+  "page_mode": "modal",
+  "enable_i18n": true,
+  "project_root": "/Users/south/Desktop/case/react-admin",
+  "fields": [
+    {
+      "dataIndex": "name",
+      "label_zh": "产品名称",
+      "label_en": "Product Name",
+      "component": "Input",
+      "search": true,
+      "table": true,
+      "form": true,
+      "required": true,
+      "width": 200
+    }
+  ]
+}
+```
+
+**配置说明**：
+- `module_name`: 模块名称（PascalCase，如 Product）
+- `api_path`: API 路径前缀（如 /product）
+- `permission_prefix`: 权限前缀（如 /product）
+- `page_mode`: 页面模式（"modal" 或 "page"）
+- `enable_i18n`: 是否开启国际化（true 或 false）
+- `project_root`: 项目根路径（可选，默认为当前目录）
+- `fields`: 字段配置数组
+
+**字段配置说明**：
+- `dataIndex`: 字段名
+- `label_zh`: 字段中文标签（由 AI 根据字段名智能生成）
+- `label_en`: 字段英文标签（由 AI 根据字段名智能生成）
+- `component`: 组件类型（Input/InputNumber/Select/DatePicker/RangePicker/TextArea/Switch/Upload）
+- `search`: 是否作为搜索项
+- `table`: 是否作为表格列
+- `form`: 是否作为表单字段
+- `required`: 是否必填
+- `width`: 表格列宽度（默认200）
+
+**重要**：AI 应根据字段的业务含义智能生成合适的中英文标签，而不是使用固定的映射表。例如：
+- `name` → "产品名称" / "Product Name"（在产品模块中）
+- `name` → "分类名称" / "Category Name"（在分类模块中）
+- `title` → "文章标题" / "Article Title"（在文章模块中）
 
 ### 6. 注意事项
 
@@ -143,19 +203,10 @@ export default {
 };
 ```
 
-**字段翻译映射**：
-- `name` → `产品名称`
-- `code` → `产品编码`
-- `price` → `价格`
-- `stock` → `库存`
-- `category` → `分类`
-- `brand` → `品牌`
-- `status` → `状态`
-- `description` → `描述`
-- `images` → `图片`
-- `title` → `标题`
-- `content` → `内容`
-- `remark` → `备注`
+**注意**：翻译内容由 AI 根据字段名和业务模块智能生成，例如：
+- 产品模块的 `name` → "产品名称"
+- 分类模块的 `name` → "分类名称"
+- 文章模块的 `title` → "文章标题"
 
 #### 7.2 英文国际化文件
 **文件路径**：`src/locales/en/{moduleName}.ts`
@@ -169,21 +220,10 @@ export default {
 };
 ```
 
-**字段翻译映射**：
-- `name` → `Name`
-- `code` → `Code`
-- `price` → `Price`
-- `stock` → `Stock`
-- `category` → `Category`
-- `brand` → `Brand`
-- `status` → `Status`
-- `description` → `Description`
-- `images` → `Images`
-- `title` → `Title`
-- `content` → `Content`
-- `remark` → `Remark`
-
-**注意**：如果字段不在映射表中，保持原字段名作为翻译。
+**注意**：翻译内容由 AI 根据字段名和业务模块智能生成，例如：
+- 产品模块的 `name` → "Product Name"
+- 分类模块的 `name` → "Category Name"
+- 文章模块的 `title` → "Article Title"
 
 ### 8. 输出顺序
 
