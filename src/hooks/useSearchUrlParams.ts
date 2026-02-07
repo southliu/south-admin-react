@@ -1,26 +1,28 @@
 /**
  * 将搜索参数带入url中
  */
-import { type FormInstance } from "antd";
-import { getUrlAllParam } from "@/utils/helper";
+import { type FormInstance } from 'antd';
+import { getUrlAllParam } from '@/utils/helper';
 
 export const useSearchUrlParams = (form: FormInstance) => {
   const [, setSearchParams] = useSearchParams();
   const { pathname, search } = useLocation();
   const { setTabs } = useTabsStore((state) => state);
 
-  useEffect(() => {
-    handleSetSearchForm();
-  }, []);
-
   /** url参数带入搜索表单中 */
-  const handleSetSearchForm = () => {
+  const handleSetSearchForm = useCallback(() => {
     const urlParams = getUrlAllParam(search);
     form?.setFieldsValue({
       ...form?.getFieldsValue(),
-      ...urlParams
-    })
-  }
+      ...urlParams,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    handleSetSearchForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** 将搜索参数带入url中 */
   const handleSetSearchParams = (searchParams: BaseFormData) => {
