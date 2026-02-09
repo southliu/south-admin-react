@@ -21,6 +21,16 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 
+// 性能监控
+import { initPerformanceMonitoring } from '@/utils/performance';
+import { initSentry } from '@/utils/sentry';
+
+// 初始化性能监控
+initPerformanceMonitoring();
+
+// 初始化 Sentry (需要在 .env 中配置 VITE_SENTRY_DSN)
+initSentry();
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
     <Router />

@@ -32,6 +32,10 @@ export default defineConfig(({ mode }) => {
       port: VITE_SERVER_PORT,
       // 跨域处理
       proxy: createProxy(VITE_PROXY),
+      // 减少文件监听开销
+      watch: {
+        ignored: ['**/node_modules/**', '**/.git/**'],
+      },
     },
     build: buildOptions(),
   };

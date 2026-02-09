@@ -1,0 +1,65 @@
+{
+  "module_name": "Product",
+  "api_path": "/product",
+  "permission_prefix": "/product",
+  "page_mode": "modal",
+  "enable_i18n": true,
+  "project_root": "/Users/south/Desktop/case/react-admin",
+  "fields": [
+    {
+      "dataIndex": "name",
+      "label_zh": "产品名称",
+      "label_en": "Product Name",
+      "component": "Input",
+      "search": true,
+      "table": true,
+      "form": true,
+      "required": true,
+      "width": 200
+    },
+    {
+      "dataIndex": "code",
+      "label_zh": "产品编码",
+      "label_en": "Product Code",
+      "component": "Input",
+      "search": true,
+      "table": true,
+      "form": true,
+      "required": true,
+      "width": 150
+    },
+    {
+      "dataIndex": "price",
+      "label_zh": "价格",
+      "label_en": "Price",
+      "component": "InputNumber",
+      "search": false,
+      "table": true,
+      "form": true,
+      "required": true,
+      "width": 120
+    },
+    {
+      "dataIndex": "stock",
+      "label_zh": "库存",
+      "label_en": "Stock",
+      "component": "InputNumber",
+      "search": false,
+      "table": true,
+      "form": true,
+      "required": true,
+      "width": 120
+    },
+    {
+      "dataIndex": "status",
+      "label_zh": "状态",
+      "label_en": "Status",
+      "component": "Switch",
+      "search": false,
+      "table": true,
+      "form": true,
+      "required": false,
+      "width": 100
+    }
+  ]
+}
