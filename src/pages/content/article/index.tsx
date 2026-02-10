@@ -1,6 +1,7 @@
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, tableColumns } from './model';
 import { message } from 'antd';
+import { useMemo, useCallback } from 'react';
 import { getArticlePage, deleteArticle } from '@/servers/content/article';
 
 // 当前行数据
@@ -58,16 +59,18 @@ function Page() {
     if (isFetch) getPage();
   }, [getPage, isFetch]);
 
-  // 首次进入自动加载接口数据
+  // 每次进入时加载数据
   useEffectOnActive(() => {
-    if (pagePermission.page && !isRefreshPage) getPage();
-     
-  }, [pagePermission.page]);
-
-  // 每次进入调用
-  useEffectOnActive(() => {
-    getPage();
-  }, []);
+    // 如果正在刷新页面，不需要重复加载
+    if (isRefreshPage) {
+      setRefreshPage(false);
+      return;
+    }
+    // 检查权限后加载数据
+    if (pagePermission.page) {
+      getPage();
+    }
+  }, [pagePermission.page, isRefreshPage, getPage]);
 
   /**
    * 点击搜索
@@ -134,19 +137,25 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender: TableOptions<object> = (_, record) => (
-    <div className="flex flex-wrap gap-5px">
-      {pagePermission.update === true && (
-        <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
-      )}
-      {pagePermission.delete === true && (
-        <DeleteBtn
-          name={(record as RowData).title}
-          handleDelete={() => onDelete((record as RowData).id)}
-        />
-      )}
-    </div>
+  const optionRender = useCallback(
+    (_: unknown, record: object) => (
+      <div className="flex flex-wrap gap-5px">
+        {pagePermission.update === true && (
+          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
+        )}
+        {pagePermission.delete === true && (
+          <DeleteBtn
+            name={(record as RowData).title}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
+        )}
+      </div>
+    ),
+    [pagePermission.update, pagePermission.delete, onUpdate, onDelete],
   );
+
+  // 缓存列配置
+  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
 
   return (
     <BaseContent isPermission={pagePermission.page}>
@@ -164,7 +173,7 @@ function Page() {
         <BaseTable
           isLoading={isLoading}
           isCreate={pagePermission.create}
-          columns={tableColumns(t, optionRender)}
+          columns={columns}
           dataSource={tableData}
           getPage={getPage}
           onCreate={onCreate}

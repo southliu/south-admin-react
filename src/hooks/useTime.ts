@@ -17,7 +17,7 @@ export const useTimes = () => {
         timer.current = null;
       }
     };
-  }, [time]);
+  }, []);
 
   return {
     time,

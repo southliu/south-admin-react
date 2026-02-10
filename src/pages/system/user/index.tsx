@@ -1,5 +1,6 @@
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import { type FormInstance, Button, Form, message } from 'antd';
+import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { createList, searchList, tableColumns } from './model';
 import {
@@ -26,7 +27,6 @@ const initCreate = {
 function Page() {
   const { t } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
-  const columns = tableColumns(t, optionRender);
   const [messageApi, contextHolder] = message.useMessage();
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -237,26 +237,40 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  function optionRender(_: unknown, record: object) {
-    return (
-      <div className="flex flex-wrap gap-5px">
-        {pagePermission.permission === true && (
-          <Button className="small-btn" onClick={() => openPermission((record as RowData).id)}>
-            {t('system.permissions')}
-          </Button>
-        )}
-        {pagePermission.update === true && (
-          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
-        )}
-        {pagePermission.delete === true && (
-          <DeleteBtn
-            name={(record as RowData).username}
-            handleDelete={() => onDelete((record as RowData).id)}
-          />
-        )}
-      </div>
-    );
-  }
+  const optionRender = useCallback(
+    (_: unknown, record: object) => {
+      return (
+        <div className="flex flex-wrap gap-5px">
+          {pagePermission.permission === true && (
+            <Button className="small-btn" onClick={() => openPermission((record as RowData).id)}>
+              {t('system.permissions')}
+            </Button>
+          )}
+          {pagePermission.update === true && (
+            <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
+          )}
+          {pagePermission.delete === true && (
+            <DeleteBtn
+              name={(record as RowData).username}
+              handleDelete={() => onDelete((record as RowData).id)}
+            />
+          )}
+        </div>
+      );
+    },
+    [
+      pagePermission.permission,
+      pagePermission.update,
+      pagePermission.delete,
+      t,
+      openPermission,
+      onUpdate,
+      onDelete,
+    ],
+  );
+
+  // 缓存列配置
+  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
 
   /** 左侧渲染 */
   const leftContentRender = (

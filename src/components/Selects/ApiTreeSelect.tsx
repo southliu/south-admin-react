@@ -2,7 +2,7 @@ import type { TreeSelectProps } from 'antd';
 import type { ApiTreeSelectProps } from './types';
 import { TreeSelect } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, memo } from 'react';
 import { MAX_TAG_COUNT } from './index';
 import Loading from './components/Loading';
 
@@ -39,7 +39,7 @@ function ApiTreeSelect(props: ApiTreeSelectProps) {
     } finally {
       setLoading(false);
     }
-  }, [props]);
+  }, [props.api, props.params, props.apiResultKey]);
 
   useEffect(() => {
     // 当有值且列表为空时，自动获取接口
@@ -75,4 +75,6 @@ function ApiTreeSelect(props: ApiTreeSelectProps) {
   );
 }
 
-export default ApiTreeSelect;
+export default memo(ApiTreeSelect, (prevProps, nextProps) => {
+  return prevProps.value === nextProps.value && prevProps.api === nextProps.api;
+});

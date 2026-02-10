@@ -52,6 +52,7 @@
     "@commitlint/config-conventional": "^20.2.0",
     "@iconify/react": "^6.0.2",
     "@remix-run/router": "^1.23.0",
+    "@sentry/react": "^10.38.0",
     "@south/stylelint": "workspace:^",
     "@types/loadable__component": "^5.13.10",
     "@types/lodash": "^4.17.21",
@@ -90,7 +91,8 @@
     "vite": "^7.3.0",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-purge-icons": "^0.10.0",
-    "vite-plugin-windicss": "^1.9.4"
+    "vite-plugin-windicss": "^1.9.4",
+    "web-vitals": "^5.1.0"
   },
   "husky": {
     "hooks": {

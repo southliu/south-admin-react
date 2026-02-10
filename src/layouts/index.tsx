@@ -1,5 +1,5 @@
 import { useToken } from '@/hooks/useToken';
-import { useCallback, useEffect, useMemo, useState, memo } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo, useDeferredValue, Suspense } from 'react';
 import { useOutlet } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { Icon } from '@iconify/react';
@@ -44,9 +44,12 @@ function Layout() {
     return deferredPathname;
   }, [deferredPathname]);
 
+  // 只在 ref 变化时更新 store，避免每次渲染都触发更新
   useEffect(() => {
-    if (keepaliveRef.current && !aliveRef.current) setAliveRef(keepaliveRef);
-  }, [keepaliveRef]);
+    if (keepaliveRef.current && !aliveRef.current) {
+      setAliveRef(keepaliveRef);
+    }
+  }, [keepaliveRef.current]); // 只依赖 ref.current
 
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
@@ -94,12 +97,15 @@ function Layout() {
   }, [pathname]);
 
   /** 判断是否是手机端 */
-  const handleIsPhone = debounce(() => {
-    const isPhone = window.innerWidth <= 768;
-    // 手机首次进来收缩菜单
-    if (isPhone) toggleCollapsed(true);
-    togglePhone(isPhone);
-  }, 500);
+  const handleIsPhone = useCallback(
+    debounce(() => {
+      const isPhone = window.innerWidth <= 768;
+      // 手机首次进来收缩菜单
+      if (isPhone) toggleCollapsed(true);
+      togglePhone(isPhone);
+    }, 500),
+    [toggleCollapsed, togglePhone],
+  );
 
   // 监听是否是手机端
   useEffect(() => {
@@ -108,9 +114,9 @@ function Layout() {
 
     return () => {
       window.removeEventListener('resize', handleIsPhone);
+      handleIsPhone.cancel(); // 清理 debounce 函数
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handleIsPhone]);
 
   // 使用 useMemo 缓存 className，避免每次渲染都重新计算
   const headerClassName = useMemo(
@@ -167,7 +173,7 @@ function Layout() {
               <Icon className="text-40px animate-spin" icon="ri:loader-2-fill" />
             </div>
           )}
-          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={18}>
+          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
             {permissions.length > 0 && (
               <ErrorBoundary>
                 <Suspense

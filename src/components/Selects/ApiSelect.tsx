@@ -2,7 +2,7 @@ import type { ApiSelectProps } from './types';
 import type { DefaultOptionType } from 'antd/es/select';
 import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { MAX_TAG_COUNT } from './index';
 import Loading from './components/Loading';
 
@@ -39,7 +39,7 @@ function ApiSelect(props: ApiSelectProps) {
     } finally {
       setLoading(false);
     }
-  }, [props]);
+  }, [props.api, props.params, props.apiResultKey]);
 
   useEffect(() => {
     // 当有值且列表为空时，自动获取接口
@@ -75,4 +75,6 @@ function ApiSelect(props: ApiSelectProps) {
   );
 }
 
-export default ApiSelect;
+export default memo(ApiSelect, (prevProps, nextProps) => {
+  return prevProps.value === nextProps.value && prevProps.api === nextProps.api;
+});

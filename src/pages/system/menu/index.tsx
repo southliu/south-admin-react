@@ -1,6 +1,7 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
 import { Button, Form, type FormInstance, message } from 'antd';
+import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';
 import {
@@ -28,7 +29,6 @@ const initCreate = {
 function Page() {
   const { t, i18n } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
-  const columns = tableColumns(t, optionRender);
   const [isFetch, setFetch] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -194,26 +194,47 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  function optionRender(_: unknown, record: object) {
-    return (
-      <div className="flex flex-wrap gap-5px">
-        {pagePermission.create === true && (record as RowData)?.type <= 2 && (
-          <Button className="small-btn" type="primary" onClick={() => onCreate(record as RowData)}>
-            {t('systems:menu.addChildMenu')}
-          </Button>
-        )}
-        {pagePermission.update === true && (
-          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
-        )}
-        {pagePermission.delete === true && (
-          <DeleteBtn
-            name={i18n.language === 'zh' ? (record as RowData).label : (record as RowData).labelEn}
-            handleDelete={() => onDelete((record as RowData).id)}
-          />
-        )}
-      </div>
-    );
-  }
+  const optionRender = useCallback(
+    (_: unknown, record: object) => {
+      return (
+        <div className="flex flex-wrap gap-5px">
+          {pagePermission.create === true && (record as RowData)?.type <= 2 && (
+            <Button
+              className="small-btn"
+              type="primary"
+              onClick={() => onCreate(record as RowData)}
+            >
+              {t('systems:menu.addChildMenu')}
+            </Button>
+          )}
+          {pagePermission.update === true && (
+            <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
+          )}
+          {pagePermission.delete === true && (
+            <DeleteBtn
+              name={
+                i18n.language === 'zh' ? (record as RowData).label : (record as RowData).labelEn
+              }
+              handleDelete={() => onDelete((record as RowData).id)}
+            />
+          )}
+        </div>
+      );
+    },
+    [
+      pagePermission.create,
+      pagePermission.update,
+      pagePermission.delete,
+      t,
+      i18n.language,
+      onCreate,
+      onUpdate,
+      onDelete,
+    ],
+  );
+
+  // 缓存列配置
+  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
 
   return (
     <BaseContent isPermission={pagePermission.page}>

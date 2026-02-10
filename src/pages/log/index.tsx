@@ -3,6 +3,7 @@ import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import type { PagePermission } from '#/public';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { message } from 'antd';
+import { useMemo, useCallback } from 'react';
 import { searchList, tableColumns } from './model';
 import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/log/log';
 
@@ -14,7 +15,6 @@ interface RowData {
 
 function Page() {
   const { t } = useTranslation();
-  const columns = tableColumns(t, optionRender);
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -150,18 +150,24 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  function optionRender(_: unknown, record: object) {
-    return (
-      <div className="flex flex-wrap gap-5px">
-        {pagePermission.delete === true && (
-          <DeleteBtn
-            name={(record as RowData).name}
-            handleDelete={() => onDelete((record as RowData).id)}
-          />
-        )}
-      </div>
-    );
-  }
+  const optionRender = useCallback(
+    (_: unknown, record: object) => {
+      return (
+        <div className="flex flex-wrap gap-5px">
+          {pagePermission.delete === true && (
+            <DeleteBtn
+              name={(record as RowData).name}
+              handleDelete={() => onDelete((record as RowData).id)}
+            />
+          )}
+        </div>
+      );
+    },
+    [pagePermission.delete, onDelete],
+  );
+
+  // 缓存列配置
+  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
 
   /** 左侧渲染 */
   const leftContentRender = (

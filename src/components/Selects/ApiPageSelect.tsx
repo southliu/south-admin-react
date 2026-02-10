@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import { Select, Spin } from 'antd';
 import { MAX_TAG_COUNT } from './index';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import Loading from './components/Loading';
 
 /**
@@ -98,8 +98,20 @@ function ApiPageSelect(props: ApiPageSelectProps) {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchValue]);
+  }, [
+    props.api,
+    props.params,
+    props.apiResultKey,
+    props.fieldNames,
+    currentPage,
+    searchValue,
+    pageKey,
+    pageSizeKey,
+    queryKey,
+    pageSize,
+    options,
+    t,
+  ]);
 
   useEffect(() => {
     // 当有值且列表为空时，自动获取接口
@@ -126,12 +138,12 @@ function ApiPageSelect(props: ApiPageSelectProps) {
       const threshold = 10; // 距离底部阈值
 
       // 触底判断
-      if (scrollTop + clientHeight >= scrollHeight - threshold && !isLoading && hasMore) {
-        setCurrentPage(currentPage + 1);
+      if (scrollTop + clientHeight >= scrollHeight - threshold && !isLoading && hasMore.current) {
+        setCurrentPage((prev) => prev + 1);
         setFetch(true);
       }
     },
-    [isLoading, hasMore, currentPage],
+    [isLoading],
   );
 
   /** 自定义下拉框内容 */
@@ -179,4 +191,6 @@ function ApiPageSelect(props: ApiPageSelectProps) {
   );
 }
 
-export default ApiPageSelect;
+export default memo(ApiPageSelect, (prevProps, nextProps) => {
+  return prevProps.value === nextProps.value && prevProps.api === nextProps.api;
+});

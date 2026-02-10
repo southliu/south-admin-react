@@ -34,8 +34,30 @@ export default defineConfig(({ mode }) => {
       proxy: createProxy(VITE_PROXY),
       // 减少文件监听开销
       watch: {
-        ignored: ['**/node_modules/**', '**/.git/**'],
+        ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**'],
+        usePolling: false,
       },
+      // HMR 优化，减少开发环境切换卡顿
+      hmr: {
+        overlay: true,
+      },
+    },
+    // 依赖预构建配置
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        'antd',
+        'zustand',
+        '@ant-design/icons',
+        'react-i18next',
+        'i18next',
+        'lodash',
+        'dayjs',
+        'keepalive-for-react',
+      ],
+      exclude: ['@south/request', '@south/utils'],
     },
     build: buildOptions(),
   };

@@ -2,7 +2,7 @@ import type { ResizeCallbackData } from 'react-resizable';
 import type { ColumnsType } from 'antd/es/table';
 import type { EnumShowType, TableColumn } from '#/public';
 import { type TableProps, Table, Button, message, Tag } from 'antd';
-import { useMemo, useState, useEffect, useRef, type ReactNode } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback, memo, type ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
 import { useTranslation } from 'react-i18next';
 import { EMPTY_VALUE } from '@/utils/config';
@@ -109,19 +109,22 @@ function BaseTable(props: Props) {
    * 处理拖拽
    * @param index - 下标
    */
-  const handleResize = (index: number) => {
-    return (_: React.SyntheticEvent<Element>, { size }: ResizeCallbackData) => {
-      const newColumns = [...columns];
-      newColumns[index] = {
-        ...newColumns[index],
-        width: size.width,
+  const handleResize = useCallback(
+    (index: number) => {
+      return (_: React.SyntheticEvent<Element>, { size }: ResizeCallbackData) => {
+        const newColumns = [...columns];
+        newColumns[index] = {
+          ...newColumns[index],
+          width: size.width,
+        };
+        setColumns(newColumns);
       };
-      setColumns(newColumns);
-    };
-  };
+    },
+    [columns],
+  );
 
   // 合并列表
-  const mergeColumns = () => {
+  const mergedColumns = useMemo(() => {
     const newColumns = handleFilterTable(columns, tableFilters, sortList);
     if (!newColumns) return [];
     const result = newColumns.map((col, index) => ({
@@ -207,7 +210,7 @@ function BaseTable(props: Props) {
     }));
 
     return result;
-  };
+  }, [columns, tableFilters, sortList, isPhone, size, handleFilterTable]);
 
   // 虚拟滚动操作值
   const virtualOptions = useVirtualTable({
@@ -321,11 +324,17 @@ function BaseTable(props: Props) {
           bordered={isBordered !== false}
           scroll={scroll}
           components={components}
-          columns={mergeColumns() as ColumnsType<object>}
+          columns={mergedColumns as ColumnsType<object>}
         />
       </div>
     </div>
   );
 }
 
-export default BaseTable;
+export default memo(BaseTable, (prevProps, nextProps) => {
+  return (
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.dataSource === nextProps.dataSource &&
+    prevProps.columns === nextProps.columns
+  );
+});
