@@ -119,10 +119,14 @@ function LayoutMenu() {
         return;
       }
 
-      // 直接更新状态和导航
+      // 立即更新菜单状态
       setCurrentSelectedKeys([key]);
       setSelectedKeys(key);
-      navigate(key);
+
+      // 使用 requestAnimationFrame 确保菜单状态先渲染，然后再跳转路由
+      requestAnimationFrame(() => {
+        navigate(key);
+      });
     },
     [pathname, isPhone, hiddenMenu, setSelectedKeys, navigate],
   );

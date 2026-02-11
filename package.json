@@ -36,6 +36,7 @@
     "i18next-http-backend": "^3.0.2",
     "keepalive-for-react": "^5.0.7",
     "lodash": "^4.17.21",
+    "motion": "^12.34.0",
     "nprogress": "^0.2.0",
     "rc-resize-observer": "^1.4.3",
     "react": "^19.2.3",

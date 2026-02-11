@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 import { useShallow } from 'zustand/shallow';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'motion/react';
 import { versionCheck } from './utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { useMenuStore, useUserStore } from '@/stores';
@@ -29,10 +30,22 @@ function Layout() {
   const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
+  const setAliveRef = usePublicStore(useShallow((state) => state.setAliveRef));
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
-  const { setPermissions, setUserInfo } = useUserStore((state) => state);
-  const { setMenuList, toggleCollapsed, togglePhone } = useMenuStore((state) => state);
-  const setAliveRef = usePublicStore((state) => state.setAliveRef);
+  const { setPermissions, setUserInfo } = useUserStore(
+    useShallow((state) => ({
+      setPermissions: state.setPermissions,
+      setUserInfo: state.setUserInfo,
+    })),
+  );
+  const { menuList, setMenuList, toggleCollapsed, togglePhone } = useMenuStore(
+    useShallow((state) => ({
+      menuList: state.menuList,
+      setMenuList: state.setMenuList,
+      toggleCollapsed: state.toggleCollapsed,
+      togglePhone: state.togglePhone,
+    })),
+  );
 
   const { permissions, userId, isMaximize, isCollapsed, isPhone, isRefresh } = useCommonStore();
 
@@ -49,7 +62,7 @@ function Layout() {
     if (keepaliveRef.current && !aliveRef.current) {
       setAliveRef(keepaliveRef);
     }
-  }, [keepaliveRef.current]); // 只依赖 ref.current
+  }, [keepaliveRef.current]);
 
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
@@ -153,7 +166,7 @@ function Layout() {
       <div className={styles.layout_right}>
         <div id="header" className={headerClassName}>
           <Header />
-          <Tabs aliveRef={keepaliveRef} />
+          {permissions.length > 0 && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
         </div>
         <div id="layout-content" className={contentClassName}>
           {isLoading && permissions.length === 0 && (
@@ -175,17 +188,24 @@ function Layout() {
           )}
           <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
             {permissions.length > 0 && (
-              <ErrorBoundary>
-                <Suspense
-                  fallback={
-                    <div className="p-30px">
-                      <Skeleton active paragraph={{ rows: 10 }} />
-                    </div>
-                  }
-                >
-                  {outlet}
-                </Suspense>
-              </ErrorBoundary>
+              <motion.div
+                key={deferredPathname}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                <ErrorBoundary>
+                  <Suspense
+                    fallback={
+                      <div className="p-30px">
+                        <Skeleton active paragraph={{ rows: 10 }} />
+                      </div>
+                    }
+                  >
+                    {outlet}
+                  </Suspense>
+                </ErrorBoundary>
+              </motion.div>
             )}
           </KeepAlive>
         </div>

@@ -32,6 +32,7 @@ export function useDropdownMenu(props: Props) {
   const { tabs } = useCommonStore();
   const { closeLeft, closeOther, closeRight, closeTabs } = useTabsStore((state) => state);
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
+  const navigate = useNavigate();
 
   // 菜单项
   const items: (key?: string) => MenuProps['items'] = (key = activeKey) => {
@@ -83,22 +84,33 @@ export function useDropdownMenu(props: Props) {
 
       // 关闭当前
       case ITabEnums.CLOSE_CURRENT:
+        if (activeKey === pathname) {
+          const currentIndex = tabs.findIndex((tab) => tab.key === activeKey);
+          const nextPath = tabs[currentIndex > 0 ? currentIndex - 1 : 0].key;
+          if (nextPath) {
+            navigate(nextPath);
+          }
+        }
         closeTabs(key, aliveRef.current?.destroy);
+
         break;
 
       // 关闭其他
       case ITabEnums.CLOSE_OTHER:
         closeOther(key, aliveRef.current?.destroy);
+        navigate(key);
         break;
 
       // 关闭左侧
       case ITabEnums.CLOSE_LEFT:
         closeLeft(key, aliveRef.current?.destroy);
+        navigate(key);
         break;
 
       // 关闭右侧
       case ITabEnums.CLOSE_RIGHT:
         closeRight(key, aliveRef.current?.destroy);
+        navigate(key);
         break;
 
       default:

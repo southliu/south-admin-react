@@ -106,28 +106,12 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
     [permissions, menuList, pathname, setActiveKey, setNav, addTabs],
   );
 
-  // 初始化标签 - 只执行一次
+  // 初始化标签
   const hasInitialized = useRef(false);
   useEffect(() => {
-    if (hasInitialized.current) return;
-    if (permissions.length > 0 && menuList.length > 0) {
-      handleAddTab();
-      hasInitialized.current = true;
-    }
-  }, [permissions, menuList, handleAddTab]);
-
-  // 监听 pathname 变化
-  useEffect(() => {
-    if (!hasInitialized.current || !pathname) return;
-
-    // 防止导航中的重复调用
-    if (isNavigatingRef.current) {
-      isNavigatingRef.current = false;
-      return;
-    }
-
-    handleAddTab(pathname);
-  }, [pathname, handleAddTab]);
+    handleAddTab();
+    hasInitialized.current = true;
+  }, []);
 
   // 同步 activeKey 和 pathname
   useEffect(() => {
@@ -148,18 +132,8 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
     } else {
       handleAddTab(key);
     }
-  }, [
-    activeKey,
-    pathname,
-    isCloseTabsLock,
-    menuList,
-    permissions,
-    urlParamsMap,
-    navigate,
-    toggleCloseTabsLock,
-    setNav,
-    handleAddTab,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // 设置浏览器标题
   useEffect(() => {
@@ -173,15 +147,22 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   }, [i18n.language, switchTabsLang]);
 
   /**
-   * 路由跳转 - 直接导航
+   * 路由跳转
    */
   const handleNavigateTo = useCallback(
     (key: string) => {
       isNavigatingRef.current = true;
-      const urlParams = urlParamsMap.get(key) || '';
-      navigate(`${key}${urlParams}`);
+
+      // 立即更新 Tab 选中状态
+      setActiveKey(key);
+
+      // 使用 requestAnimationFrame 确保 Tab 状态先渲染，然后再跳转路由
+      requestAnimationFrame(() => {
+        const urlParams = urlParamsMap.get(key) || '';
+        navigate(`${key}${urlParams}`);
+      });
     },
-    [urlParamsMap, navigate],
+    [urlParamsMap, navigate, setActiveKey],
   );
 
   /**
@@ -200,9 +181,19 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
    */
   const remove = useCallback(
     (targetKey: string) => {
+      // 如果删除的是当前选中的，则跳转至上一个
+      if (activeKey === targetKey) {
+        const currentIndex = tabs.findIndex((tab) => tab.key === activeKey);
+        const nextPath = tabs[currentIndex > 0 ? currentIndex - 1 : 0].key;
+        if (nextPath) {
+          handleAddTab(nextPath);
+          navigate(nextPath);
+        }
+      }
+
       closeTabs(targetKey, aliveRef.current?.destroy);
     },
-    [closeTabs, aliveRef],
+    [closeTabs, aliveRef, activeKey],
   );
 
   /**
@@ -343,13 +334,13 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         flex
         items-center
         justify-between
-        mx-2
+        mr-2
         transition-all
         ${isMaximize ? styles['con-maximize'] : ''}
       `}
     >
       {contextHolder}
-      <div className="w-[calc(100%-110px)]">
+      <div className="w-full">
         {tabs.length > 0 ? (
           <Tabs
             hideAdd
@@ -361,29 +352,30 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
             type="editable-card"
             onEdit={onEdit}
             renderTabBar={renderTabBar}
+            tabBarExtraContent={
+              <div className="flex">
+                {tabOptions.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`
+                      left-divide-tab
+                      change
+                      divide-solid
+                      w-36px
+                      h-36px
+                      hover:opacity-70
+                      flex
+                      place-content-center
+                      items-center
+                    `}
+                  >
+                    {item.element}
+                  </div>
+                ))}
+              </div>
+            }
           />
         ) : null}
-      </div>
-
-      <div className="flex">
-        {tabOptions.map((item, index) => (
-          <div
-            key={index}
-            className={`
-              left-divide-tab
-              change
-              divide-solid
-              w-36px
-              h-36px
-              hover:opacity-70
-              flex
-              place-content-center
-              items-center
-            `}
-          >
-            {item.element}
-          </div>
-        ))}
       </div>
     </div>
   );

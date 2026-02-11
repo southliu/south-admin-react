@@ -25,6 +25,7 @@ function Page() {
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [messageApi, contextHolder] = message.useMessage();
   const { permissions } = useCommonStore();
+  const navigate = useNavigate();
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const closeTabGoNext = useTabsStore((state) => state.closeTabGoNext);
   const setRefreshPage = usePublicStore((state) => state.setRefreshPage);
@@ -106,6 +107,7 @@ function Page() {
       nextPath: fatherPath,
       dropScope: aliveRef.current?.destroy,
     });
+    navigate(fatherPath);
   };
 
   /**
