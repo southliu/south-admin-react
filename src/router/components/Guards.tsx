@@ -5,7 +5,6 @@ import { message } from '@south/message';
 import { getLocalInfo } from '@south/utils';
 import { TOKEN } from '@/utils/config';
 import { Spin } from 'antd';
-import nprogress from 'nprogress';
 
 // 懒加载 Layout 组件，减少首屏加载体积
 const Layout = lazy(() => import('@/layouts'));
@@ -64,7 +63,6 @@ function Guards() {
     // 防止重复重定向
     if (shouldRedirect && !isRedirectingRef.current) {
       isRedirectingRef.current = true;
-      nprogress.start();
 
       // 执行重定向
       navigate(redirectPath, { replace: true });
@@ -80,13 +78,11 @@ function Guards() {
 
       // 延迟关闭进度条，确保路由切换完成
       const timer = setTimeout(() => {
-        nprogress.done();
         isRedirectingRef.current = false;
       }, 100);
 
       return () => {
         clearTimeout(timer);
-        nprogress.done();
       };
     }
   }, [shouldRedirect, redirectPath, navigate, location.pathname, t]);

@@ -75,23 +75,17 @@ function BaseTable(props: Props) {
     setColumns(newColumns);
     setTableFilters(columnKeys);
     setSortList(columnKeys);
-  }, [props.columns]);
+  }, []);
 
   // 添加新增缺少方法警告
-  useEffect(() => {
-    if (isCreate && !onCreate) {
-      message.warning(t('public.createMethodWarning'));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCreate]);
+  if (isCreate && !onCreate) {
+    message.warning(t('public.createMethodWarning'));
+  }
 
   // 添加分页缺少方法警告
-  useEffect(() => {
-    if (isOperate && !getPage) {
-      message.warning(t('public.getPageWarning'));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getPage]);
+  if (isOperate && !getPage) {
+    message.warning(t('public.getPageWarning'));
+  }
 
   // 表格高度
   const tableHeight = getTableHeight(tableRef.current);

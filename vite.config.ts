@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
   const { VITE_SERVER_PORT, VITE_PROXY } = viteEnv;
 
   return {
+    base: '/',
     plugins: createVitePlugins(),
     resolve: {
       alias: {
@@ -41,23 +42,6 @@ export default defineConfig(({ mode }) => {
       hmr: {
         overlay: true,
       },
-    },
-    // 依赖预构建配置
-    optimizeDeps: {
-      include: [
-        'react',
-        'react-dom',
-        'react-router-dom',
-        'antd',
-        'zustand',
-        '@ant-design/icons',
-        'react-i18next',
-        'i18next',
-        'lodash',
-        'dayjs',
-        'keepalive-for-react',
-      ],
-      exclude: ['@south/request', '@south/utils'],
     },
     build: buildOptions(),
   };

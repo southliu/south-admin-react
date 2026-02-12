@@ -10,7 +10,7 @@ import {
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import DraggableTabNode, { type DraggableTabPaneProps } from './DraggableTabNode';
 import { useCallback, useEffect, useMemo, useState, memo, useRef, type RefObject } from 'react';
-import { getMenuByKey } from '@/menus/utils/helper';
+import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
 import { message, Tabs, Dropdown } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
@@ -46,36 +46,29 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const [refreshTime, setRefreshTime] = useState<NodeJS.Timeout | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
-  const isNavigatingRef = useRef(false);
 
   const setRefresh = usePublicStore((state) => state.setRefresh);
-
-  // 使用 useShallow 优化 Zustand 订阅
-  const {
-    tabs,
-    isCloseTabsLock,
-    activeKey,
-    setActiveKey,
-    addTabs,
-    sortTabs,
-    closeTabs,
-    setNav,
-    toggleCloseTabsLock,
-    switchTabsLang,
-  } = useTabsStore(
+  const { setOpenKeys, setSelectedKeys } = useMenuStore(
     useShallow((state) => ({
-      tabs: state.tabs,
-      isCloseTabsLock: state.isCloseTabsLock,
-      activeKey: state.activeKey,
-      setActiveKey: state.setActiveKey,
-      addTabs: state.addTabs,
-      sortTabs: state.sortTabs,
-      closeTabs: state.closeTabs,
-      setNav: state.setNav,
-      toggleCloseTabsLock: state.toggleCloseTabsLock,
-      switchTabsLang: state.switchTabsLang,
+      setOpenKeys: state.setOpenKeys,
+      setSelectedKeys: state.setSelectedKeys,
     })),
   );
+
+  // 使用 useShallow 优化 Zustand 订阅
+  const { tabs, activeKey, setActiveKey, addTabs, sortTabs, closeTabs, setNav, switchTabsLang } =
+    useTabsStore(
+      useShallow((state) => ({
+        tabs: state.tabs,
+        activeKey: state.activeKey,
+        setActiveKey: state.setActiveKey,
+        addTabs: state.addTabs,
+        sortTabs: state.sortTabs,
+        closeTabs: state.closeTabs,
+        setNav: state.setNav,
+        switchTabsLang: state.switchTabsLang,
+      })),
+    );
 
   const { permissions, isMaximize, menuList } = useCommonStore();
 
@@ -107,39 +100,9 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   );
 
   // 初始化标签
-  const hasInitialized = useRef(false);
   useEffect(() => {
     handleAddTab();
-    hasInitialized.current = true;
   }, []);
-
-  // 同步 activeKey 和 pathname
-  useEffect(() => {
-    if (activeKey === pathname) return;
-
-    const key = isCloseTabsLock ? activeKey : pathname;
-
-    if (isCloseTabsLock) {
-      toggleCloseTabsLock(false);
-      const menuByKeyProps = { menus: menuList, permissions, key };
-      const newItems = getMenuByKey(menuByKeyProps);
-      if (newItems?.nav) {
-        setNav(newItems.nav);
-      }
-      // 直接导航
-      const urlParams = urlParamsMap.get(key) || '';
-      navigate(`${key}${urlParams}`);
-    } else {
-      handleAddTab(key);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-
-  // 设置浏览器标题
-  useEffect(() => {
-    const title = getTabTitle(tabs, pathname);
-    if (title) setTitle(t, title);
-  }, [tabs, pathname, t]);
 
   // 语言切换
   useEffect(() => {
@@ -151,8 +114,6 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
    */
   const handleNavigateTo = useCallback(
     (key: string) => {
-      isNavigatingRef.current = true;
-
       // 立即更新 Tab 选中状态
       setActiveKey(key);
 
@@ -160,6 +121,10 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
       requestAnimationFrame(() => {
         const urlParams = urlParamsMap.get(key) || '';
         navigate(`${key}${urlParams}`);
+
+        // 刷新标题
+        const title = getTabTitle(tabs, key);
+        if (title) setTitle(t, title);
       });
     },
     [urlParamsMap, navigate, setActiveKey],
@@ -170,7 +135,14 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
    */
   const onChange = useCallback(
     (key: string) => {
-      handleNavigateTo(key);
+      // 菜单操作
+      const newOpenKey = getOpenMenuByRouter(key);
+      setOpenKeys(newOpenKey);
+      setSelectedKeys(key);
+
+      requestAnimationFrame(() => {
+        handleNavigateTo(key);
+      });
     },
     [handleNavigateTo],
   );

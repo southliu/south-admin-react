@@ -63,6 +63,16 @@ function Login() {
       const newPassword = decryption(password);
       form.setFieldsValue({ username, password: newPassword.value });
     }
+
+    // 监听错误信息提示
+    const bc = new BroadcastChannel('login');
+    bc.onmessage = (msg) => {
+      debugger;
+      message.error({
+        content: String(msg),
+        key: 'error',
+      });
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

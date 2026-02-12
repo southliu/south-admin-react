@@ -1,7 +1,7 @@
 import type { MenuProps } from 'antd';
 import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
-import { useCallback, useEffect, useMemo, useState, memo } from 'react';
+import { useCallback, useMemo, useState, memo } from 'react';
 import { Menu } from 'antd';
 import { isUrl } from '@/utils/is';
 import { Icon } from '@iconify/react';
@@ -13,17 +13,29 @@ import { useShallow } from 'zustand/react/shallow';
 import {
   filterMenus,
   getFirstMenu,
+  getMenuByKey,
   getOpenMenuByRouter,
   handleFilterMenus,
   splitPath,
 } from '@/menus/utils/helper';
 import styles from '../index.module.less';
 import Logo from '@/assets/images/logo.svg';
+import { getTabTitle } from '../utils/helper';
+import { setTitle } from '@/utils/helper';
 
 function LayoutMenu() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
+
+  const { tabs, setActiveKey, addTabs, setNav } = useTabsStore(
+    useShallow((state) => ({
+      tabs: state.tabs,
+      setActiveKey: state.setActiveKey,
+      addTabs: state.addTabs,
+      setNav: state.setNav,
+    })),
+  );
 
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
@@ -66,15 +78,19 @@ function LayoutMenu() {
     if (permissions.length === 0 || menuList.length === 0) return [];
     const newMenus = filterMenus(menuList, permissions);
     return filterMenuIcon(newMenus);
-  }, [menuList, permissions, filterMenuIcon]);
+  }, [menuList, permissions, filterMenuIcon, i18n.language]);
 
-  // 同步 pathname 变化
+  // 刷新页面根据路由选中对应的菜单
   useEffect(() => {
     const newOpenKey = getOpenMenuByRouter(pathname);
-    setCurrentOpenKeys(newOpenKey);
-    setCurrentSelectedKeys([pathname]);
-    setSelectedKeys(pathname);
-  }, [pathname, setSelectedKeys]);
+
+    requestAnimationFrame(() => {
+      setCurrentOpenKeys(newOpenKey);
+      setCurrentSelectedKeys([pathname]);
+      setSelectedKeys(pathname);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 同步 store 中的 selectedKeys 变化
   useEffect(() => {
@@ -82,6 +98,13 @@ function LayoutMenu() {
       setCurrentSelectedKeys([selectedKeys]);
     }
   }, [selectedKeys]);
+
+  // 同步 store 中的 openKeys 变化
+  useEffect(() => {
+    if (openKeys?.length) {
+      setCurrentOpenKeys(openKeys);
+    }
+  }, [openKeys]);
 
   /**
    * 路由跳转
@@ -125,7 +148,26 @@ function LayoutMenu() {
 
       // 使用 requestAnimationFrame 确保菜单状态先渲染，然后再跳转路由
       requestAnimationFrame(() => {
-        navigate(key);
+        // 标签栏操作
+        setActiveKey(key);
+        const menuByKeyProps = { menus: menuList, permissions, key };
+        const newItems = getMenuByKey(menuByKeyProps);
+
+        if (newItems?.key) {
+          setActiveKey(newItems.key);
+          setNav(newItems.nav);
+          addTabs(newItems);
+        } else {
+          setActiveKey(key);
+        }
+
+        // 刷新标题
+        const title = getTabTitle(tabs, key);
+        if (title) setTitle(t, title);
+
+        requestAnimationFrame(() => {
+          navigate(key);
+        });
       });
     },
     [pathname, isPhone, hiddenMenu, setSelectedKeys, navigate],

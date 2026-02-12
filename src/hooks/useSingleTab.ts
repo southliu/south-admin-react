@@ -39,11 +39,13 @@ export function useSingleTab(props: Props) {
       setOpenKeys(newOpenKey);
       setSelectedKeys(fatherPath);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 处理默认展开
   useEffect(() => {
     handleInit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**

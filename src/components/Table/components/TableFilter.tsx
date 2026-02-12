@@ -35,7 +35,7 @@ function TableFilter(props: Props) {
 
   useEffect(() => {
     filterColumns(columns);
-  }, [columns]);
+  }, []);
 
   /** 处理点击事件 */
   const handleClick = () => {

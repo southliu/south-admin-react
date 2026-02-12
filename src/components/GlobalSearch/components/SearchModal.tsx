@@ -45,12 +45,13 @@ function SearchModal(props: Props) {
   // 聚焦输入框
   useLayoutEffect(() => {
     if (isOpen) {
-      // 转为宏任务防止聚焦失效
-      setTimeout(() => {
+      // 防止聚焦失效
+      requestAnimationFrame(() => {
+        // 聚焦输入框
         inputRef.current?.focus({
           cursor: 'end',
         });
-      }, 0);
+      });
     }
 
     // 退出时清空数据

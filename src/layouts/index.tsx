@@ -2,7 +2,6 @@ import { useToken } from '@/hooks/useToken';
 import { useCallback, useEffect, useMemo, useState, memo, useDeferredValue, Suspense } from 'react';
 import { useOutlet } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
-import { Icon } from '@iconify/react';
 import { debounce } from 'lodash';
 import { useShallow } from 'zustand/shallow';
 import { useLocation } from 'react-router-dom';
@@ -14,6 +13,7 @@ import { useMenuStore, useUserStore } from '@/stores';
 import { getUserRefreshPermissions } from '@/servers/system/user';
 import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
+import nprogress from 'nprogress';
 import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
@@ -47,7 +47,7 @@ function Layout() {
     })),
   );
 
-  const { permissions, userId, isMaximize, isCollapsed, isPhone, isRefresh } = useCommonStore();
+  const { permissions, userId, isMaximize, isCollapsed, isPhone } = useCommonStore();
 
   // 使用 useDeferredValue 延迟非关键的路由更新，提升响应性
   const deferredPathname = useDeferredValue(pathname);
@@ -101,11 +101,20 @@ function Layout() {
       getUserInfo();
       getMenuData();
     }
-  }, [getUserInfo, getMenuData, token, userId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 监测是否需要刷新
   useEffect(() => {
-    versionCheck(t, messageApi);
+    nprogress?.done?.();
+
+    requestAnimationFrame(() => {
+      versionCheck(t, messageApi);
+    });
+
+    return () => {
+      nprogress?.start?.();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
@@ -162,7 +171,8 @@ function Layout() {
   return (
     <div id="layout">
       {contextHolder}
-      <Menu />
+      {permissions.length > 0 && menuList.length > 0 && <Menu />}
+
       <div className={styles.layout_right}>
         <div id="header" className={headerClassName}>
           <Header />
@@ -173,19 +183,6 @@ function Layout() {
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
           {!isLoading && permissions.length === 0 && <Forbidden />}
-          {isRefresh && (
-            <div
-              className={`
-              absolute
-              left-50%
-              top-50%
-              -rotate-x-50%
-              -rotate-y-50%
-            `}
-            >
-              <Icon className="text-40px animate-spin" icon="ri:loader-2-fill" />
-            </div>
-          )}
           <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
             {permissions.length > 0 && (
               <motion.div

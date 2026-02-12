@@ -37,22 +37,14 @@ function creteRequest(url: string, tokenKey: string) {
           const zhMsg = '权限不足，请重新登录！';
           const msg = lang === 'en' ? enMsg : zhMsg;
           removeLocalInfo(tokenKey);
-          message.error({
-            content: msg,
-            key: 'error',
-          });
           console.error('错误信息:', data?.message || msg);
 
+          // 给登录页传输数据
+          const bc = new BroadcastChannel('login');
+          bc.postMessage(msg);
+
           // 跳转登录页
-          const url = window.location.href;
-          if (url.includes('#')) {
-            window.location.hash = '/login';
-          } else {
-            // window.location.href跳转会出现message无法显示情况，所以需要延时
-            setTimeout(() => {
-              window.location.href = '/login';
-            }, 1000);
-          }
+          window.location.href = '/login';
           return res;
         }
 
