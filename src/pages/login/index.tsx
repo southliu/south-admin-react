@@ -2,6 +2,8 @@ import type { LoginData } from './model';
 import type { FormProps } from 'antd';
 import { Checkbox, message } from 'antd';
 import { Form, Button, Input } from 'antd';
+import I18n from '@/components/I18n';
+import Theme from '@/components/Theme';
 import { login } from '@/servers/login';
 import { setTitle } from '@/utils/helper';
 import { getMenuList } from '@/servers/system/menu';

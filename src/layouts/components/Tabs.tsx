@@ -8,7 +8,7 @@ import {
   useSensor,
 } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import DraggableTabNode, { type DraggableTabPaneProps } from './DraggableTabNode';
+import DraggableTabNode from './DraggableTabNode';
 import { useCallback, useEffect, useMemo, useState, memo, useRef, type RefObject } from 'react';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
 import { message, Tabs, Dropdown } from 'antd';
@@ -37,8 +37,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   // 使用 useMemo 缓存传感器配置，避免每次渲染重新创建
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 20, // 增加激活距离，减少误触
-      tolerance: 10, // 增加容差
+      distance: 5, // 降低激活距离，更容易触发拖拽
     },
   });
 
@@ -46,6 +45,8 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const [refreshTime, setRefreshTime] = useState<NodeJS.Timeout | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuKey, setContextMenuKey] = useState<string | null>(null);
 
   const setRefresh = usePublicStore((state) => state.setRefresh);
   const { setOpenKeys, setSelectedKeys } = useMenuStore(
@@ -244,31 +245,46 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const renderTabBar: TabsProps['renderTabBar'] = useMemo(
     () => (tabBarProps, DefaultTabBar) => (
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd} collisionDetection={closestCenter}>
-        <SortableContext items={tabs.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={tabs.map((i) => ({ id: i.key }))}
+          strategy={horizontalListSortingStrategy}
+        >
           <DefaultTabBar {...tabBarProps}>
-            {(node) => (
-              <DraggableTabNode
-                {...(node as React.ReactElement<DraggableTabPaneProps>).props}
-                key={node.key}
-              >
-                <div>
+            {(node) => {
+              const key = node.key as string;
+              return (
+                <DraggableTabNode
+                  data-node-key={key}
+                  key={key}
+                  onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                    e.preventDefault();
+                    setContextMenuKey(key);
+                    setContextMenuVisible(true);
+                  }}
+                >
                   <Dropdown
-                    menu={{
-                      items: dropdownItems(node.key as string),
-                      onClick: (e) => onDropdownClick(e.key, node.key as string),
+                    open={contextMenuVisible && contextMenuKey === key}
+                    onOpenChange={(open) => {
+                      setContextMenuVisible(open);
+                      if (!open) {
+                        setContextMenuKey(null);
+                      }
                     }}
-                    trigger={['contextMenu']}
+                    menu={{
+                      items: dropdownItems(key),
+                      onClick: (e) => onDropdownClick(e.key, key),
+                    }}
                   >
                     {node}
                   </Dropdown>
-                </div>
-              </DraggableTabNode>
-            )}
+                </DraggableTabNode>
+              );
+            }}
           </DefaultTabBar>
         </SortableContext>
       </DndContext>
     ),
-    [sensor, tabs, onDragEnd, dropdownItems, onDropdownClick],
+    [sensor, tabs, onDragEnd, dropdownItems, onDropdownClick, contextMenuVisible, contextMenuKey],
   );
 
   // 操作按钮渲染

@@ -1,5 +1,6 @@
 import { Row, Col } from 'antd';
 import { Icon } from '@iconify/react';
+import Count from '@/components/Count';
 
 function Block() {
   const { t } = useTranslation();
