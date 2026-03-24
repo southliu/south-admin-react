@@ -13,6 +13,7 @@ import type {
   TimeRangePickerProps,
   TransferProps,
   FormItemProps,
+  SwitchProps,
 } from 'antd';
 import type {
   ApiSelectProps,
@@ -120,6 +121,7 @@ export type ComponentProps =
   | ApiSelectProps
   | ApiTreeSelectProps
   | ApiPageSelectProps
+  | SwitchProps
   | EditorProps;
 
 // 组件参数
