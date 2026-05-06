@@ -1,7 +1,7 @@
 import type { SideMenu } from '#/public';
 import type { InputProps, InputRef } from 'antd';
-import { Ref, useImperativeHandle, useLayoutEffect } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import type { Ref } from 'react';
+import { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { debounce } from 'lodash';
 import { Modal, Input } from 'antd';
 import { Icon } from '@iconify/react';
@@ -43,7 +43,7 @@ function SearchModal(props: Props) {
   }));
 
   // 聚焦输入框
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       // 防止聚焦失效
       requestAnimationFrame(() => {
