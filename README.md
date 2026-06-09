@@ -47,6 +47,10 @@ pnpm install -w
 ```bash
 pnpm config set registry https://registry.npmmirror.com
 ```
+##### pnpm（v10+ /v11）的安全机制：默认禁止依赖包的 postinstall 等构建脚本，防止恶意代码，执行以下命令。
+```bash
+pnpm approve-builds
+```
 
 - 运行
 
