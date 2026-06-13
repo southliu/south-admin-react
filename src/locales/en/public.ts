@@ -78,6 +78,7 @@ export default {
   createMethodWarning: 'The new component lacks a corresponding method',
   getPageWarning: 'Missing page acquisition method',
   tableSelectWarning: 'Please select table data',
+  selectAtLeastOne: 'Please select at least one item',
   menuSearchPlaceholder: 'Please enter the menu name',
   noMoreData: 'No more data',
   noLoginVisit: 'Cannot access without login',

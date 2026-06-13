@@ -1,5 +1,5 @@
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
-import { type FormInstance, Button, Form, message } from 'antd';
+import { type FormInstance, Form, message } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { createList, searchList, tableColumns } from './model';
@@ -11,7 +11,6 @@ import {
   getUserPage,
   updateUser,
 } from '@/servers/system/user';
-import PermissionDrawer from './components/PermissionDrawer';
 
 // 当前行数据
 interface RowData {
@@ -40,8 +39,6 @@ function Page() {
   const [pageSize, setPageSize] = useState(INIT_PAGINATION.pageSize);
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
-  const [promiseId, setPromiseId] = useState('');
-  const [isPromiseOpen, setPromiseOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [form] = Form.useForm();
   const [searchForm] = Form.useForm();
@@ -58,7 +55,6 @@ function Page() {
     create: checkPermission(`${permissionPrefix}/create`, permissions),
     update: checkPermission(`${permissionPrefix}/update`, permissions),
     delete: checkPermission(`${permissionPrefix}/delete`, permissions),
-    permission: checkPermission(`${permissionPrefix}/authority`, permissions),
   };
 
   /** 获取表格数据 */
@@ -102,17 +98,6 @@ function Page() {
     setSearchData(values);
     handleSetSearchParams(values);
     setFetch(true);
-  };
-
-  /** 开启权限 */
-  const openPermission = async (id: string) => {
-    setPromiseId(id);
-    setPromiseOpen(true);
-  };
-
-  /** 关闭权限 */
-  const closePermission = () => {
-    setPromiseOpen(false);
   };
 
   /** 点击新增 */
@@ -241,11 +226,6 @@ function Page() {
     (_: unknown, record: object) => {
       return (
         <div className="flex flex-wrap gap-5px">
-          {pagePermission.permission === true && (
-            <Button className="small-btn" onClick={() => openPermission((record as RowData).id)}>
-              {t('system.permissions')}
-            </Button>
-          )}
           {pagePermission.update === true && (
             <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
           )}
@@ -259,11 +239,9 @@ function Page() {
       );
     },
     [
-      pagePermission.permission,
       pagePermission.update,
       pagePermission.delete,
       t,
-      openPermission,
       onUpdate,
       onDelete,
     ],
@@ -334,8 +312,6 @@ function Page() {
           handleFinish={handleCreate}
         />
       </BaseModal>
-
-      <PermissionDrawer isOpen={isPromiseOpen} id={promiseId} onClose={closePermission} />
     </BaseContent>
   );
 }

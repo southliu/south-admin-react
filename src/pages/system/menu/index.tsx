@@ -10,6 +10,7 @@ import {
   createMenu,
   updateMenu,
   deleteMenu,
+  batchDeleteMenu,
 } from '@/servers/system/menu';
 
 // 当前行数据
@@ -41,6 +42,7 @@ function Page() {
   const [pageSize, setPageSize] = useState(INIT_PAGINATION.pageSize);
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const type = Form.useWatch('type', form);
@@ -179,6 +181,27 @@ function Page() {
   };
 
   /**
+   * 批量删除
+   */
+  const onBatchDelete = async () => {
+    if (selectedRowKeys.length === 0) {
+      messageApi.warning(t('public.selectAtLeastOne'));
+      return;
+    }
+    try {
+      setLoading(true);
+      const { code, message } = await batchDeleteMenu(selectedRowKeys as string[]);
+      if (Number(code) === 200) {
+        messageApi.success(message || t('public.successfullyDeleted'));
+        setSelectedRowKeys([]);
+        getPage();
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
    * 处理分页
    * @param page - 当前页数
    * @param pageSize - 每页条数
@@ -256,6 +279,21 @@ function Page() {
           dataSource={tableData}
           getPage={getPage}
           onCreate={onCreate}
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (selectedRowKeys: React.Key[]) => setSelectedRowKeys(selectedRowKeys),
+          }}
+          leftContent={
+            selectedRowKeys.length > 0 && pagePermission.delete ? (
+              <Button
+                danger
+                className="small-btn"
+                onClick={onBatchDelete}
+              >
+                {t('public.batchDelete')} ({selectedRowKeys.length})
+              </Button>
+            ) : undefined
+          }
         />
 
         <BasePagination

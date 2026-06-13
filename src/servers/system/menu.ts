@@ -46,6 +46,14 @@ export function deleteMenu(id: string) {
 }
 
 /**
+ * 批量删除
+ * @param ids - 删除id值数组
+ */
+export function batchDeleteMenu(ids: string[]) {
+  return request.post(`${API.URL}/batchDelete`, { ids });
+}
+
+/**
  * 获取当前菜单数据
  * @param data - 请求数据
  */

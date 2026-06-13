@@ -33,7 +33,9 @@ function AuthorizeSelect(props: Props) {
 
   /** 点击复选框 */
   const handleCheckedKeysChange = (checkedKeys: Key[]) => {
-    onChange?.(checkedKeys);
+    // 将字符串数组转换为整数数组
+    const numberKeys = checkedKeys.map(key => typeof key === 'string' ? parseInt(key, 10) : key as number);
+    onChange?.(numberKeys);
   };
 
   return (
