@@ -75,7 +75,7 @@ function BaseTable(props: Props) {
     setColumns(newColumns);
     setTableFilters(columnKeys);
     setSortList(columnKeys);
-  }, []);
+  }, [props.columns]);
 
   // 添加新增缺少方法警告
   if (isCreate && !onCreate) {

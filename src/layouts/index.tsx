@@ -104,6 +104,15 @@ function Layout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 组件卸载时确保关闭进度条（退出登录场景）
+  useEffect(() => {
+    return () => {
+      setTimeout(() => {
+        nprogress?.done?.();
+      }, 300);
+    };
+  }, []);
+
   // 监测是否需要刷新
   useEffect(() => {
     nprogress?.done?.();
