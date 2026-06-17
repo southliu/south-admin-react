@@ -122,6 +122,25 @@ function Page() {
     }
   };
 
+  /**
+   * 点击复制
+   * @param id - 唯一值
+   */
+  const onCopy = async (id: string) => {
+    try {
+      setCreateOpen(true);
+      setCreateTitle(ADD_TITLE(t));
+      setCreateId('');
+      setCreateLoading(true);
+      const { code, data } = await getRoleById(id);
+      if (Number(code) !== 200) return;
+      const { id: _id, createdAt, updatedAt, ...rest } = data;
+      setCreateData(rest);
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
   /** 表单提交 */
   const createSubmit = () => {
     createFormRef?.current?.submit();
@@ -190,6 +209,15 @@ function Page() {
           {pagePermission.update === true && (
             <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
           )}
+          {pagePermission.create === true && (
+            <Button
+              type="primary"
+              className="small-btn"
+              onClick={() => onCopy((record as RowData).id)}
+            >
+              {t('public.copy')}
+            </Button>
+          )}
           {pagePermission.delete === true && (
             <DeleteBtn
               name={(record as RowData).name}
@@ -199,7 +227,7 @@ function Page() {
         </div>
       );
     },
-    [pagePermission.update, pagePermission.delete, onUpdate, onDelete],
+    [pagePermission.update, pagePermission.create, pagePermission.delete, onUpdate, onCopy, onDelete, t],
   );
 
   // 缓存列配置

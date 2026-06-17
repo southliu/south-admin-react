@@ -65,8 +65,10 @@ pnpm build
 ```
 
 ## 🌐 后端项目
+![Go](https://img.shields.io/badge/-Go-black?style=plastic&logo=go) [south-admin-gin](https://github.com/southliu/south-admin-gin)<br/>
+![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-fastApi](https://github.com/southliu/south-admin-fastApi)<br/>
+![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-django](https://github.com/southliu/south-admin-django)<br/>
 ![Nest](https://img.shields.io/badge/-Nest-black?style=plastic&logo=node.js) [south-admin-nest](https://github.com/southliu/south-admin-nest)<br/>
-![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-django](https://github.com/southliu/south-admin-django)
 
 ## ✈️ 快速编码
 1. 使用Claude Code的skills（**推荐**）：
