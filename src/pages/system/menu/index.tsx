@@ -1,6 +1,6 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Button, Form, type FormInstance, message } from 'antd';
+import { Button, Form, type FormInstance, message, Popconfirm } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';
@@ -285,13 +285,20 @@ function Page() {
           }}
           leftContent={
             selectedRowKeys.length > 0 && pagePermission.delete ? (
-              <Button
-                danger
-                className="small-btn"
-                onClick={onBatchDelete}
+              <Popconfirm
+                title={t('public.kindTips')}
+                description={t('public.batchDeleteConfirmMessage', { name: '' })}
+                onConfirm={onBatchDelete}
+                okText={t('public.confirm')}
+                cancelText={t('public.cancel')}
               >
-                {t('public.batchDelete')} ({selectedRowKeys.length})
-              </Button>
+                <Button
+                  danger
+                  className="small-btn"
+                >
+                  {t('public.batchDelete')} ({selectedRowKeys.length})
+                </Button>
+              </Popconfirm>
             ) : undefined
           }
         />
