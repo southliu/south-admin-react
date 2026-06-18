@@ -1,7 +1,7 @@
 import { request } from '@/utils/request';
 
 enum API {
-  URL = '/log',
+  URL = '/system/log',
 }
 
 /**

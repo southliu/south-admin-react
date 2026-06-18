@@ -3,7 +3,7 @@ import { Button, Result, Tooltip } from 'antd';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '@/stores/user';
-import { createLog } from '@/servers/log/log';
+import { createLog } from '@/servers/system/log';
 import { useLogout } from '@/hooks/useLogout';
 
 interface Props {

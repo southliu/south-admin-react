@@ -5,7 +5,7 @@ import { useEffectOnActive } from 'keepalive-for-react';
 import { message } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { searchList, tableColumns } from './model';
-import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/log/log';
+import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/system/log';
 
 // 当前行数据
 interface RowData {
@@ -27,13 +27,13 @@ function Page() {
   const { permissions } = useCommonStore();
 
   // 权限前缀
-  const permissionPrefix = '/log';
+  const permissionPrefix = '/authority/log';
 
   // 权限
   const pagePermission: PagePermission = {
     page: checkPermission(permissionPrefix, permissions),
-    create: checkPermission(`${permissionPrefix}/create`, permissions),
-    update: checkPermission(`${permissionPrefix}/update`, permissions),
+    create: false,
+    update: false,
     delete: checkPermission(`${permissionPrefix}/delete`, permissions),
   };
 
