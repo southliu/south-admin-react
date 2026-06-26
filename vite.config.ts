@@ -14,6 +14,12 @@ export default defineConfig(({ mode }) => {
   return {
     base: '/',
     plugins: createVitePlugins(),
+    define: {
+      // react-draggable 4.6.0 的 log() 运行时会读取 process.env.DRAGGABLE_DEBUG，
+      // 浏览器环境中 process 未定义会抛出 "process is not defined"，
+      // 导致拖拽回调 handleDragStart 中断、模态框无法拖动。这里将其置为 false。
+      'process.env.DRAGGABLE_DEBUG': JSON.stringify(false),
+    },
     resolve: {
       alias: {
         '@': '/src',
