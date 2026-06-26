@@ -79,12 +79,18 @@ function BaseTable(props: Props) {
 
   // 添加新增缺少方法警告
   if (isCreate && !onCreate) {
-    message.warning(t('public.createMethodWarning'));
+    message.warning({
+      content: t('public.createMethodWarning'),
+      key: 'createMethodWarning',
+    });
   }
 
   // 添加分页缺少方法警告
   if (isOperate && !getPage) {
-    message.warning(t('public.getPageWarning'));
+    message.warning({
+      content: t('public.getPageWarning'),
+      key: 'getPageWarning',
+    });
   }
 
   // 表格高度

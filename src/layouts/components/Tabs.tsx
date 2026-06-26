@@ -103,7 +103,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   // 初始化标签
   useEffect(() => {
     handleAddTab();
-  }, []);
+  }, [pathname]);
 
   // 语言切换
   useEffect(() => {

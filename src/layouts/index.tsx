@@ -155,7 +155,7 @@ function Layout() {
       `
         border-bottom
         transition-all
-        z-15
+        z-20!
         ${styles.header}
         ${isCollapsed ? styles['header-close-menu'] : ''}
         ${isMaximize ? styles['header-none'] : ''}

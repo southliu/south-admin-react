@@ -90,7 +90,7 @@ function LayoutMenu() {
       setSelectedKeys(pathname);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]);
 
   // 同步 store 中的 selectedKeys 变化
   useEffect(() => {

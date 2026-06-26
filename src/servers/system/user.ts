@@ -1,6 +1,5 @@
 import type { LoginResult } from '@/pages/login/model';
 import { request } from '@/utils/request';
-import { PermissionResult } from './role';
 
 enum API {
   URL = '/system/user',
@@ -53,22 +52,6 @@ export function deleteUser(id: string) {
  */
 export function batchDeleteUser(data: BaseFormData) {
   return request.post(`${API.URL}/batchDelete`, data);
-}
-
-/**
- * 获取权限列表
- * @param data - 搜索数据
- */
-export function getUserPermission(data: object) {
-  return request.get<PermissionResult>(`${API.URL}/authorize`, { params: data });
-}
-
-/**
- * 保存用户权限
- * @param data - 权限数据
- */
-export function saveUserPermission(data: object) {
-  return request.put(`${API.URL}/authorize/save`, data);
 }
 
 /**
