@@ -87,15 +87,6 @@ function Guards() {
     }
   }, [shouldRedirect, redirectPath, navigate, location.pathname, t]);
 
-  // 重定向时不渲染任何内容
-  if (shouldRedirect || redirected) {
-    return (
-      <div className="absolute left-50% top-50% -translate-x-1/2 -translate-y-1/2 text-center">
-        <Spin spinning={true} />
-      </div>
-    );
-  }
-
   // 使用 useMemo 缓存 Layout 组件，只在 token 和 isValid 变化时重新渲染
   const layoutElement = useMemo(() => {
     if (isValid && token) {
@@ -113,6 +104,15 @@ function Guards() {
     }
     return null;
   }, [token, isValid]);
+
+  // 重定向时不渲染任何内容
+  if (shouldRedirect || redirected) {
+    return (
+      <div className="absolute left-50% top-50% -translate-x-1/2 -translate-y-1/2 text-center">
+        <Spin spinning={true} />
+      </div>
+    );
+  }
 
   // 渲染页面内容
   if (location.pathname === '/login' && token) {
