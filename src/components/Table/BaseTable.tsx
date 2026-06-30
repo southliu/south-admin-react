@@ -2,7 +2,7 @@ import type { ResizeCallbackData } from 'react-resizable';
 import type { ColumnsType } from 'antd/es/table';
 import type { EnumShowType, TableColumn } from '#/public';
 import { type TableProps, Table, Button, message, Tag } from 'antd';
-import { useMemo, useState, useEffect, useRef, useCallback, memo, type ReactNode } from 'react';
+import { useMemo, useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
 import { useTranslation } from 'react-i18next';
 import { EMPTY_VALUE } from '@/utils/config';
@@ -331,10 +331,4 @@ function BaseTable(props: Props) {
   );
 }
 
-export default memo(BaseTable, (prevProps, nextProps) => {
-  return (
-    prevProps.isLoading === nextProps.isLoading &&
-    prevProps.dataSource === nextProps.dataSource &&
-    prevProps.columns === nextProps.columns
-  );
-});
+export default BaseTable;
