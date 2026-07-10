@@ -15,6 +15,7 @@ export const useLogout = () => {
 
   /** 退出登录 */
   const handleLogout = () => {
+    sessionStorage.removeItem('layout-bootstrap');
     clearInfo();
     closeAllTab();
     setActiveKey('');
