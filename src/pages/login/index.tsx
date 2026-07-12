@@ -69,9 +69,8 @@ function Login() {
     // 监听错误信息提示
     const bc = new BroadcastChannel('login');
     bc.onmessage = (msg) => {
-      debugger;
       message.error({
-        content: String(msg),
+        content: msg?.data || String(msg),
         key: 'error',
       });
     };

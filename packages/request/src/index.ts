@@ -39,7 +39,10 @@ function creteRequest(url: string, tokenKey: string) {
           removeLocalInfo(tokenKey);
           console.error('错误信息:', data?.message || msg);
 
-          // 给登录页传输数据
+          // 当前页直接提示，避免跳转后提示丢失
+          message.error({ content: msg, key: 'permission-expired' });
+
+          // 给其他标签页的登录页传输数据（同标签页收不到自己的消息）
           const bc = new BroadcastChannel('login');
           bc.postMessage(msg);
 
