@@ -1,14 +1,5 @@
 import { useToken } from '@/hooks/useToken';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  memo,
-  useDeferredValue,
-  Suspense,
-  useRef,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState, memo, useDeferredValue } from 'react';
 import { useOutlet } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { debounce } from 'lodash';
@@ -20,7 +11,6 @@ import { versionCheck } from './utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { useMenuStore, useUserStore } from '@/stores';
 import { getUserRefreshPermissions } from '@/servers/system/user';
-import type { LoginResult } from '@/pages/login/model';
 import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import nprogress from 'nprogress';
@@ -31,41 +21,6 @@ import Forbidden from '@/pages/403';
 import ErrorBoundary from './components/ErrorBoundary';
 import styles from './index.module.less';
 
-const BOOTSTRAP_CACHE_KEY = 'layout-bootstrap';
-
-interface BootstrapCache {
-  user: LoginResult['user'];
-  permissions: string[];
-  menuList: SideMenu[];
-}
-
-function readBootstrapCache(): BootstrapCache | null {
-  try {
-    const rawCache = sessionStorage.getItem(BOOTSTRAP_CACHE_KEY);
-    if (!rawCache) return null;
-
-    const cache = JSON.parse(rawCache) as BootstrapCache;
-    const isValid =
-      cache.user?.id &&
-      Array.isArray(cache.permissions) &&
-      cache.permissions.length > 0 &&
-      Array.isArray(cache.menuList) &&
-      cache.menuList.length > 0;
-
-    return isValid ? cache : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeBootstrapCache(cache: BootstrapCache) {
-  try {
-    sessionStorage.setItem(BOOTSTRAP_CACHE_KEY, JSON.stringify(cache));
-  } catch {
-    // Storage is optional; a blocked quota must not prevent the page from loading.
-  }
-}
-
 function Layout() {
   const [getToken] = useToken();
   const { t } = useTranslation();
@@ -74,15 +29,13 @@ function Layout() {
   const outlet = useOutlet();
   const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
-  const bootstrapCacheRef = useRef<BootstrapCache | null>(readBootstrapCache());
   const [messageApi, contextHolder] = message.useMessage();
   const setAliveRef = usePublicStore(useShallow((state) => state.setAliveRef));
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
-  const { setPermissions, setUserInfo, userInfo } = useUserStore(
+  const { setPermissions, setUserInfo } = useUserStore(
     useShallow((state) => ({
       setPermissions: state.setPermissions,
       setUserInfo: state.setUserInfo,
-      userInfo: state.userInfo,
     })),
   );
   const { menuList, setMenuList, toggleCollapsed, togglePhone } = useMenuStore(
@@ -114,15 +67,17 @@ function Layout() {
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
     try {
+      setLoading(true);
       const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
-      if (Number(code) !== 200) return null;
+      if (Number(code) !== 200) return;
       const { user, permissions } = data;
       setUserInfo(user);
       setPermissions(permissions);
-      return { user, permissions };
     } catch (err) {
       console.error('获取用户数据失败:', err);
-      return null;
+      setPermissions([]);
+    } finally {
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -130,60 +85,22 @@ function Layout() {
   /** 获取菜单数据 */
   const getMenuData = useCallback(async () => {
     try {
+      setLoading(true);
       const { code, data } = await getMenuList();
-      if (Number(code) !== 200) return null;
+      if (Number(code) !== 200) return;
       setMenuList(data || []);
-      return data || [];
-    } catch (err) {
-      console.error('Failed to load menu bootstrap data:', err);
-      return null;
+    } finally {
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     // 当用户信息缓存不存在时则重新获取
-    if (!token) return;
-
-    if (userId) {
-      if (permissions.length && menuList.length) {
-        writeBootstrapCache({ user: userInfo, permissions, menuList });
-      }
-      return;
+    if (token && !userId) {
+      getUserInfo();
+      getMenuData();
     }
-
-    const cachedBootstrap = bootstrapCacheRef.current;
-    if (cachedBootstrap) {
-      setUserInfo(cachedBootstrap.user);
-      setPermissions(cachedBootstrap.permissions);
-      setMenuList(cachedBootstrap.menuList);
-      setLoading(false);
-    }
-
-    let isUnmounted = false;
-
-    const initializeLayout = async () => {
-      if (!cachedBootstrap) setLoading(true);
-
-      const [userData, menuData] = await Promise.all([getUserInfo(), getMenuData()]);
-      if (isUnmounted) return;
-
-      if (userData && menuData?.length) {
-        writeBootstrapCache({
-          user: userData.user,
-          permissions: userData.permissions,
-          menuList: menuData,
-        });
-      }
-
-      setLoading(false);
-    };
-
-    initializeLayout();
-
-    return () => {
-      isUnmounted = true;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -283,17 +200,7 @@ function Layout() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
               >
-                <ErrorBoundary>
-                  <Suspense
-                    fallback={
-                      <div className="p-30px">
-                        <Skeleton active paragraph={{ rows: 10 }} />
-                      </div>
-                    }
-                  >
-                    {outlet}
-                  </Suspense>
-                </ErrorBoundary>
+                <ErrorBoundary>{outlet}</ErrorBoundary>
               </motion.div>
             )}
           </KeepAlive>
