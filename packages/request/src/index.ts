@@ -1,15 +1,22 @@
-import type { RequestCancel } from './types';
+import type { CreateRequestOptions, RequestCancel } from './types';
 import { message } from '@south/message';
 import { getLocalInfo, removeLocalInfo } from '@south/utils';
 import axios from 'axios';
 import AxiosRequest from './request';
 
 /**
+ * 权限过期提示在 localStorage 中的存储 key
+ * 请求拦截器在整页跳转前写入，登录页挂载后读取并清除
+ */
+const LOGIN_EXPIRED_MSG = 'login:expiredMsg';
+
+/**
  * 创建请求
  * @param url - 链接地址
  * @param tokenKey - 存token的key值
+ * @param options - 扩展选项（onAuthExpired 权限过期回调，由应用层注入）
  */
-function creteRequest(url: string, tokenKey: string) {
+function creteRequest(url: string, tokenKey: string, options?: CreateRequestOptions) {
   return new AxiosRequest({
     baseURL: url,
     timeout: 180 * 1000,
@@ -39,21 +46,26 @@ function creteRequest(url: string, tokenKey: string) {
           removeLocalInfo(tokenKey);
           console.error('错误信息:', data?.message || msg);
 
-          // 当前页直接提示，避免跳转后提示丢失
-          message.error({ content: msg, key: 'permission-expired' });
-
-          // 给其他标签页的登录页传输数据（同标签页收不到自己的消息）
-          const bc = new BroadcastChannel('login');
-          bc.postMessage(msg);
+          // 存储过期值
+          localStorage.setItem(LOGIN_EXPIRED_MSG, msg);
 
           // 跳转登录页
-          window.location.href = '/login';
+          if (options?.onAuthExpired) {
+            options.onAuthExpired();
+          } else {
+            window.location.href = '/login';
+          }
           return res;
         }
 
-        // 错误处理
+        // blob 响应（文件下载）跳过业务 code 校验，交由调用方处理（如 ExportModal 解析错误 blob）
+        if (data instanceof Blob || res.config?.responseType === 'blob') {
+          return res;
+        }
+
+        // 错误处理（FastAPI HTTPException 返回 {detail} 无 message/code，故兜底 detail）
         if (data?.code !== 200) {
-          handleError(data?.message);
+          handleError(data?.message || data?.detail);
           return res;
         }
 
@@ -86,5 +98,5 @@ const handleError = (error: string, content?: string) => {
   });
 };
 
-export { creteRequest };
+export { creteRequest, LOGIN_EXPIRED_MSG };
 export type * from './types';

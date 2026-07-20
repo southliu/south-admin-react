@@ -25,6 +25,15 @@ export interface CreateRequestConfig<T = AxiosResponse> extends CreateAxiosDefau
   interceptors?: RequestInterceptors<T>;
 }
 
+// creteRequest 扩展选项
+export interface CreateRequestOptions {
+  /**
+   * 权限过期（响应 code 401）时的处理回调
+   * 由应用层注入，与具体路由模式（HashRouter / BrowserRouter）解耦
+   */
+  onAuthExpired?: () => void;
+}
+
 // 接口响应数据
 export interface ServerResult<T = unknown> {
   code: number;

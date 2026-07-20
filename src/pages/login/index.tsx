@@ -5,12 +5,13 @@ import { Form, Button, Input } from 'antd';
 import I18n from '@/components/I18n';
 import Theme from '@/components/Theme';
 import { login } from '@/servers/login';
+import { LOGIN_EXPIRED_MSG } from '@south/request';
 import { setTitle } from '@/utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { getUserRefreshPermissions } from '@/servers/system/user';
 import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus/utils/helper';
-import Logo from '@/assets/images/logo.svg';
+import Logo from '@/assets/images/logo.png';
 
 const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
@@ -66,14 +67,12 @@ function Login() {
       form.setFieldsValue({ username, password: newPassword.value });
     }
 
-    // 监听错误信息提示
-    const bc = new BroadcastChannel('login');
-    bc.onmessage = (msg) => {
-      message.error({
-        content: msg?.data || String(msg),
-        key: 'error',
-      });
-    };
+    // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
+    const expiredMsg = localStorage.getItem(LOGIN_EXPIRED_MSG);
+    if (expiredMsg) {
+      messageApi.error({ content: expiredMsg, key: 'permission-expired' });
+      localStorage.removeItem(LOGIN_EXPIRED_MSG);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
