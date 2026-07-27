@@ -2,7 +2,7 @@ import type { MouseEventHandler, ReactNode, RefObject } from 'react';
 import type { ModalProps } from 'antd';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { useEffect, useRef, useState } from 'react';
-import { Modal, Tooltip } from 'antd';
+import { Modal, Spin, Tooltip } from 'antd';
 import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks/useCommonStore';
@@ -10,11 +10,12 @@ import Draggable from 'react-draggable';
 import './index.less';
 
 interface Props extends Omit<ModalProps, 'onCancel'> {
+  isLoading?: boolean;
   onCancel: () => void;
 }
 
 function BaseModal(props: Props) {
-  const { width, children, wrapClassName, onCancel } = props;
+  const { width, children, wrapClassName, onCancel, isLoading = false } = props;
   const { t } = useTranslation();
   const { isPhone } = useCommonStore();
   const [isDisabled, setDisabled] = useState(true);
@@ -134,7 +135,9 @@ function BaseModal(props: Props) {
       wrapClassName={isFullscreen ? 'full-modal' : wrapClassName || ''}
       width={isFullscreen ? '100%' : width || 520}
     >
-      <div className="base-modal-content">{children}</div>
+      <Spin spinning={isLoading}>
+        <div className="base-modal-content">{children}</div>
+      </Spin>
     </Modal>
   );
 }

@@ -114,6 +114,14 @@ class AxiosRequest {
     return this.instance.put(url, options, config) as Promise<ServerResult<T>>;
   }
   /**
+   * patch请求
+   * @param url - 链接
+   * @param options - 参数
+   */
+  patch<T = object>(url: string, options = {}, config?: AxiosRequestConfig<object>) {
+    return this.instance.patch(url, options, config) as Promise<ServerResult<T>>;
+  }
+  /**
    * delete请求
    * @param url - 链接
    * @param options - 参数

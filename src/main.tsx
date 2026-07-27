@@ -10,6 +10,9 @@ import 'nprogress/nprogress.css';
 import '@/assets/css/scrollbar.less';
 import '@/assets/css/theme-color.less';
 
+// 静态导入icon
+import '@/utils/icons';
+
 // 国际化i18n
 import './locales/config';
 

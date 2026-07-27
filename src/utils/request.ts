@@ -5,13 +5,24 @@ import { creteRequest } from '@south/request';
 const prefixUrl = import.meta.env.VITE_BASE_URL as string;
 const baseURL = process.env.NODE_ENV !== 'development' ? prefixUrl : '/api';
 
-// 请求配置
+// 业务侧统一请求实例（get/post/put/patch/delete/sse）
 export const request = creteRequest(baseURL, TOKEN, {
-  // 权限过期处理：当前为 HashRouter，先设 hash 路由再 reload 强制刷新以清理内存鉴权状态
-  // 若后续切换为 BrowserRouter，改为 window.location.href = '/login' 即可
+  // 权限过期处理：自动兼容 HashRouter 与 BrowserRouter。
+  // HashRouter 路由在 hash（形如 "#/ai-refund/workbench"），改 hash 后需 reload；
+  // BrowserRouter 路由在 pathname，改 location.href 会自动整页加载。
   onAuthExpired: () => {
-    window.location.hash = '/login';
-    window.location.reload();
+    const isHashRouter = window.location.hash.startsWith('#');
+    const currentRoute = isHashRouter
+      ? window.location.hash.slice(1)
+      : `${window.location.pathname}${window.location.search}`;
+    const redirect = currentRoute && currentRoute !== '/login' ? `?redirect=${currentRoute}` : '';
+    const loginPath = `/login${redirect}`;
+    if (isHashRouter) {
+      window.location.hash = loginPath;
+      window.location.reload();
+    } else {
+      window.location.href = loginPath;
+    }
   },
 });
 

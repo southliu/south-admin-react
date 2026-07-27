@@ -37,23 +37,26 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
       // 接口响应拦截
       responseInterceptors(res) {
         const { data } = res;
-        // 权限不足
+        // 权限过期
         if (data?.code === 401) {
           const lang = localStorage.getItem('lang');
           const enMsg = 'Insufficient permissions, please log in again!';
-          const zhMsg = '权限不足，请重新登录！';
+          const zhMsg = '权限过期，请重新登录！';
           const msg = lang === 'en' ? enMsg : zhMsg;
           removeLocalInfo(tokenKey);
           console.error('错误信息:', data?.message || msg);
 
-          // 存储过期值
+          // 整页跳转会清空当前页内存中的 message 实例，BroadcastChannel 也无法跨刷新投递
+          // （postMessage 时登录页尚未挂载，消息无人接收即丢失），因此改用 localStorage 携带提示
+          // （与 token 存储一致），由登录页挂载后读取
           localStorage.setItem(LOGIN_EXPIRED_MSG, msg);
 
-          // 跳转登录页
           if (options?.onAuthExpired) {
             options.onAuthExpired();
           } else {
-            window.location.href = '/login';
+            const current = `${window.location.pathname}${window.location.search}`;
+            const redirect = current && current !== '/login' ? `?redirect=${current}` : '';
+            window.location.href = `/login${redirect}`;
           }
           return res;
         }
