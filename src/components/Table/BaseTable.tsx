@@ -71,7 +71,10 @@ function BaseTable(props: Props) {
 
   useEffect(() => {
     const newColumns = filterTableColumns(props.columns as TableColumn[]);
-    const columnKeys = newColumns?.map((col) => col.dataIndex).filter(Boolean) as string[];
+    const columnKeys = newColumns
+      ?.filter((col) => !(col as TableColumn).hidden)
+      .map((col) => col.dataIndex)
+      .filter(Boolean) as string[];
     setColumns(newColumns);
     setTableFilters(columnKeys);
     setSortList(columnKeys);
@@ -127,7 +130,9 @@ function BaseTable(props: Props) {
   const mergedColumns = useMemo(() => {
     const newColumns = handleFilterTable(columns, tableFilters, sortList);
     if (!newColumns) return [];
-    const result = newColumns.map((col, index) => ({
+    const result = newColumns
+      .filter((col) => !(col as TableColumn).hidden)
+      .map((col, index) => ({
       ...col,
       ellipsis: col.ellipsis ?? true,
       // 手机端去除列固定，除非设置了isKeepFixed
