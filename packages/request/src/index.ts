@@ -39,6 +39,15 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
         const { data } = res;
         // 权限过期
         if (data?.code === 401) {
+          const currentToken = getLocalInfo(tokenKey) || '';
+          const requestToken = String(res.config.headers.get('Authorization') || '').replace(
+            'Bearer ',
+            '',
+          );
+          if (currentToken && requestToken !== currentToken) {
+            return res;
+          }
+
           const lang = localStorage.getItem('lang');
           const enMsg = 'Insufficient permissions, please log in again!';
           const zhMsg = '权限过期，请重新登录！';
@@ -46,9 +55,6 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
           removeLocalInfo(tokenKey);
           console.error('错误信息:', data?.message || msg);
 
-          // 整页跳转会清空当前页内存中的 message 实例，BroadcastChannel 也无法跨刷新投递
-          // （postMessage 时登录页尚未挂载，消息无人接收即丢失），因此改用 localStorage 携带提示
-          // （与 token 存储一致），由登录页挂载后读取
           localStorage.setItem(LOGIN_EXPIRED_MSG, msg);
 
           if (options?.onAuthExpired) {

@@ -249,10 +249,11 @@ function Login() {
             autoComplete="on"
             onFinish={handleFinish}
             onFinishFailed={handleFinishFailed}
-            initialValues={{
-              username: 'admin',
-              password: 'admin123456',
-            }}
+            initialValues={
+              import.meta.env.VITE_SHOW_DEFAULT_ACCOUNT === 'true'
+                ? { username: 'admin', password: 'admin123456' }
+                : {}
+            }
           >
             <div className="text-#AAA6A6 text-14px mb-8px">{t('login.username')}</div>
 
