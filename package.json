@@ -13,7 +13,8 @@
     "lint:stylelint": "stylelint --cache --fix \"**/*.{less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "preview": "vite preview",
     "prepare": "husky install",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "init:project": "node .claude/skills/init-project/scripts/init.mjs"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2.0.1",

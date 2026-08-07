@@ -84,6 +84,51 @@ pnpm build
    
 	2.4 在`log`文件夹下创建`index.ts`文件，在该文件下输入`demoPage`后回车，将XXX改为Log，将xxx改为对应权限表示。
 
+## 🧹 项目初始化（清除示例内容）
+
+项目内置了演示用的示例内容（demo 页面、content 文章模块、Github 角标等），开始业务开发前可一键清除。清除过程会连带删除代码中的 `import` 与 JSX 引用，避免遗留悬空引用。
+
+> ⚠️ 该操作不可逆，建议在干净的 git 工作区执行，方便回滚。
+
+### 方式一：pnpm 脚本（推荐）
+
+```bash
+pnpm init:project
+```
+
+执行后会先 `dry-run` 预览将要删除的文件和将要修改的引用，确认后才真正执行。也可直接传参：
+
+```bash
+pnpm run init:project -- --dry-run   # 仅预览，不删除
+pnpm run init:project -- --yes       # 跳过确认直接执行
+```
+
+### 方式二：Claude Code Skill
+
+在 Claude Code 中执行 `/init-project`，会调用同一套清理脚本并交互确认。
+
+### 方式三：直接运行脚本
+
+```bash
+# 预览
+python .claude/skills/init-project/scripts/cleanup.py --dry-run
+# 执行
+python .claude/skills/init-project/scripts/cleanup.py
+```
+
+### 清理范围
+
+| 类型 | 目标 |
+| --- | --- |
+| 页面 | `src/pages/demo/`、`src/pages/content/` |
+| 组件 | `src/components/Github/` |
+| 接口 | `src/servers/content/` |
+| 静态菜单 | `src/menus/demo.ts` 及 `src/menus/index.ts` 中的 demo 引用 |
+| 国际化 | `src/locales/zh/content.ts`、`src/locales/en/content.ts` |
+| 代码引用 | `src/layouts/components/Header.tsx` 中的 Github 引用 |
+
+清理完成后，建议执行 `pnpm lint` 和 `pnpm dev` 验证项目正常运行。完整说明见 `.claude/skills/init-project/SKILL.md`。
+
 ## 📁 项目结构
 
 ```tree
