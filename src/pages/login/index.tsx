@@ -11,7 +11,8 @@ import { getMenuList } from '@/servers/system/menu';
 import { getUserRefreshPermissions } from '@/servers/system/user';
 import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus/utils/helper';
-import Logo from '@/assets/images/logo.svg';
+import { cancelAllRequest } from '@/utils/request';
+import Logo from '@/assets/images/logo.png';
 
 const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
@@ -26,7 +27,7 @@ function Login() {
   const [isRemember, setRemember] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
   const { search } = useLocation();
-  const { permissions, menuList } = useCommonStore();
+  const { permissions } = useCommonStore();
   const setMenuList = useMenuStore((state) => state.setMenuList);
   const setThemeValue = usePublicStore((state) => state.setThemeValue);
   const { setPermissions, setUserInfo } = useUserStore((state) => state);
@@ -44,6 +45,9 @@ function Login() {
   }, [themeCache]);
 
   useEffect(() => {
+    // 清除上一会话的残留请求
+    cancelAllRequest();
+
     // 如果存在token，则直接进入页面
     if (getToken()) {
       // 如果不存在缓存则获取权限
@@ -99,7 +103,8 @@ function Login() {
 
   /** 获取菜单数据 */
   const getMenuData = async () => {
-    if (menuList?.length) return menuList;
+    const cached = useMenuStore.getState().menuList;
+    if (cached?.length) return cached;
     let result: SideMenu[] = [];
 
     try {
@@ -124,11 +129,19 @@ function Login() {
     return search.substring(start, end);
   };
 
-  /** 菜单跳转 */
+  /**
+   * 菜单跳转
+   * @param permissions - 权限列表
+   */
   const handleGoMenu = async (permissions: string[]) => {
-    let menuData: SideMenu[] = menuList;
+    let menuData = useMenuStore.getState().menuList;
     if (!menuData?.length) {
       menuData = (await getMenuData()) as SideMenu[];
+    }
+
+    // 菜单仍为空（接口失败或返回空），无法确定跳转目标
+    if (!menuData?.length) {
+      return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
     }
 
     // 如果存在重定向
@@ -170,7 +183,8 @@ function Login() {
       setToken(token);
       setUserInfo(user);
       setPermissions(permissions);
-      handleGoMenu(permissions);
+
+      await handleGoMenu(permissions);
     } finally {
       setLoading(false);
     }
