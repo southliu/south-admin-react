@@ -93,14 +93,18 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         setActiveKey(newItems.key);
         setNav(newItems.nav);
         addTabs(newItems);
+        // 路由变化同步浏览器标题，
+        const title =
+          i18n.language === 'en' ? newItems.labelEn : newItems.labelZh || newItems.label;
+        if (title) setTitle(t, title);
       } else {
         setActiveKey(path);
       }
     },
-    [permissions, menuList, pathname, setActiveKey, setNav, addTabs],
+    [permissions, menuList, pathname, setActiveKey, setNav, addTabs, t, i18n],
   );
 
-  // 初始化标签
+  // 初始化标签 & 路由变化时同步
   useEffect(() => {
     handleAddTab();
   }, [pathname]);

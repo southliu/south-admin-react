@@ -1,4 +1,5 @@
 import { useShallow } from 'zustand/shallow';
+import { cancelAllRequest } from '@/utils/request';
 
 /**
  * 获取常用的状态数据
@@ -11,10 +12,10 @@ export const useLogout = () => {
   const setMenuList = useMenuStore((state) => state.setMenuList);
   const clearInfo = useUserStore((state) => state.clearInfo);
   const navigate = useNavigate();
-  const location = useLocation();
 
   /** 退出登录 */
   const handleLogout = () => {
+    cancelAllRequest();
     sessionStorage.removeItem('layout-bootstrap');
     clearInfo();
     closeAllTab();
@@ -23,7 +24,7 @@ export const useLogout = () => {
     setPermissions([]);
     removeToken();
     aliveRef.current?.destroyAll(); // 清除keepalive缓存
-    navigate(`/login?redirect=${location.pathname}${location.search}`);
+    navigate('/login');
   };
 
   return [handleLogout] as const;

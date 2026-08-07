@@ -10,8 +10,7 @@
 使用`React`,`Typescript`,`Vite`,`Antd`等主流技术开发的开箱即用的中后台前端项目，`Vite`实现自动生成路由，支持`KeepAlive`功能，`zustand`状态管理，支持虚拟滚动表格，`UnoCss`开发样式。
 
 ## 🚀 项目演示
-[演示地址](https://southliu.github.io/)，接口数据都为mock数据，无法进行新增和修改。
-
+[演示地址](https://southliu.top/)
 <img width="1920" height="922" alt="image" src="https://github.com/user-attachments/assets/943f1ca2-9ad3-45cc-83aa-7a3d18984653" />
 
 ![02.gif](https://github.com/southliu/github-static/blob/main/react-admin/02.gif)
