@@ -12,7 +12,7 @@ import { getUserRefreshPermissions } from '@/servers/system/user';
 import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus/utils/helper';
 import { cancelAllRequest } from '@/utils/request';
-import Logo from '@/assets/images/logo.png';
+import Logo from '@/assets/images/logo.svg';
 
 const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
