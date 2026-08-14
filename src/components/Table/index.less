@@ -13,9 +13,14 @@
   cursor: col-resize;
 }
 
-.ant-table-body,
 .ant-table-container {
-  overflow: auto !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
   scrollbar-color: auto;
   scrollbar-width: auto;
+}
+
+.ant-table-body {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
 }
