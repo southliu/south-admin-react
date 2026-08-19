@@ -15,7 +15,10 @@ export const request = creteRequest(baseURL, TOKEN, {
     const currentRoute = isHashRouter
       ? window.location.hash.slice(1)
       : `${window.location.pathname}${window.location.search}`;
-    const redirect = currentRoute && currentRoute !== '/login' ? `?redirect=${currentRoute}` : '';
+    // 已在登录页（含带 redirect 参数）时不再跳转，避免并发 401 把 redirect 参数嵌套成
+    // /login?redirect=/login?redirect=...
+    if (currentRoute.startsWith('/login')) return;
+    const redirect = currentRoute ? `?redirect=${currentRoute}` : '';
     const loginPath = `/login${redirect}`;
     if (isHashRouter) {
       window.location.hash = loginPath;

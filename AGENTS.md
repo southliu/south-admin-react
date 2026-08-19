@@ -18,8 +18,19 @@ pnpm prettier         # 格式化代码
 
 ## 新建页面（重要约定）
 
+- **pages 目录按菜单结构命名**：一级菜单 → 父文件夹，二级菜单 → 子文件夹（kebab-case）。如菜单为「系统管理-菜单管理、系统管理-用户管理、商城管理-商品类型、商城管理-商品列表」，对应：
+
+  ```
+  src/pages/system/menu/index.tsx      # 系统管理-菜单管理
+  src/pages/system/user/index.tsx      # 系统管理-用户管理
+  src/pages/mall/goods-type/index.tsx  # 商城管理-商品类型
+  src/pages/mall/goods/index.tsx       # 商城管理-商品列表
+  ```
+
+  即 `src/pages/<一级菜单>/<二级菜单>/index.tsx`；同菜单层级的页面必须落在同一父文件夹下，路由 `/system/menu` 由目录自动生成。
 - **优先使用 `/demo-create` skill**（`.claude/skills/demo-create/SKILL.md`）生成标准 CRUD 页面，不要手写整套模板。
-- 页面目录结构固定为：`src/pages/父文件夹/子文件夹/index.tsx + model.tsx`（model 承放搜索项、表格列、表单配置），文件夹划分要清晰分明。
+- **【强制】每次创建新的路由页面，必须使用 `/demo-create` skill 生成**（`.claude/skills/demo-create/SKILL.md`），不要手写整套 CRUD 模板。仅以下情况可以不用 demo-create：页面非标准 CRUD 结构（如仪表盘、自定义复杂布局），此时在 AGENTS.md 或对话中说明原因。
+- 每页固定 `index.tsx + model.ts`（model 承放搜索项、表格列、表单配置），文件夹划分要清晰分明。
 - **能组件化就组件化**：
   - 仅当前页面使用的组件 → 放在该页面子文件夹的 `components/` 中（参考 `src/pages/system/menu/components/`）。
   - 全局/跨页面使用的组件 → 放 `src/components/`，公共二次封装组件以 `Base` 开头（如 `BaseTable`、`BaseForm`、`BaseModal`）。
