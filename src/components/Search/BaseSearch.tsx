@@ -181,6 +181,28 @@ const BaseSearch = (props: Props) => {
     console.warn('搜索错误:', errorInfo);
   };
 
+  /**
+   * 表单值变化：点击清除图标清空搜索项时自动提交表单，重新加载列表
+   * @param changedValues - 变化的表单值
+   * @param allValues - 全部表单值
+   */
+  const onValuesChange: FormProps['onValuesChange'] = (changedValues, allValues) => {
+    props.onValuesChange?.(changedValues, allValues);
+
+    const isEmpty = Object.values(changedValues ?? {}).every((value) => {
+      return (
+        value === undefined ||
+        value === null ||
+        value === '' ||
+        (Array.isArray(value) && !value.length)
+      );
+    });
+
+    if (isEmpty) {
+      form?.submit();
+    }
+  };
+
   /** 渲染按钮列表 */
   const renderBtnList = (
     <div className="flex flex-wrap gap-10px">
@@ -231,6 +253,7 @@ const BaseSearch = (props: Props) => {
         form={form}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
+        onValuesChange={onValuesChange}
         autoComplete="off"
       >
         {type === 'default' && (
