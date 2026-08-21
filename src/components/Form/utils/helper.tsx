@@ -143,9 +143,7 @@ export const filterEmptyStr = (values: Record<string, unknown>) => {
       values[key] = values[key]?.trim();
     }
 
-    if (values[key] !== '') {
-      params[key] = values[key];
-    }
+    params[key] = values[key];
   });
 
   return params;

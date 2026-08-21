@@ -70,3 +70,13 @@ pnpm prettier         # 格式化代码
 
 - `pnpm init:project` — 一键清除模板演示内容（demo 页面、content 模块等），不可逆，见 `.claude/skills/init-project/SKILL.md`
 - `.vscode/south.code-snippets` — `demoPage`/`demoModel`/`demoApi` 等代码片段，是 demo-create skill 的模板来源
+
+## 工作规则（必须遵守）
+
+1. 不允许跳过项目上下文直接改代码；先读相关模块再动手。
+2. 不允许没有验证就声称完成；改动必须 `pnpm lint` 通过并实际运行验证后才能报告完成。
+3. 不允许为了完成局部需求大范围重构无关模块。
+4. 不允许恢复或覆盖用户已有的未说明改动（改动前先 `git status`/`git diff` 确认工作区）。
+5. 不允许引入与当前项目技术栈和代码风格冲突的实现方式。
+6. 注释只写 non-obvious reason，禁止保留 intermediate attempts；PR/提交描述只写最终行为，diff 里看不出来的取舍与从未合入的状态一律不提。
+7. 验证用的临时数据和前后端 dev 端口在收尾时必须清理/关闭；临时改动（如 `.env.development` 代理切换）必须还原。
