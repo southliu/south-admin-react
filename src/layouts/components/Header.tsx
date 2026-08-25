@@ -28,7 +28,7 @@ function Header() {
   const [handleLogout] = useLogout();
   const { t } = useTranslation();
   const { modal } = App.useApp();
-  const { isCollapsed, isMaximize, username, nav } = useCommonStore();
+  const { isCollapsed, isMaximize, username, name, nav } = useCommonStore();
   // 是否窗口最大化
   const passwordRef = useRef<PasswordModal>(null);
   const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);
@@ -98,14 +98,14 @@ function Header() {
                 className="rounded-1/2 overflow-hidden object-cover bg-light-500"
               />
               <span className="ml-2 text-15px min-w-50px truncate">
-                {username || 'south-admin'}
+                {name || username || 'south-admin'}
               </span>
             </div>
           </Dropdown>
         </div>
       ),
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [username],
+      [name, username],
     );
   };
 

@@ -4,6 +4,7 @@ import { devtools } from 'zustand/middleware';
 interface UserInfo {
   id: number;
   username: string;
+  name: string;
   email: string;
   phone: string;
   roles: number[];
@@ -24,6 +25,7 @@ export const useUserStore = create<UserState>()(
       userInfo: {
         id: 0,
         username: '',
+        name: '',
         email: '',
         phone: '',
         roles: [],
@@ -35,7 +37,7 @@ export const useUserStore = create<UserState>()(
       /** 清除用户信息 */
       clearInfo: () =>
         set({
-          userInfo: { id: 0, username: '', email: '', phone: '', roles: [] },
+          userInfo: { id: 0, username: '', name: '', email: '', phone: '', roles: [] },
         }),
     }),
     {

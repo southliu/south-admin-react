@@ -13,6 +13,7 @@ export const useCommonStore = () => {
       userId: state.userInfo.id,
       roles: state.userInfo.roles,
       username: state.userInfo.username,
+      name: state.userInfo.name,
     })),
   );
 

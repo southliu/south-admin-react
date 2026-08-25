@@ -8,6 +8,7 @@ export interface LoginData {
 interface User {
   id: number;
   username: string;
+  name: string;
   phone: string;
   email: string;
   roles: number[];
