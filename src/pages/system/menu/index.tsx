@@ -88,9 +88,13 @@ function Page() {
   }, [pagePermission.page]);
 
   // 每次进入调用
-  useEffectOnActive(() => {
-    getPage();
-  }, []);
+  useEffectOnActive(
+    () => {
+      getPage();
+    },
+    [],
+    true,
+  );
 
   /**
    * 点击搜索
@@ -292,10 +296,7 @@ function Page() {
                 okText={t('public.confirm')}
                 cancelText={t('public.cancel')}
               >
-                <Button
-                  danger
-                  className="small-btn"
-                >
+                <Button danger className="small-btn">
                   {t('public.batchDelete')} ({selectedRowKeys.length})
                 </Button>
               </Popconfirm>

@@ -33,3 +33,7 @@ coverage/
 stats.html
 .vite
 types/autoImports.d.ts
+gui-test-screenshots
+.tmp-shots
+.codex-staging
+.codex-temp

@@ -85,9 +85,13 @@ function Page() {
   }, [pagePermission.page]);
 
   // 每次进入调用
-  useEffectOnActive(() => {
-    getPage();
-  }, []);
+  useEffectOnActive(
+    () => {
+      getPage();
+    },
+    [],
+    true,
+  );
 
   /**
    * 点击搜索
@@ -238,13 +242,7 @@ function Page() {
         </div>
       );
     },
-    [
-      pagePermission.update,
-      pagePermission.delete,
-      t,
-      onUpdate,
-      onDelete,
-    ],
+    [pagePermission.update, pagePermission.delete, t, onUpdate, onDelete],
   );
 
   // 缓存列配置
