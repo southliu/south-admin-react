@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { debounce } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import * as echarts from 'echarts/core';
 import {
   BarChart,
@@ -85,6 +85,10 @@ export const useEcharts = (options: echarts.EChartsCoreOption, data?: unknown) =
   const htmlDivRef = useRef<HTMLDivElement>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const debouncedResizeRef = useRef<ReturnType<typeof debounce> | null>(null);
+  const optionsRef = useRef(options);
+  const isFirstUpdateRef = useRef(true);
+  const lastOptionsRef = useRef(options);
+  const lastDataRef = useRef(data);
 
   /** 销毁echarts */
   const dispose = useCallback(() => {
@@ -104,11 +108,11 @@ export const useEcharts = (options: echarts.EChartsCoreOption, data?: unknown) =
 
   /** 初始化 */
   useEffect(() => {
-    if (!htmlDivRef.current || !options) return;
+    if (!htmlDivRef.current || !optionsRef.current) return;
 
     // 初始化chart
     echartsRef.current = echarts.init(htmlDivRef.current);
-    echartsRef.current.setOption(options);
+    echartsRef.current.setOption(optionsRef.current);
 
     // 创建并保存 debounced resize 函数
     debouncedResizeRef.current = debounce(() => {
@@ -126,13 +130,20 @@ export const useEcharts = (options: echarts.EChartsCoreOption, data?: unknown) =
     return () => {
       dispose();
     };
-  }, [options, dispose]);
+  }, [dispose]);
 
   // 当数据变化时更新图表
   useEffect(() => {
-    if (data && echartsRef.current) {
-      echartsRef.current.setOption(options);
+    if (isFirstUpdateRef.current) {
+      isFirstUpdateRef.current = false;
+    } else if (!isEqual(options, lastOptionsRef.current) || !isEqual(data, lastDataRef.current)) {
+      // 调用方每次 render 都会新建 options 对象，必须按内容比较：
+      // 内容没变不调 setOption（图表完全不动），内容变了恰好更新一次
+      echartsRef.current?.setOption(options);
     }
+
+    lastOptionsRef.current = options;
+    lastDataRef.current = data;
   }, [data, options]);
 
   return [htmlDivRef, echartsRef] as const;

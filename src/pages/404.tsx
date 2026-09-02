@@ -62,7 +62,9 @@ function NotFound() {
     if (currentMenuList.length === 0) return;
 
     const firstMenu = getFirstMenu(currentMenuList, currentPermissions);
-    navigate(firstMenu || '/');
+    // 所有菜单都没有对应页面时不跳转，留在404避免跳到空白首页再循环回来
+    if (!firstMenu) return;
+    navigate(firstMenu);
     const menuByKeyProps = {
       menus: currentMenuList,
       permissions: currentPermissions,

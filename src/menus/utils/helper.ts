@@ -1,6 +1,7 @@
 import type { SideMenu } from '#/public';
 import type { Langs } from '@/components/I18n';
 import { cloneDeep } from 'lodash';
+import { isRouteExist } from '@/router/utils/helper';
 import { LANG } from '@/utils/config';
 
 /**
@@ -335,9 +336,10 @@ export function getFirstMenu(menus: SideMenu[], permissions: string[], result = 
       }
     }
 
-    // 有权限且没有有子数据
-    if (hasPermission(menus[i], permissions) && !hasChildren(menus[i]) && !result)
-      result = menus[i].key;
+    // 有权限且没有有子数据，且菜单对应的前端页面真实存在（否则跳过去只会命中404）
+    if (hasPermission(menus[i], permissions) && !hasChildren(menus[i]) && !result) {
+      if (isRouteExist(menus[i].key)) result = menus[i].key;
+    }
   }
 
   return result;

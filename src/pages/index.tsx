@@ -10,7 +10,8 @@ function Page() {
   /** 跳转第一个有效菜单路径 */
   const goFirstMenu = useCallback(() => {
     const firstMenu = getFirstMenu(menuList, permissions);
-    navigate(firstMenu);
+    // 无可跳转菜单时不导航，navigate('') 会停留在空白页
+    if (firstMenu) navigate(firstMenu);
   }, [menuList, navigate, permissions]);
 
   useEffect(() => {

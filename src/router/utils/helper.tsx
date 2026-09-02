@@ -1,6 +1,26 @@
 import type { RouteObject } from 'react-router-dom';
 import { lazy } from 'react';
+import { matchPath } from 'react-router-dom';
 import { ROUTER_EXCLUDE } from './config';
+
+type PageFiles = Record<string, () => Promise<unknown>>;
+
+// 页面文件映射，与 Router.tsx 的路由生成规则共用同一套排除与路径推导
+// glob 路径相对本文件（src/router/utils/）解析
+const pageFiles = import.meta.glob('../../pages/**/*.tsx', { eager: false }) as PageFiles;
+
+/**
+ * 路径是否有对应的前端页面路由（含动态参数路由）
+ * @param pathname - 菜单路径
+ */
+export function isRouteExist(pathname: string): boolean {
+  if (!pathname) return false;
+
+  for (const path of routePaths) {
+    if (matchPath(path, pathname)) return true;
+  }
+  return false;
+}
 
 /**
  * 路由添加layout
@@ -108,4 +128,13 @@ function getRouterPage(path: string): string {
   }
 
   return result;
+}
+
+// 全量页面路由路径，须在 getRouterPage（const 箭头函数）初始化之后计算
+const routePaths = new Set<string>();
+for (const key in pageFiles) {
+  if (handleRouterExclude(key)) continue;
+  const path = getRouterPage(key);
+  if (path === '/login') continue;
+  routePaths.add(path);
 }
