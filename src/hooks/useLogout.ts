@@ -23,8 +23,11 @@ export const useLogout = () => {
     setMenuList([]);
     setPermissions([]);
     removeToken();
-    aliveRef.current?.destroyAll(); // 清除keepalive缓存
     navigate('/login');
+    // 避免退出登录失效
+    setTimeout(() => {
+      aliveRef.current?.destroyAll();
+    }, 0);
   };
 
   return [handleLogout] as const;
