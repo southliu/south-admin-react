@@ -31,6 +31,7 @@ pnpm prettier         # 格式化代码
 - **优先使用 `/demo-create` skill**（`.claude/skills/demo-create/SKILL.md`）生成标准 CRUD 页面，不要手写整套模板。
 - **【强制】每次创建新的路由页面，必须使用 `/demo-create` skill 生成**（`.claude/skills/demo-create/SKILL.md`），不要手写整套 CRUD 模板。仅以下情况可以不用 demo-create：页面非标准 CRUD 结构（如仪表盘、自定义复杂布局），此时在 AGENTS.md 或对话中说明原因。
 - 每页固定 `index.tsx + model.ts`（model 承放搜索项、表格列、表单配置），文件夹划分要清晰分明。
+- **输入框必须限制长度**：开发输入框前先确认对应数据库表字段的长度（查后端表结构/API 文档，不清楚时向用户确认），并在表单/搜索 schema 的 `componentProps.maxLength` 中设置该长度（如 `varchar(50)` → `maxLength: 50`，参考 `src/pages/system/user/model.tsx`）；不允许出现没有 `maxLength` 的文本输入框。
 - **能组件化就组件化**：
   - 仅当前页面使用的组件 → 放在该页面子文件夹的 `components/` 中（参考 `src/pages/system/menu/components/`）。
   - 全局/跨页面使用的组件 → 放 `src/components/`，公共二次封装组件以 `Base` 开头（如 `BaseTable`、`BaseForm`、`BaseModal`）。

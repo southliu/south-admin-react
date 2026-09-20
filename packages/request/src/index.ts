@@ -87,7 +87,7 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
           return err;
         }
 
-        handleError((err as RequestCancel)?.response?.data?.message || '服务器错误！');
+        handleError((err as RequestCancel)?.response?.data?.message || '网络异常，请稍后重试');
         return err;
       },
     },
@@ -102,7 +102,7 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
 const handleError = (error: string, content?: string) => {
   console.error('错误信息:', error);
   message.error({
-    content: content || error || '服务器错误',
+    content: content || error || '网络异常，请稍后重试',
     key: 'error',
   });
 };
