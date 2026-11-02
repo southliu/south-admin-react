@@ -191,7 +191,7 @@ function Layout() {
           {isLoading && permissions.length === 0 && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
-          {!isLoading && permissions.length === 0 && <Forbidden />}
+          {!isLoading && permissions.length === 0 && Boolean(token) && <Forbidden />}
           <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
             {permissions.length > 0 && (
               <motion.div

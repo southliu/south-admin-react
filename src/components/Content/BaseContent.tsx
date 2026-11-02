@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Forbidden from '@/pages/403';
+import { useToken } from '@/hooks/useToken';
 
 interface Props {
   isPermission?: boolean;
@@ -8,6 +9,8 @@ interface Props {
 
 function BaseContent(props: Props) {
   const { isPermission, children } = props;
+  const [getToken] = useToken();
+  const showForbidden = isPermission === false && Boolean(getToken());
 
   return (
     <>
@@ -16,7 +19,7 @@ function BaseContent(props: Props) {
           {children}
         </div>
       )}
-      {isPermission === false && (
+      {showForbidden && (
         <div className="h-full p-10px box-border overflow-auto">
           <Forbidden />
         </div>

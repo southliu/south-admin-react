@@ -52,10 +52,11 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
           const enMsg = 'Insufficient permissions, please log in again!';
           const zhMsg = '权限过期，请重新登录！';
           const msg = lang === 'en' ? enMsg : zhMsg;
+          const errorMessage = data?.message || data?.detail || msg;
           removeLocalInfo(tokenKey);
-          console.error('错误信息:', data?.message || msg);
+          handleError(errorMessage);
 
-          localStorage.setItem(LOGIN_EXPIRED_MSG, msg);
+          localStorage.setItem(LOGIN_EXPIRED_MSG, errorMessage);
 
           if (options?.onAuthExpired) {
             options.onAuthExpired();
@@ -87,7 +88,8 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
           return err;
         }
 
-        handleError((err as RequestCancel)?.response?.data?.message || '网络异常，请稍后重试');
+        const responseData = (err as RequestCancel)?.response?.data;
+        handleError(responseData?.message || responseData?.detail || '网络异常，请稍后重试');
         return err;
       },
     },

@@ -7,6 +7,7 @@ export interface RequestCancel extends Cancel {
     data: {
       code?: number;
       message?: string;
+      detail?: string;
     };
   };
 }
