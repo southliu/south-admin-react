@@ -45,14 +45,18 @@ export function createVitePlugins() {
       versionUpdatePlugin(),
       // 生成 .nojekyll 空文件
       nojekyllPlugin(),
-      // 包分析
-      visualizer({
-        gzipSize: true,
-        brotliSize: true,
-      }),
       // 打包时间
       timePlugin(),
     );
+
+    if (process.env.ANALYZE === 'true') {
+      vitePlugins.push(
+        visualizer({
+          gzipSize: true,
+          brotliSize: true,
+        }),
+      );
+    }
   }
 
   return vitePlugins;

@@ -63,6 +63,12 @@ pnpm dev
 pnpm build
 ```
 
+- 分析打包体积（生成项目根目录下的 `stats.html`）
+
+```bash
+pnpm build:analyze
+```
+
 ## 🌐 后端项目
 ![Go](https://img.shields.io/badge/-Go-black?style=plastic&logo=go) [south-admin-gin](https://github.com/southliu/south-admin-gin)<br/>
 ![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-fastApi](https://github.com/southliu/south-admin-fastApi)<br/>
