@@ -1,3 +1,4 @@
+import { useMenuStore } from '@/stores/menu';
 import type { TabsProps } from 'antd';
 import type { KeepAliveRef } from 'keepalive-for-react';
 import {

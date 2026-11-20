@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { InputProps } from 'antd';
 import { Input } from 'antd';
 

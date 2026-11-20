@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 import { Select, Spin } from 'antd';
 import { MAX_TAG_COUNT } from './index';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import Loading from './components/Loading';
 
 /**

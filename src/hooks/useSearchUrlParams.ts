@@ -1,3 +1,7 @@
+import { useSearchParams, useLocation } from 'react-router-dom';
+import { useTabsStore } from '@/stores/tabs';
+import { useCallback, useEffect } from 'react';
+import type { BaseFormData } from '#/form';
 /**
  * 将搜索参数带入url中
  */

@@ -65,7 +65,7 @@ pnpm prettier         # 格式化代码
 - `@/*` → `src/*`，`#/*` → `types/*`
 - 表单用声明式 `BaseFormList` schema，组件映射在 `src/components/Form/utils/componentMap.tsx`
 - 图标用 Iconify（`@iconify/react`）
-- TypeScript 严格模式，`pnpm build` 前需存在 `types/autoImports.d.ts`（不存在则先跑一次 `pnpm dev` 生成）
+- TypeScript 严格模式，Hooks、组件、工具函数与类型均使用显式导入，类型使用 `import type`。
 
 ## 其他工具
 

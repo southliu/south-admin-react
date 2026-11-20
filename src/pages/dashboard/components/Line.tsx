@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { useEcharts } from '@/hooks/useEcharts';
 import type { EChartsCoreOption } from 'echarts';
 
 function Line() {

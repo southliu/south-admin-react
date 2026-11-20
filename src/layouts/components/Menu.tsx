@@ -1,7 +1,8 @@
+import { useTabsStore } from '@/stores/tabs';
 import type { MenuProps } from 'antd';
 import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
-import { useCallback, useMemo, useState, memo } from 'react';
+import { useCallback, useMemo, useState, memo, useEffect } from 'react';
 import { Menu } from 'antd';
 import { isUrl } from '@/utils/is';
 import { Icon } from '@iconify/react';

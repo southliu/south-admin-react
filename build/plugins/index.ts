@@ -2,7 +2,6 @@ import type { PluginOption } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { timePlugin } from './time';
 import { nojekyllPlugin } from './nojekyll';
-import { autoImportPlugin } from './autoImport';
 import { versionUpdatePlugin } from './version';
 import react from '@vitejs/plugin-react-swc';
 import unocss from 'unocss/vite';
@@ -20,8 +19,6 @@ export function createVitePlugins() {
       tsDecorators: false,
     }),
     unocss(),
-    // 自动导入
-    autoImportPlugin(),
   ];
 
   // 生产环境才启用这些插件

@@ -1,7 +1,19 @@
+import { useTranslation } from 'react-i18next';
+import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { checkPermission } from '@/utils/permissions';
+import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BasePagination from '@/components/Pagination/BasePagination';
+import BaseModal from '@/components/Modal/BaseModal';
+import BaseForm from '@/components/Form/BaseForm';
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
 import { Button, Form, type FormInstance, message, Popconfirm } from 'antd';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';
 import {

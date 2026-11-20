@@ -1,7 +1,21 @@
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import type { BaseFormData } from '#/form';
+import { INIT_PAGINATION } from '@/utils/config';
+import { usePublicStore } from '@/stores/public';
+import type { PagePermission } from '#/public';
+import { checkPermission } from '@/utils/permissions';
+import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BasePagination from '@/components/Pagination/BasePagination';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, tableColumns } from './model';
 import { message } from 'antd';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { getArticlePage, deleteArticle } from '@/servers/content/article';
 
 // 当前行数据

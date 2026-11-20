@@ -1,3 +1,10 @@
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { usePublicStore } from '@/stores/public';
+import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
+import type { ThemeType } from '@/stores/public';
+import PasswordStrength from '@/components/PasswordStrength';
 import type { FormProps } from 'antd';
 import { InputNumber, message } from 'antd';
 import { Form, Button, Input } from 'antd';

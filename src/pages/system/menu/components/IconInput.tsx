@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
 import { Input, Tooltip, type InputProps } from 'antd';

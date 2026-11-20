@@ -1,5 +1,5 @@
 import type { ColProps, FormInstance } from 'antd';
-import type { BaseFormData, BaseSearchList } from '#/form';
+import type { BaseFormData, BaseSearchList, BaseFormList } from '#/form';
 import { type CSSProperties, type ReactNode, type Ref, useEffect, useState, useMemo } from 'react';
 import { type FormProps, Button, Col, Flex } from 'antd';
 import { Form } from 'antd';

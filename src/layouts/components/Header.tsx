@@ -1,3 +1,4 @@
+import { useLogout } from '@/hooks/useLogout';
 import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
 import { useMemo, useRef, memo } from 'react';

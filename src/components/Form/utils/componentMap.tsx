@@ -1,5 +1,6 @@
+import LoadingComponent from '@/components/Form/components/LoadingComponent';
 import type { TFunction } from 'i18next';
-import type { ComponentType, BaseFormList } from '#/form';
+import type { ComponentType, BaseFormList, ComponentProps } from '#/form';
 import { initCompProps } from './helper';
 import { CreateBusiness } from '@/components/Business';
 import type { FormInstance, InputProps } from 'antd';

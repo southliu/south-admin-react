@@ -1,3 +1,11 @@
+import { useTranslation } from 'react-i18next';
+import { useState, useCallback, useEffect } from 'react';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { checkPermission } from '@/utils/permissions';
+import type { BaseFormData } from '#/form';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseSearch from '@/components/Search/BaseSearch';
 import { searchList } from './model';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { getDataTrends } from '@/servers/dashboard';

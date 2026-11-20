@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { useEcharts } from '@/hooks/useEcharts';
 import type { EChartsCoreOption } from 'echarts';
 
 const data = [962, 1023, 1112, 1123, 1239, 1382, 1420, 1523, 1622, 1643, 1782, 1928];

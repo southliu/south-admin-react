@@ -1,3 +1,17 @@
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
+import type { BaseFormData } from '#/form';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { usePublicStore } from '@/stores/public';
+import { useTabsStore } from '@/stores/tabs';
+import { useSingleTab } from '@/hooks/useSingleTab';
+import type { PagePermission } from '#/public';
+import { checkPermission } from '@/utils/permissions';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseForm from '@/components/Form/BaseForm';
+import SubmitBottom from '@/components/Bottom/SubmitBottom';
 import { Form, type FormInstance, message, Spin } from 'antd';
 import { createList } from './model';
 import { useShallow } from 'zustand/shallow';

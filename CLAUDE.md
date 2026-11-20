@@ -152,7 +152,7 @@ export function getXXXPage(data: PaginationData) {
 - React SWC for fast compilation
 - UnoCSS for atomic CSS
 - Legacy plugin for browser compatibility (production only)
-- Auto-import plugin configured in `build/plugins/autoImport.ts`
+- Hooks, components, utilities, and types use explicit imports; use `import type` for types.
 
 ### Code Snippets
 VS Code snippets are in `.vscode/south.code-snippets`:

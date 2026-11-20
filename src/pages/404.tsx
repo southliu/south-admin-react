@@ -1,3 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useTabsStore } from '@/stores/tabs';
+import type { SideMenu } from '#/public';
 import { getFirstMenu, getMenuByKey } from '@/menus/utils/helper';
 import { getMenuList } from '@/servers/system/menu';
 import { getUserRefreshPermissions } from '@/servers/system/user';

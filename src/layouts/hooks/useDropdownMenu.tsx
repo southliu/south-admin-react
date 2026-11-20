@@ -1,5 +1,6 @@
+import { usePublicStore } from '@/stores/public';
 import type { MenuProps } from 'antd';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   RedoOutlined,

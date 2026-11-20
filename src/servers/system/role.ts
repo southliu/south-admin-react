@@ -1,3 +1,5 @@
+import type { BaseFormData } from '#/form';
+import type { PaginationData, PageServerResult } from '#/public';
 import type { Key, ReactNode } from 'react';
 import type { DataNode } from 'antd/es/tree';
 import { request } from '@/utils/request';

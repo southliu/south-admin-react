@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { TableColumn } from '#/public';
 import { useTranslation } from 'react-i18next';
 import BaseTable from '@/components/Table/BaseTable';

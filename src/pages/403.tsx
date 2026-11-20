@@ -1,3 +1,7 @@
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useTabsStore } from '@/stores/tabs';
 import { getFirstMenu, getMenuByKey } from '@/menus/utils/helper';
 import { Button } from 'antd';
 import styles from './all.module.less';

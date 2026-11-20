@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { changeMenuState } from '@/servers/system/menu';
 import { message, Popconfirm, Switch } from 'antd';
 import { useState } from 'react';

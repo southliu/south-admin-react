@@ -1,9 +1,19 @@
+import { useTranslation } from 'react-i18next';
+import { INIT_PAGINATION } from '@/utils/config';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { checkPermission } from '@/utils/permissions';
+import { DeleteBtn } from '@/components/Buttons';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BasePagination from '@/components/Pagination/BasePagination';
 import type { BaseFormData } from '#/form';
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import type { PagePermission } from '#/public';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { message } from 'antd';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { searchList, tableColumns } from './model';
 import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/system/log';
 

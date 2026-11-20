@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import { addComponent } from '../Form/utils/componentMap';
 
 // 自定义组件名

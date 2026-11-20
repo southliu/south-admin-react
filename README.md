@@ -252,7 +252,7 @@ const menuList = defaultMenus;
 使用了monorepo项目安装新依赖时需要在后面添加`-w`或`--workspace`，否则会报错，比如：`pnpm i mobx -w`。
 
 #### 6. 无法执行build？
-首先检查是否存在`types/autoImports.d.ts`，如果不存在执行`pnpm dev`，之后再执行`pnpm build`。
+`pnpm build` 会先执行 TypeScript 检查。若提示缺少标识符，请补充对应的显式导入；类型使用 `import type`，无需先启动开发服务器。
 
 ## 🧡 捐赠
 如果您觉得这个项目对您有帮助，您可以帮作者买一杯咖啡表示支持!

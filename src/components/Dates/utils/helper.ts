@@ -2,7 +2,7 @@ import type { Dayjs } from 'dayjs';
 import type { DatePickerProps } from 'antd';
 import type { BaseFormData, BaseFormList } from '#/form';
 import type { RangeValueType } from 'rc-picker/lib/PickerInput/RangePicker';
-import { DATE_FORMAT } from '@/utils/config';
+import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils/config';
 import dayjs from 'dayjs';
 
 /**
