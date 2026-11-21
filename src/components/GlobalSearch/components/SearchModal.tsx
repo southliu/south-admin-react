@@ -1,16 +1,16 @@
-import type { SideMenu } from '#/public';
 import type { InputProps, InputRef } from 'antd';
+import type { SideMenu } from '#/public';
 import type { Ref } from 'react';
-import { useEffect, useRef, useState, useImperativeHandle } from 'react';
-import { debounce } from 'lodash';
-import { Modal, Input } from 'antd';
-import { Icon } from '@iconify/react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useKeyStroke } from '@/hooks/useKeyStroke';
 import { getMenuByKey, getOpenMenuByRouter, searchMenuValue } from '@/menus/utils/helper';
+import { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useTabsStore } from '@/stores';
+import { useKeyStroke } from '@/hooks/useKeyStroke';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify/react';
+import { Modal, Input } from 'antd';
+import { debounce } from 'lodash';
 import SearchResult from './SearchResult';
 import SearchFooter from './SearchFooter';
 

@@ -1,6 +1,6 @@
+import { Button, Upload, type UploadProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useToken } from '@/hooks/useToken';
-import { Button, Upload, type UploadProps } from 'antd';
 
 function BaseUpload(props: UploadProps) {
   const { t } = useTranslation();

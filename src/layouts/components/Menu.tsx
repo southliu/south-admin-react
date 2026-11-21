@@ -1,16 +1,6 @@
-import { useTabsStore } from '@/stores/tabs';
-import type { MenuProps } from 'antd';
-import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
-import { useCallback, useMemo, useState, memo, useEffect } from 'react';
-import { Menu } from 'antd';
-import { isUrl } from '@/utils/is';
-import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useMenuStore } from '@/stores';
-import { useShallow } from 'zustand/react/shallow';
+import type { SideMenu } from '#/public';
+import type { MenuProps } from 'antd';
 import {
   filterMenus,
   getFirstMenu,
@@ -19,14 +9,45 @@ import {
   handleFilterMenus,
   splitPath,
 } from '@/menus/utils/helper';
-import styles from '../index.module.less';
-import Logo from '@/assets/images/logo.svg';
+import { useCallback, useMemo, memo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useShallow } from 'zustand/react/shallow';
+import { useTranslation } from 'react-i18next';
 import { getTabTitle } from '../utils/helper';
+import { useTabsStore } from '@/stores/tabs';
 import { setTitle } from '@/utils/helper';
+import { useMenuStore } from '@/stores';
+import { Icon } from '@iconify/react';
+import { isUrl } from '@/utils/is';
+import { Menu } from 'antd';
+import Logo from '@/assets/images/logo.svg';
+import styles from '../index.module.less';
+
+/**
+ * 转换菜单icon格式
+ */
+function filterMenuIcon(menus: SideMenu[]): SideMenu[] {
+  if (!menus?.length) return [];
+
+  return menus.map((item) => {
+    const newItem: SideMenu = { ...item };
+
+    if (item?.icon) {
+      newItem.icon = <Icon icon={item.icon as string} />;
+    }
+
+    if (item?.children?.length) {
+      newItem.children = filterMenuIcon(item.children as SideMenu[]);
+    }
+
+    return newItem;
+  });
+}
 
 function LayoutMenu() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { pathname } = useLocation();
 
   const { tabs, setActiveKey, addTabs, setNav } = useTabsStore(
@@ -40,46 +61,24 @@ function LayoutMenu() {
 
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
-  const { toggleCollapsed, setSelectedKeys } = useMenuStore(
+  const { toggleCollapsed, setSelectedKeys, setOpenKeys } = useMenuStore(
     useShallow((state) => ({
       toggleCollapsed: state.toggleCollapsed,
       setSelectedKeys: state.setSelectedKeys,
+      setOpenKeys: state.setOpenKeys,
     })),
   );
 
-  // 本地状态管理
-  const [currentOpenKeys, setCurrentOpenKeys] = useState<string[]>(openKeys || []);
-  const [currentSelectedKeys, setCurrentSelectedKeys] = useState<string[]>(
-    selectedKeys ? [selectedKeys] : [],
-  );
-
-  /**
-   * 转换菜单icon格式
-   */
-  const filterMenuIcon = useCallback((menus: SideMenu[]): SideMenu[] => {
-    if (!menus?.length) return [];
-
-    return menus.map((item) => {
-      const newItem: SideMenu = { ...item };
-
-      if (item?.icon) {
-        newItem.icon = <Icon icon={item.icon as string} />;
-      }
-
-      if (item?.children?.length) {
-        newItem.children = filterMenuIcon(item.children as SideMenu[]);
-      }
-
-      return newItem;
-    });
-  }, []);
+  const currentOpenKeys = openKeys || [];
+  const currentSelectedKeys = selectedKeys ? [selectedKeys] : [];
+  const setCurrentOpenKeys = setOpenKeys;
 
   // 过滤菜单
   const filteredMenus = useMemo(() => {
     if (permissions.length === 0 || menuList.length === 0) return [];
     const newMenus = filterMenus(menuList, permissions);
     return filterMenuIcon(newMenus);
-  }, [menuList, permissions, filterMenuIcon, i18n.language]);
+  }, [menuList, permissions]);
 
   // 刷新页面根据路由选中对应的菜单
   useEffect(() => {
@@ -87,25 +86,10 @@ function LayoutMenu() {
 
     requestAnimationFrame(() => {
       setCurrentOpenKeys(newOpenKey);
-      setCurrentSelectedKeys([pathname]);
       setSelectedKeys(pathname);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-
-  // 同步 store 中的 selectedKeys 变化
-  useEffect(() => {
-    if (selectedKeys) {
-      setCurrentSelectedKeys([selectedKeys]);
-    }
-  }, [selectedKeys]);
-
-  // 同步 store 中的 openKeys 变化
-  useEffect(() => {
-    if (openKeys?.length) {
-      setCurrentOpenKeys(openKeys);
-    }
-  }, [openKeys]);
 
   /**
    * 路由跳转
@@ -144,7 +128,6 @@ function LayoutMenu() {
       }
 
       // 立即更新菜单状态
-      setCurrentSelectedKeys([key]);
       setSelectedKeys(key);
 
       // 使用 requestAnimationFrame 确保菜单状态先渲染，然后再跳转路由
@@ -171,7 +154,20 @@ function LayoutMenu() {
         });
       });
     },
-    [pathname, isPhone, hiddenMenu, setSelectedKeys, navigate],
+    [
+      pathname,
+      isPhone,
+      hiddenMenu,
+      setSelectedKeys,
+      navigate,
+      addTabs,
+      menuList,
+      permissions,
+      setActiveKey,
+      setNav,
+      t,
+      tabs,
+    ],
   );
 
   /**
@@ -205,7 +201,7 @@ function LayoutMenu() {
 
       setCurrentOpenKeys(newOpenKey);
     },
-    [diffOpenMenu],
+    [diffOpenMenu, setCurrentOpenKeys],
   );
 
   /** 点击logo */

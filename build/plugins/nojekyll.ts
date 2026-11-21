@@ -1,6 +1,6 @@
 import type { PluginOption } from 'vite';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
 
 /**
  * 打包完后生成 .nojekyll 空文件

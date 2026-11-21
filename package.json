@@ -6,16 +6,20 @@
   "homepage": "https://github.com/southliu/south-admin-react",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "build": "node scripts/generate-icons.mjs && tsc && vite build",
     "build:analyze": "cross-env ANALYZE=true pnpm build",
-    "build:dev": "tsc && vite build --mode dev",
-    "build:test": "tsc && vite build --mode test",
+    "build:dev": "node scripts/generate-icons.mjs && tsc && vite build --mode dev",
+    "build:test": "node scripts/generate-icons.mjs && tsc && vite build --mode test",
     "lint": "eslint . --ext .js,.ts,.jsx,.tsx --fix",
     "lint:stylelint": "stylelint --cache --fix \"**/*.{less,postcss,css,scss}\" --cache --cache-location node_modules/.cache/stylelint/",
     "preview": "vite preview",
     "prepare": "husky install",
     "prettier": "prettier --write .",
-    "init:project": "node .claude/skills/init-project/scripts/init.mjs"
+    "init:project": "node .claude/skills/init-project/scripts/init.mjs",
+    "predev": "node scripts/generate-icons.mjs",
+    "lint:check": "eslint . --ext .js,.ts,.jsx,.tsx",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2.0.1",
@@ -26,11 +30,15 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@iconify-json/ant-design": "^1.2.8",
     "@iconify-json/cil": "^1.2.3",
+    "@iconify-json/fluent": "^1.2.62",
     "@iconify-json/gg": "^1.2.2",
     "@iconify-json/gridicons": "^1.2.5",
     "@iconify-json/icon-park": "^1.2.4",
     "@iconify-json/icon-park-outline": "^1.2.4",
     "@iconify-json/ion": "^1.2.7",
+    "@iconify-json/la": "^1.2.1",
+    "@iconify-json/majesticons": "^1.2.5",
+    "@iconify-json/material-symbols": "^1.2.101",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify-json/uil": "^1.2.3",
     "@south/message": "workspace:^",
@@ -65,6 +73,7 @@
     "@commitlint/config-conventional": "^20.2.0",
     "@eslint/js": "^10.0.1",
     "@iconify/react": "^6.0.2",
+    "@playwright/test": "^1.65.1",
     "@remix-run/router": "^1.23.0",
     "@sentry/react": "^10.38.0",
     "@south/stylelint": "workspace:^",
@@ -104,5 +113,6 @@
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
-  }
+  },
+  "packageManager": "pnpm@11.9.0"
 }

@@ -1,16 +1,15 @@
-import type { AxiosResponse, InternalAxiosRequestConfig, CreateAxiosDefaults, Cancel } from 'axios';
+import type {
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+  CreateAxiosDefaults,
+  AxiosError,
+} from 'axios';
 
-export interface RequestCancel extends Cancel {
-  data: object;
-  response: {
-    status: number;
-    data: {
-      code?: number;
-      message?: string;
-      detail?: string;
-    };
-  };
-}
+export type RequestCancel = AxiosError<{
+  code?: number;
+  message?: string;
+  detail?: string;
+}>;
 
 export interface RequestInterceptors<T> {
   // 请求拦截
@@ -28,6 +27,8 @@ export interface CreateRequestConfig<T = AxiosResponse> extends CreateAxiosDefau
 
 // creteRequest 扩展选项
 export interface CreateRequestOptions {
+  /** 由应用层提供当前语言的网络异常兜底文案。 */
+  getNetworkErrorMessage?: () => string;
   /**
    * 权限过期（响应 code 401）时的处理回调
    * 由应用层注入，与具体路由模式（HashRouter / BrowserRouter）解耦

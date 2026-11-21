@@ -1,12 +1,13 @@
 import type { BaseSearchList, BaseFormList } from '#/form';
 import type { TableOptions, TableColumn } from '#/public';
-import { EMPTY_VALUE, FORM_REQUIRED } from '@/utils/config';
 import type { TFunction } from 'i18next';
 import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils/constants';
+import { EMPTY_VALUE, FORM_REQUIRED } from '@/utils/config';
 import { getMenuList } from '@/servers/system/menu';
+import { MENU_LENGTH } from '@/utils/fieldLimits';
 import { Icon } from '@iconify/react';
-import IconInput from './components/IconInput';
 import StateSwitch from './components/StateSwitch';
+import IconInput from './components/IconInput';
 
 // 搜索数据
 export const searchList = (t: TFunction): BaseSearchList[] => [
@@ -14,11 +15,13 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
     label: t('systems:menu.label'),
     name: 'label',
     component: 'Input',
+    componentProps: { maxLength: MENU_LENGTH.label },
   },
   {
     label: t('systems:menu.labelEn'),
     name: 'labelEn',
     component: 'Input',
+    componentProps: { maxLength: MENU_LENGTH.labelEn },
   },
   {
     label: t('system.state'),
@@ -126,12 +129,14 @@ export const createList = (t: TFunction, id: string, type?: number): BaseFormLis
     name: 'label',
     rules: FORM_REQUIRED,
     component: 'Input',
+    componentProps: { maxLength: MENU_LENGTH.label },
   },
   {
     label: t('systems:menu.labelEn'),
     name: 'labelEn',
     rules: FORM_REQUIRED,
     component: 'Input',
+    componentProps: { maxLength: MENU_LENGTH.labelEn },
   },
   {
     label: t('public.type'),
@@ -147,6 +152,7 @@ export const createList = (t: TFunction, id: string, type?: number): BaseFormLis
     name: 'router',
     rules: [{ required: type !== 3 }],
     component: 'Input',
+    componentProps: { maxLength: MENU_LENGTH.router },
   },
   {
     label: t('system.state'),
@@ -168,11 +174,13 @@ export const createList = (t: TFunction, id: string, type?: number): BaseFormLis
     name: 'rule',
     rules: [{ required: type === 3 }],
     component: 'Input',
+    componentProps: { maxLength: MENU_LENGTH.rule },
   },
   {
     label: t('systems:menu.icon'),
     name: 'icon',
     component: 'customize',
+    componentProps: { maxLength: MENU_LENGTH.icon },
     render: IconInput,
   },
   {

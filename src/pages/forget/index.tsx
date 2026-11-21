@@ -1,19 +1,20 @@
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
-import { usePublicStore } from '@/stores/public';
-import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
 import type { ThemeType } from '@/stores/public';
-import PasswordStrength from '@/components/PasswordStrength';
 import type { FormProps } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
+import { message as globalMessage } from '@south/message';
+import { useState, useRef, useEffect } from 'react';
+import { USER_LENGTH } from '@/utils/fieldLimits';
+import { usePublicStore } from '@/stores/public';
+import { forgetPassword } from '@/servers/login';
+import { useTranslation } from 'react-i18next';
 import { InputNumber, message } from 'antd';
 import { Form, Button, Input } from 'antd';
-import I18n from '@/components/I18n';
-import Theme from '@/components/Theme';
 import { setTitle } from '@/utils/helper';
-import { message as globalMessage } from '@south/message';
-import { forgetPassword } from '@/servers/login';
+import PasswordStrength from '@/components/PasswordStrength';
 import Logo from '@/assets/images/logo.svg';
+import Theme from '@/components/Theme';
+import I18n from '@/components/I18n';
 
 interface ForgetData {
   username: string;
@@ -180,7 +181,12 @@ function Forget() {
                 { required: true, message: t('public.pleaseEnter', { name: t('login.username') }) },
               ]}
             >
-              <Input allow-clear="true" placeholder={t('login.username')} autoComplete="username" />
+              <Input
+                maxLength={USER_LENGTH.username}
+                allow-clear="true"
+                placeholder={t('login.username')}
+                autoComplete="username"
+              />
             </Form.Item>
 
             <Form.Item

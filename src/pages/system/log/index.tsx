@@ -1,21 +1,21 @@
-import { useTranslation } from 'react-i18next';
-import { INIT_PAGINATION } from '@/utils/config';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { checkPermission } from '@/utils/permissions';
-import { DeleteBtn } from '@/components/Buttons';
-import BaseContent from '@/components/Content/BaseContent';
-import BaseCard from '@/components/Card/BaseCard';
-import BaseSearch from '@/components/Search/BaseSearch';
-import BaseTable from '@/components/Table/BaseTable';
-import BasePagination from '@/components/Pagination/BasePagination';
-import type { BaseFormData } from '#/form';
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import type { PagePermission } from '#/public';
-import { useEffectOnActive } from 'keepalive-for-react';
-import { message } from 'antd';
-import { useMemo, useCallback, useState, useEffect } from 'react';
-import { searchList, tableColumns } from './model';
+import type { BaseFormData } from '#/form';
 import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/system/log';
+import { useCallback, useState, useEffect } from 'react';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useEffectOnActive } from 'keepalive-for-react';
+import { checkPermission } from '@/utils/permissions';
+import { searchList, tableColumns } from './model';
+import { INIT_PAGINATION } from '@/utils/config';
+import { DeleteBtn } from '@/components/Buttons';
+import { useTranslation } from 'react-i18next';
+import { message } from 'antd';
+import BasePagination from '@/components/Pagination/BasePagination';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BaseCard from '@/components/Card/BaseCard';
 
 // 当前行数据
 interface RowData {
@@ -164,24 +164,21 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender = useCallback(
-    (_: unknown, record: object) => {
-      return (
-        <div className="flex flex-wrap gap-5px">
-          {pagePermission.delete === true && (
-            <DeleteBtn
-              name={(record as RowData).name}
-              handleDelete={() => onDelete((record as RowData).id)}
-            />
-          )}
-        </div>
-      );
-    },
-    [pagePermission.delete, onDelete],
-  );
+  const optionRender = (_: unknown, record: object) => {
+    return (
+      <div className="flex flex-wrap gap-5px">
+        {pagePermission.delete === true && (
+          <DeleteBtn
+            name={(record as RowData).name}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
+        )}
+      </div>
+    );
+  };
 
-  // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  // 列配置
+  const columns = tableColumns(t, optionRender);
 
   /** 左侧渲染 */
   const leftContentRender = (

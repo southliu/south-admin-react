@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { checkPermission } from '@/utils/permissions';
-import WangEditor from '@/components/WangEditor';
+import { useState } from 'react';
 import BaseContent from '@/components/Content/BaseContent';
+import WangEditor from '@/components/WangEditor';
 
 function MyEditor() {
   const { permissions } = useCommonStore();

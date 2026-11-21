@@ -1,29 +1,30 @@
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useToken } from '@/hooks/useToken';
-import { useState, useEffect } from 'react';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { useMenuStore } from '@/stores/menu';
-import { usePublicStore } from '@/stores/public';
-import { useUserStore } from '@/stores/user';
-import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
 import type { ThemeType } from '@/stores/public';
 import type { SideMenu } from '#/public';
 import type { LoginData } from './model';
 import type { FormProps } from 'antd';
-import { Checkbox, message } from 'antd';
-import { Form, Button, Input } from 'antd';
-import I18n from '@/components/I18n';
-import Theme from '@/components/Theme';
-import { login } from '@/servers/login';
-import { LOGIN_EXPIRED_MSG } from '@south/request';
-import { setTitle } from '@/utils/helper';
-import { getMenuList } from '@/servers/system/menu';
 import { getUserRefreshPermissions } from '@/servers/system/user';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
+import { useCommonStore } from '@/hooks/useCommonStore';
 import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus/utils/helper';
+import { LOGIN_EXPIRED_MSG } from '@south/request';
 import { cancelAllRequest } from '@/utils/request';
+import { USER_LENGTH } from '@/utils/fieldLimits';
+import { loadMenuList } from '@/menus/utils/load';
+import { usePublicStore } from '@/stores/public';
+import { useTranslation } from 'react-i18next';
+import { useMenuStore } from '@/stores/menu';
+import { useUserStore } from '@/stores/user';
+import { useToken } from '@/hooks/useToken';
+import { useState, useEffect } from 'react';
+import { Form, Button, Input } from 'antd';
+import { setTitle } from '@/utils/helper';
+import { Checkbox, message } from 'antd';
+import { login } from '@/servers/login';
 import Logo from '@/assets/images/logo.svg';
+import Theme from '@/components/Theme';
+import I18n from '@/components/I18n';
 
 const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
@@ -35,7 +36,9 @@ function Login() {
   const [form] = Form.useForm();
   const [getToken, setToken] = useToken();
   const [isLoading, setLoading] = useState(false);
-  const [isRemember, setRemember] = useState(true);
+  const [isRemember, setRemember] = useState(
+    () => localStorage.getItem(CHECK_REMEMBER) !== 'false',
+  );
   const [messageApi, contextHolder] = message.useMessage();
   const { search } = useLocation();
   const { permissions } = useCommonStore();
@@ -55,42 +58,6 @@ function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeCache]);
 
-  useEffect(() => {
-    // 清除上一会话的残留请求
-    cancelAllRequest();
-
-    // 如果存在token，则直接进入页面
-    if (getToken()) {
-      // 如果不存在缓存则获取权限
-      if (!permissions.length) {
-        getUserPermissions();
-      } else {
-        // 有权限则直接跳转
-        handleGoMenu(permissions);
-      }
-    }
-
-    // 如果存在记住我缓存
-    const remember = localStorage.getItem(CHECK_REMEMBER);
-    setRemember(remember !== 'false');
-
-    // 如果存在账号密码缓存，则自动填充
-    const username = localStorage.getItem(USER_USERNAME);
-    const password = localStorage.getItem(USER_PASSWORD);
-    if (username && password) {
-      const newPassword = decryption(password);
-      form.setFieldsValue({ username, password: newPassword.value });
-    }
-
-    // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
-    const expiredMsg = localStorage.getItem(LOGIN_EXPIRED_MSG);
-    if (expiredMsg) {
-      messageApi.error({ content: expiredMsg, key: 'permission-expired' });
-      localStorage.removeItem(LOGIN_EXPIRED_MSG);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // 语言切换修改title
   useEffect(() => {
     setTitle(t, t('login.login'));
@@ -98,7 +65,7 @@ function Login() {
   }, [i18n.language]);
 
   /** 获取用户权限 */
-  const getUserPermissions = async () => {
+  async function getUserPermissions() {
     try {
       setLoading(true);
       const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
@@ -110,20 +77,20 @@ function Login() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   /** 获取菜单数据 */
   const getMenuData = async () => {
     const cached = useMenuStore.getState().menuList;
     if (cached?.length) return cached;
-    let result: SideMenu[] = [];
+    let result: SideMenu[] | undefined;
 
     try {
       setLoading(true);
-      const { code, data } = await getMenuList();
+      const { code, data } = await loadMenuList();
       if (Number(code) !== 200) return;
       setMenuList(data || []);
-      result = data;
+      result = data || [];
     } catch (error) {
       console.error('获取菜单数据失败:', error);
     } finally {
@@ -146,13 +113,15 @@ function Login() {
    * 菜单跳转
    * @param permissions - 权限列表
    */
-  const handleGoMenu = async (permissions: string[]) => {
-    let menuData = useMenuStore.getState().menuList;
+  async function handleGoMenu(permissions: string[]) {
+    let menuData: SideMenu[] | undefined = useMenuStore.getState().menuList;
     if (!menuData?.length) {
-      menuData = (await getMenuData()) as SideMenu[];
+      menuData = await getMenuData();
     }
 
-    // 菜单仍为空时留在登录页，避免带着空菜单进入布局。
+    if (!menuData) return;
+
+    // 成功返回空菜单时留在登录页，避免带着空菜单进入布局。
     if (!menuData?.length) {
       return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
     }
@@ -172,7 +141,39 @@ function Login() {
       return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
     }
     navigate(firstMenu);
-  };
+  }
+
+  useEffect(() => {
+    // 清除上一会话的残留请求
+    cancelAllRequest();
+
+    // 如果存在token，则直接进入页面
+    if (getToken()) {
+      // 如果不存在缓存则获取权限
+      if (!permissions.length) {
+        getUserPermissions();
+      } else {
+        // 有权限则直接跳转
+        handleGoMenu(permissions);
+      }
+    }
+
+    // 如果存在账号密码缓存，则自动填充
+    const username = localStorage.getItem(USER_USERNAME);
+    const password = localStorage.getItem(USER_PASSWORD);
+    if (username && password) {
+      const newPassword = decryption(password);
+      form.setFieldsValue({ username, password: newPassword.value });
+    }
+
+    // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
+    const expiredMsg = localStorage.getItem(LOGIN_EXPIRED_MSG);
+    if (expiredMsg) {
+      messageApi.error({ content: expiredMsg, key: 'permission-expired' });
+      localStorage.removeItem(LOGIN_EXPIRED_MSG);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * 处理登录
@@ -292,6 +293,7 @@ function Login() {
               ]}
             >
               <Input
+                maxLength={USER_LENGTH.username}
                 allow-clear="true"
                 placeholder={t('public.pleaseEnter', { name: t('login.username') })}
                 autoComplete="username"
@@ -309,6 +311,7 @@ function Login() {
               ]}
             >
               <Input.Password
+                maxLength={USER_LENGTH.password}
                 placeholder={t('public.pleaseEnter', { name: t('login.password') })}
                 autoComplete="current-password"
               />

@@ -1,7 +1,7 @@
+import type { ItemType } from 'antd/es/menu/interface';
+import type { ColumnType } from 'antd/es/table';
 import type { ReactNode } from 'react';
 import type { TableProps } from 'antd';
-import type { ColumnType } from 'antd/es/table';
-import type { ItemType } from 'antd/es/menu/interface';
 
 // 数组
 export type ArrayData = string[] | number[] | boolean[];

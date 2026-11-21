@@ -1,9 +1,9 @@
 import type { RouteObject } from 'react-router-dom';
-import { lazy } from 'react';
+import { lazy, type ComponentType } from 'react';
 import { matchPath } from 'react-router-dom';
 import { ROUTER_EXCLUDE } from './config';
 
-type PageFiles = Record<string, () => Promise<unknown>>;
+type PageFiles = Record<string, () => Promise<{ default: ComponentType }>>;
 
 // 页面文件映射，与 Router.tsx 的路由生成规则共用同一套排除与路径推导
 // glob 路径相对本文件（src/router/utils/）解析
@@ -44,7 +44,9 @@ export function layoutRoutes(routes: RouteObject[]): RouteObject[] {
  * 处理路由
  * @param routes - 路由数据
  */
-export function handleRoutes(routes: Record<string, () => Promise<any>>): RouteObject[] {
+export function handleRoutes(
+  routes: Record<string, () => Promise<{ default: ComponentType }>>,
+): RouteObject[] {
   const layouts: RouteObject[] = []; // layout内部组件
 
   for (const key in routes) {
@@ -56,14 +58,7 @@ export function handleRoutes(routes: Record<string, () => Promise<any>>): RouteO
     if (path === '/login') continue;
 
     // 使用 React.lazy 包装动态导入的组件
-    const LazyComponent = lazy(async () => {
-      const module = await routes[key]();
-      // 处理不同的模块导出格式
-      const Component = module?.default || module;
-      return {
-        default: Component,
-      };
-    });
+    const LazyComponent = lazy(routes[key]);
 
     layouts.push({
       path,

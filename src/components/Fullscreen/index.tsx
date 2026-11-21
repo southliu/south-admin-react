@@ -1,7 +1,7 @@
-import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
 import { useFullscreen } from '@/hooks/useFullscreen';
+import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify/react';
+import { Tooltip } from 'antd';
 
 /**
  * @description: 全屏组件

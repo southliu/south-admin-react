@@ -1,14 +1,14 @@
 import type { CheckboxList } from './TableFilter';
-import { type DragEndEvent, DndContext } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
-import { Icon } from '@iconify/react';
-import { Checkbox } from 'antd';
 import {
   SortableContext,
   arrayMove,
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { type DragEndEvent, DndContext } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import { Icon } from '@iconify/react';
+import { Checkbox } from 'antd';
 
 interface SortableItemProps {
   item: CheckboxList;

@@ -1,5 +1,5 @@
-import { message } from '@south/message';
 import { encryption, decryption } from './crypto';
+import { message } from '@south/message';
 
 /**
  * @description: localStorage封装

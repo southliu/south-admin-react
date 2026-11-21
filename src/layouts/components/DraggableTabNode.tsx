@@ -1,8 +1,8 @@
-import type { CSSProperties } from 'react';
-import { CSS } from '@dnd-kit/utilities';
-import { useSortable } from '@dnd-kit/sortable';
-import type { FC } from 'react';
 import type { Transform } from '@dnd-kit/utilities';
+import type { CSSProperties } from 'react';
+import type { FC } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export interface DraggableTabPaneProps {
   'data-node-key': string;
@@ -23,18 +23,12 @@ const DraggableTabNode: FC<DraggableTabPaneProps> = (props) => {
     display: 'inline-block',
   };
 
-  // 过滤掉右键事件，避免与拖拽冲突
-  const { onContextMenu: _onContextMenu, ...restListeners } = listeners as {
-    onContextMenu?: never;
-    [key: string]: any;
-  };
-
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...restListeners}
+      {...listeners}
       onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         // 如果提供了 onContextMenu，则调用它，否则阻止默认行为
         if (onContextMenu) {

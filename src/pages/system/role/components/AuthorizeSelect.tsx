@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
 import type { Key } from 'react';
-import { Spin, type SelectProps } from 'antd';
 import { getRolePermission, type PermissionData } from '@/servers/system/role';
+import { useState, useEffect, useCallback } from 'react';
+import { Spin, type SelectProps } from 'antd';
 import MenuAuthorize from './MenuAuthorize';
 
 interface Props extends SelectProps {
@@ -13,12 +13,8 @@ function AuthorizeSelect(props: Props) {
   const [list, setList] = useState<PermissionData[]>([]);
   const [isLoading, setLoading] = useState(false);
 
-  useEffect(() => {
-    getList();
-  }, []);
-
   /** 获取数据 */
-  const getList = async () => {
+  const getList = useCallback(async () => {
     const params = { roleId: id };
 
     try {
@@ -30,12 +26,18 @@ function AuthorizeSelect(props: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    void getList();
+  }, [getList]);
 
   /** 点击复选框 */
   const handleCheckedKeysChange = (checkedKeys: Key[]) => {
     // 将字符串数组转换为整数数组
-    const numberKeys = checkedKeys.map(key => typeof key === 'string' ? parseInt(key, 10) : key as number);
+    const numberKeys = checkedKeys.map((key) =>
+      typeof key === 'string' ? parseInt(key, 10) : (key as number),
+    );
     onChange?.(numberKeys);
   };
 

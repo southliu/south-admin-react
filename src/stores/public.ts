@@ -1,7 +1,7 @@
 import type { KeepAliveRef } from 'keepalive-for-react';
 import type { RefObject } from 'react';
-import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { create } from 'zustand';
 
 export type ThemeType = 'dark' | 'light';
 

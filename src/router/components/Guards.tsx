@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo, useRef, lazy, Suspense } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { message } from '@south/message';
 import { getLocalInfo } from '@south/utils';
+import { message } from '@south/message';
 import { TOKEN } from '@/utils/config';
 import { Spin } from 'antd';
 

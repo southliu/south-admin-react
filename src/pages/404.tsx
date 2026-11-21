@@ -1,12 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { useTabsStore } from '@/stores/tabs';
 import type { SideMenu } from '#/public';
 import { getFirstMenu, getMenuByKey } from '@/menus/utils/helper';
-import { getMenuList } from '@/servers/system/menu';
 import { getUserRefreshPermissions } from '@/servers/system/user';
+import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useUserStore } from '@/stores';
+import { loadMenuList } from '@/menus/utils/load';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useTabsStore } from '@/stores/tabs';
 import { Button } from 'antd';
 import styles from './all.module.less';
 
@@ -37,7 +37,7 @@ function NotFound() {
   /** 获取菜单数据 */
   const fetchMenuList = async (): Promise<SideMenu[]> => {
     try {
-      const { code, data } = await getMenuList();
+      const { code, data } = await loadMenuList();
       if (Number(code) === 200 && data) {
         setMenuList(data);
         return data;

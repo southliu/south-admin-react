@@ -1,22 +1,43 @@
-import { addCollection } from '@iconify/react';
-// 离线图标集：项目用到的全部 prefix 全量打包，避免运行时依赖 api.iconify.design（线上网络不可达会导致 <Icon> 空白）
-import antDesign from '@iconify-json/ant-design/icons.json';
-import cil from '@iconify-json/cil/icons.json';
-import gg from '@iconify-json/gg/icons.json';
-import gridicons from '@iconify-json/gridicons/icons.json';
-import iconPark from '@iconify-json/icon-park/icons.json';
-import iconParkOutline from '@iconify-json/icon-park-outline/icons.json';
-import ion from '@iconify-json/ion/icons.json';
-import mdi from '@iconify-json/mdi/icons.json';
-import uil from '@iconify-json/uil/icons.json';
+import { addCollection, getIcon, setCustomIconLoader } from '@iconify/react';
+import initialIcons from '@/assets/icons.json';
+import i18n from '@/locales/config';
 
-// 静态注册：在应用渲染前完成，菜单/页面内的 <Icon> 即可离线渲染
-addCollection(antDesign);
-addCollection(cil);
-addCollection(gg);
-addCollection(gridicons);
-addCollection(iconPark);
-addCollection(iconParkOutline);
-addCollection(ion);
-addCollection(mdi);
-addCollection(uil);
+for (const collection of Object.values(initialIcons)) addCollection(collection);
+
+const prefixes = [
+  'ant-design',
+  'cil',
+  'gg',
+  'gridicons',
+  'icon-park',
+  'icon-park-outline',
+  'ion',
+  'mdi',
+  'uil',
+  'la',
+  'fluent',
+  'majesticons',
+  'material-symbols',
+];
+const pendingCollections = new Map<string, Promise<void>>();
+
+// 完整集合由构建脚本输出为本站静态 JSON，不进入首屏或 legacy JS。
+for (const prefix of prefixes) {
+  setCustomIconLoader(async (name) => {
+    let pending = pendingCollections.get(prefix);
+    if (!pending) {
+      pending = fetch(`${import.meta.env.BASE_URL}icons/${prefix}.json`)
+        .then(async (response) => {
+          if (!response.ok) throw new Error(i18n.t('public.networkError'));
+          addCollection(await response.json());
+        })
+        .catch((error: unknown) => {
+          pendingCollections.delete(prefix);
+          throw error;
+        });
+      pendingCollections.set(prefix, pending);
+    }
+    await pending;
+    return getIcon(`${prefix}:${name}`) || null;
+  }, prefix);
+}

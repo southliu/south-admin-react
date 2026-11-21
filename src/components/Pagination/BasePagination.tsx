@@ -1,6 +1,6 @@
 import type { PaginationProps } from 'antd';
-import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { Pagination } from 'antd';
 import './index.less';
 
 function BasePagination(props: PaginationProps) {

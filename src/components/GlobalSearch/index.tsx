@@ -1,8 +1,8 @@
 import type { SearchModalProps } from './components/SearchModal';
+import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify/react';
 import { useRef } from 'react';
 import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
 import SearchModal from './components/SearchModal';
 
 /**

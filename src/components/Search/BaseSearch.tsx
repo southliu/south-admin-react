@@ -1,18 +1,26 @@
-import type { ColProps, FormInstance } from 'antd';
 import type { BaseFormData, BaseSearchList, BaseFormList } from '#/form';
-import { type CSSProperties, type ReactNode, type Ref, useEffect, useState, useMemo } from 'react';
-import { type FormProps, Button, Col, Flex } from 'antd';
-import { Form } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { filterDayjs } from '@/components/Dates';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { getComponent } from '@/components/Form/utils/componentMap';
-import { SearchOutlined, ReloadOutlined, DownOutlined } from '@ant-design/icons';
+import type { ColProps, FormInstance } from 'antd';
+import {
+  type CSSProperties,
+  type ReactNode,
+  type Ref,
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   filterEmptyStr,
   filterFormItem,
   handleValuePropName,
 } from '@/components/Form/utils/helper';
+import { SearchOutlined, ReloadOutlined, DownOutlined } from '@ant-design/icons';
+import { getComponent } from '@/components/Form/utils/componentMap';
+import { type FormProps, Button, Col, Flex } from 'antd';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { filterDayjs } from '@/components/Dates';
+import { useTranslation } from 'react-i18next';
+import { Form } from 'antd';
 
 interface Props extends FormProps {
   list: BaseSearchList[];
@@ -59,7 +67,7 @@ const BaseSearch = (props: Props) => {
   const { isPhone } = useCommonStore();
   let [form] = Form.useForm();
   const [isExpand, setExpand] = useState(false);
-  const [isFirst, setFirst] = useState(true);
+  const isFirst = useRef(true);
 
   if (searchForm) {
     form = searchForm;
@@ -76,15 +84,15 @@ const BaseSearch = (props: Props) => {
   // 初始化内容
   useEffect(() => {
     try {
-      if (Object.keys(data).length && isFirst) {
-        setFirst(false);
+      if (Object.keys(data).length && isFirst.current) {
+        isFirst.current = false;
         form.setFieldsValue({ ...data });
       }
     } catch (e) {
       console.error(e);
       console.warn('传入的搜索数据不是一个对象');
     }
-  }, [data, form, isFirst]);
+  }, [data, form]);
 
   // 清除多余参数
   const formProps = { ...props };

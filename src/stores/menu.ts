@@ -1,6 +1,6 @@
 import type { SideMenu } from '#/public';
-import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { create } from 'zustand';
 
 interface MenuState {
   isPhone: boolean;

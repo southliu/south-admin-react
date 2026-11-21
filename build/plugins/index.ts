@@ -1,12 +1,12 @@
 import type { PluginOption } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { timePlugin } from './time';
-import { nojekyllPlugin } from './nojekyll';
 import { versionUpdatePlugin } from './version';
-import react from '@vitejs/plugin-react-swc';
-import unocss from 'unocss/vite';
-import legacy from '@vitejs/plugin-legacy';
+import { nojekyllPlugin } from './nojekyll';
+import { timePlugin } from './time';
 import viteCompression from 'vite-plugin-compression';
+import react from '@vitejs/plugin-react-swc';
+import legacy from '@vitejs/plugin-legacy';
+import unocss from 'unocss/vite';
 
 export function createVitePlugins() {
   const isDev = process.env.NODE_ENV === 'development';

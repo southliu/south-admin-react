@@ -1,8 +1,8 @@
-import { useParams } from 'react-router-dom';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { checkPermission } from '@/utils/permissions';
-import BaseCard from '@/components/Card/BaseCard';
+import { useParams } from 'react-router-dom';
 import BaseContent from '@/components/Content/BaseContent';
+import BaseCard from '@/components/Card/BaseCard';
 
 function Dynamic() {
   const { id } = useParams();

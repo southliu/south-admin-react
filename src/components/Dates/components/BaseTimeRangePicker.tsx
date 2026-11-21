@@ -1,6 +1,6 @@
 import type { TimeRangePickerProps } from 'antd';
-import { TimePicker } from 'antd';
 import { stringRang2DayjsRang } from '../utils/helper';
+import { TimePicker } from 'antd';
 
 const { RangePicker } = TimePicker;
 

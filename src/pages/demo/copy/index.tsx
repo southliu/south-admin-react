@@ -1,9 +1,9 @@
-import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { checkPermission } from '@/utils/permissions';
+import { useTranslation } from 'react-i18next';
+import BaseContent from '@/components/Content/BaseContent';
 import CopyInput from '@/components/Copy/CopyInput';
 import CopyBtn from '@/components/Copy/CopyBtn';
-import BaseContent from '@/components/Content/BaseContent';
 
 function CopyPage() {
   const { t } = useTranslation();

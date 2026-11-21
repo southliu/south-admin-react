@@ -1,7 +1,8 @@
 import type { BaseSearchList, BaseFormList, CustomizeRender } from '#/form';
 import type { TableOptions, TableColumn } from '#/public';
-import { FORM_REQUIRED } from '@/utils/config';
 import type { TFunction } from 'i18next';
+import { ROLE_LENGTH, utf8ByteRule } from '@/utils/fieldLimits';
+import { FORM_REQUIRED } from '@/utils/config';
 import AuthorizeSelect from './components/AuthorizeSelect';
 
 // 搜索数据
@@ -10,6 +11,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
     label: t('public.name'),
     name: 'name',
     component: 'Input',
+    componentProps: { maxLength: ROLE_LENGTH.name },
   },
 ];
 
@@ -61,11 +63,14 @@ export const createList = (t: TFunction, id: string): BaseFormList[] => [
     name: 'name',
     rules: FORM_REQUIRED,
     component: 'Input',
+    componentProps: { maxLength: ROLE_LENGTH.name },
   },
   {
     label: t('system.description'),
     name: 'description',
     component: 'TextArea',
+    rules: [utf8ByteRule(t, ROLE_LENGTH.description)],
+    componentProps: { maxLength: ROLE_LENGTH.description },
   },
   {
     label: t('system.authorize'),

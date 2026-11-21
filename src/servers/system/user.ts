@@ -1,6 +1,6 @@
-import type { BaseFormData } from '#/form';
 import type { PaginationData, PageServerResult } from '#/public';
 import type { LoginResult } from '@/pages/login/model';
+import type { BaseFormData } from '#/form';
 import { request } from '@/utils/request';
 
 enum API {

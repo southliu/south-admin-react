@@ -1,12 +1,12 @@
-import { useSearchParams, useLocation } from 'react-router-dom';
-import { useTabsStore } from '@/stores/tabs';
-import { useCallback, useEffect } from 'react';
 import type { BaseFormData } from '#/form';
+import { useSearchParams, useLocation } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
+import { useTabsStore } from '@/stores/tabs';
 /**
  * 将搜索参数带入url中
  */
-import { type FormInstance } from 'antd';
 import { getUrlAllParam } from '@/utils/helper';
+import { type FormInstance } from 'antd';
 
 export const useSearchUrlParams = (form: FormInstance) => {
   const [, setSearchParams] = useSearchParams();

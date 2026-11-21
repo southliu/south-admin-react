@@ -1,6 +1,7 @@
-import type { TFunction } from 'i18next';
-import type { BaseSearchList } from '#/form';
 import type { TableColumn, TableOptions } from '#/public';
+import type { BaseSearchList } from '#/form';
+import type { TFunction } from 'i18next';
+import { LOG_LENGTH } from '@/utils/fieldLimits';
 
 // 日志数据类型
 export interface LogItem {
@@ -26,12 +27,14 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
     name: 'username',
     wrapperWidth: 200,
     component: 'Input',
+    componentProps: { maxLength: LOG_LENGTH.username },
   },
   {
     label: t('log.ip'),
     name: 'ip',
     wrapperWidth: 200,
     component: 'Input',
+    componentProps: { maxLength: LOG_LENGTH.ip },
   },
   {
     label: t('log.method'),

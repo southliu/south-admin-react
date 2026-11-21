@@ -1,6 +1,7 @@
 import type { InputProps } from 'antd';
-import { useEffect, useState } from 'react';
+import { USER_LENGTH } from '@/utils/fieldLimits';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
 import { debounce } from 'lodash';
 import { Input } from 'antd';
 import StrengthBar from './components/StrengthBar';
@@ -36,6 +37,7 @@ function PasswordStrength(props: InputProps) {
   return (
     <>
       <Input.Password
+        maxLength={USER_LENGTH.password}
         value={value}
         allowClear={true}
         placeholder={t('public.inputPleaseEnter')}

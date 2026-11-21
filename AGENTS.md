@@ -10,10 +10,12 @@ pnpm build            # 生产构建（tsc + vite build）
 pnpm lint             # ESLint 检查并自动修复
 pnpm lint:stylelint   # 样式检查
 pnpm prettier         # 格式化代码
+pnpm test             # Node 原生回归测试
+pnpm test:e2e         # Playwright 浏览器回归测试
 ```
 
 - 安装依赖必须加 `-w`（monorepo 根）：`pnpm i <package> -w`；pnpm 10+ 构建脚本被拦截时执行 `pnpm approve-builds`。
-- 无测试框架，验证方式为 `pnpm lint` + `pnpm dev` / `pnpm build`。
+- 回归测试使用 Node 原生 test runner 与 Playwright；按变更范围运行 `pnpm test` / `pnpm test:e2e`，并执行 `pnpm lint` + `pnpm dev` / `pnpm build`。
 - Git 提交遵循 conventional commits（husky + commitlint 强制，如 `feat: xxx`）；提交失败先执行 `npx husky install`。
 
 ## 新建页面（重要约定）
@@ -36,6 +38,8 @@ pnpm prettier         # 格式化代码
   - 仅当前页面使用的组件 → 放在该页面子文件夹的 `components/` 中（参考 `src/pages/system/menu/components/`）。
   - 全局/跨页面使用的组件 → 放 `src/components/`，公共二次封装组件以 `Base` 开头（如 `BaseTable`、`BaseForm`、`BaseModal`）。
 - **接口文件放 `src/servers/`，目录结构必须与 `src/pages/` 保持一致**：如 `src/pages/system/user/` 对应 `src/servers/system/user.ts`。
+- **接口方法直接返回请求**：保持 `export function xxx() { return request.get/post/put(...); }` 格式。认证与通用错误处理放请求层，加载重试放调用方共享逻辑，不在 API 文件里增加循环、业务校验或重试。
+- 接口错误优先显示后端有效的 `message/detail`；没有错误信息时，统一使用国际化键 `public.networkError`（中文：网络异常，请稍后重试），不自行生成或覆盖后端业务错误。
 - 样式尽量使用 UnoCSS 原子类，避免写冗余 less。
 
 ## 目录结构
@@ -66,6 +70,7 @@ pnpm prettier         # 格式化代码
 - 表单用声明式 `BaseFormList` schema，组件映射在 `src/components/Form/utils/componentMap.tsx`
 - 图标用 Iconify（`@iconify/react`）
 - TypeScript 严格模式，Hooks、组件、工具函数与类型均使用显式导入，类型使用 `import type`。
+- 导入按 `import type`、具名 `import {}`、默认 `import xxx` 分组，同组按整条导入语句长度降序排列，等长保留原序；不调整花括号内成员顺序。`pnpm lint` 自动修复。副作用导入和导入间的注释作为边界，保留初始化顺序与注释归属。
 
 ## 其他工具
 

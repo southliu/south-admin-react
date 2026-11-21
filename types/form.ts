@@ -20,14 +20,14 @@ import type {
   ApiTreeSelectProps,
   ApiPageSelectProps,
 } from '@/components/Selects/types';
-import type { Key, ReactNode } from 'react';
-import type { RangePickerProps } from 'antd/lib/date-picker';
-import type { DefaultOptionType } from 'antd/lib/select';
-import type { RuleObject } from 'antd/lib/form';
-import type { ServerResult } from '@south/request';
 import type { BusinessComponents } from '@/components/Business';
+import type { RangePickerProps } from 'antd/lib/date-picker';
 import type { EditorProps } from '@/components/WangEditor';
+import type { DefaultOptionType } from 'antd/lib/select';
+import type { ServerResult } from '@south/request';
 import type { TextAreaProps } from 'antd/es/input';
+import type { RuleObject } from 'antd/lib/form';
+import type { Key, ReactNode } from 'react';
 
 // 数据类型
 export type BaseFormData = Record<string, unknown>;

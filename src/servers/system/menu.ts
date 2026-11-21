@@ -1,5 +1,5 @@
-import type { BaseFormData } from '#/form';
 import type { PaginationData, PageServerResult, SideMenu } from '#/public';
+import type { BaseFormData } from '#/form';
 import { request } from '@/utils/request';
 
 enum API {
@@ -59,20 +59,8 @@ export function batchDeleteMenu(ids: string[]) {
  * 获取当前菜单数据
  * @param data - 请求数据
  */
-export async function getMenuList() {
-  for (let attempt = 0; ; attempt += 1) {
-    try {
-      const result = await request.get<SideMenu[]>(`${API.URL}/list`);
-      const code = Number(result?.code);
-      // 登录失效由请求拦截器处理，空菜单则是正常的权限结果。
-      if (code !== 200 && code !== 401 && code !== 403) {
-        throw new Error('Failed to load menus');
-      }
-      return result;
-    } catch (error) {
-      if (attempt >= 1) throw error;
-    }
-  }
+export function getMenuList() {
+  return request.get<SideMenu[]>(`${API.URL}/list`);
 }
 
 /**

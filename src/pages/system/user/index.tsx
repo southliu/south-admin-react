@@ -1,23 +1,6 @@
-import { useTranslation } from 'react-i18next';
-import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
-import type { BaseFormData } from '#/form';
-import { useSearchUrlParams } from '@/hooks/useSearchUrlParams';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import type { PagePermission } from '#/public';
-import { checkPermission } from '@/utils/permissions';
-import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
-import BaseContent from '@/components/Content/BaseContent';
-import BaseCard from '@/components/Card/BaseCard';
-import BaseSearch from '@/components/Search/BaseSearch';
-import BaseTable from '@/components/Table/BaseTable';
-import BasePagination from '@/components/Pagination/BasePagination';
-import BaseModal from '@/components/Modal/BaseModal';
-import BaseForm from '@/components/Form/BaseForm';
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
-import { type FormInstance, Form, message } from 'antd';
-import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
-import { useEffectOnActive } from 'keepalive-for-react';
-import { createList, searchList, tableColumns } from './model';
+import type { PagePermission } from '#/public';
+import type { BaseFormData } from '#/form';
 import {
   batchDeleteUser,
   createUser,
@@ -26,6 +9,23 @@ import {
   getUserPage,
   updateUser,
 } from '@/servers/system/user';
+import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
+import { useCallback, useRef, useState, useEffect } from 'react';
+import { useSearchUrlParams } from '@/hooks/useSearchUrlParams';
+import { createList, searchList, tableColumns } from './model';
+import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { type FormInstance, Form, message } from 'antd';
+import { useEffectOnActive } from 'keepalive-for-react';
+import { checkPermission } from '@/utils/permissions';
+import { useTranslation } from 'react-i18next';
+import BasePagination from '@/components/Pagination/BasePagination';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BaseModal from '@/components/Modal/BaseModal';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseForm from '@/components/Form/BaseForm';
 
 // 当前行数据
 interface RowData {
@@ -241,8 +241,7 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender = useCallback(
-    (_: unknown, record: object) => {
+  const optionRender = (_: unknown, record: object) => {
       return (
         <div className="flex flex-wrap gap-5px">
           {pagePermission.update === true && (
@@ -256,12 +255,10 @@ function Page() {
           )}
         </div>
       );
-    },
-    [pagePermission.update, pagePermission.delete, t, onUpdate, onDelete],
-  );
+    };
 
-  // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  // 列配置
+  const columns = tableColumns(t, optionRender);
 
   /** 左侧渲染 */
   const leftContentRender = (

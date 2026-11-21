@@ -1,9 +1,9 @@
 import { ThemeType, usePublicStore } from '@/stores/public';
-import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
 import { MouseEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { THEME_KEY } from '@/utils/config';
+import { Icon } from '@iconify/react';
+import { Tooltip } from 'antd';
 import './index.module.less';
 
 function Theme() {

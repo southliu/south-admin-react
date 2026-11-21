@@ -1,9 +1,9 @@
-import type { TabPaneProps } from 'antd';
-import type { NavData } from '@/menus/utils/helper';
 import type { KeepAliveRef } from 'keepalive-for-react';
+import type { NavData } from '@/menus/utils/helper';
+import type { TabPaneProps } from 'antd';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { create } from 'zustand';
 
 export interface TabsData extends Omit<TabPaneProps, 'tab'> {
   key: string;
@@ -93,7 +93,7 @@ export const useTabsStore = create<TabsState>()(
             if (index >= 0) tabs.splice(index, 1);
 
             if (payload === state.activeKey) {
-              let target = '';
+              let target: string;
               if (index < tabs.length) {
                 target = tabs?.[index]?.key || '';
               } else {

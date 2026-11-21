@@ -1,5 +1,5 @@
-import { usePublicStore } from '@/stores/public';
 import { useCommonStore } from './useCommonStore';
+import { usePublicStore } from '@/stores/public';
 
 export function useFullscreen() {
   const { isFullscreen } = useCommonStore();

@@ -65,7 +65,7 @@ const deferredInit = () => {
 
 // 检查是否支持 requestIdleCallback
 if ('requestIdleCallback' in window) {
-  (window as any).requestIdleCallback(() => deferredInit());
+  window.requestIdleCallback(() => deferredInit());
 } else {
   // 降级方案：使用 setTimeout 延迟执行
   setTimeout(deferredInit, 0);

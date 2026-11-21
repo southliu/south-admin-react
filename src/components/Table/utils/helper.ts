@@ -1,5 +1,5 @@
-import type { TableColumn } from '#/public';
 import type { SizeType } from 'antd/es/config-provider/SizeContext';
+import type { TableColumn } from '#/public';
 import { EMPTY_VALUE } from '@/utils/config';
 import { cloneDeep } from 'lodash';
 

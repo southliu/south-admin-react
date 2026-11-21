@@ -1,6 +1,6 @@
 import type { PluginOption } from 'vite';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
 
 export const versionUpdatePlugin = (): PluginOption => {
   let outDir = '';

@@ -1,16 +1,16 @@
-import { usePublicStore } from '@/stores/public';
 import type { MenuProps } from 'antd';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
   RedoOutlined,
   CloseOutlined,
   VerticalAlignTopOutlined,
   VerticalAlignMiddleOutlined,
 } from '@ant-design/icons';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import { useTabsStore } from '@/stores';
+import { usePublicStore } from '@/stores/public';
+import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/shallow';
+import { useTabsStore } from '@/stores';
 
 enum ITabEnums {
   REFRESH = 'refresh', // 重新加载

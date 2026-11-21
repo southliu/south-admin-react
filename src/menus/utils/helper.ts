@@ -1,8 +1,8 @@
-import type { SideMenu } from '#/public';
 import type { Langs } from '@/components/I18n';
-import { cloneDeep } from 'lodash';
+import type { SideMenu } from '#/public';
 import { isRouteExist } from '@/router/utils/helper';
 import { LANG } from '@/utils/config';
+import { cloneDeep } from 'lodash';
 
 /**
  * 根据路由获取展开菜单数组

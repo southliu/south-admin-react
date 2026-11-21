@@ -1,14 +1,14 @@
 import type { MenuProps } from 'antd';
-import { Dropdown } from 'antd';
-import { Icon } from '@iconify/react';
+import { getTabTitle } from '@/layouts/utils/helper';
+import { useShallow } from 'zustand/react/shallow';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useShallow } from 'zustand/react/shallow';
-import { LANG } from '@/utils/config';
 import { setTitle } from '@/utils/helper';
-import { getTabTitle } from '@/layouts/utils/helper';
 import { useTabsStore } from '@/stores';
+import { Icon } from '@iconify/react';
+import { LANG } from '@/utils/config';
+import { Dropdown } from 'antd';
 
 export type Langs = 'zh' | 'en';
 

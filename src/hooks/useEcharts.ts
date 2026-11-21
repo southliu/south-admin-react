@@ -1,15 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { debounce, isEqual } from 'lodash';
-import * as echarts from 'echarts/core';
-import {
-  BarChart,
-  GaugeChart,
-  LineChart,
-  PictorialBarChart,
-  PieChart,
-  RadarChart,
-  ScatterChart,
-} from 'echarts/charts';
+import type {
+  DatasetComponentOption,
+  GridComponentOption,
+  LegendComponentOption,
+  TitleComponentOption,
+  ToolboxComponentOption,
+  TooltipComponentOption,
+} from 'echarts/components';
 import type {
   BarSeriesOption,
   GaugeSeriesOption,
@@ -28,16 +24,20 @@ import {
   TooltipComponent,
   TransformComponent,
 } from 'echarts/components';
-import type {
-  DatasetComponentOption,
-  GridComponentOption,
-  LegendComponentOption,
-  TitleComponentOption,
-  ToolboxComponentOption,
-  TooltipComponentOption,
-} from 'echarts/components';
+import {
+  BarChart,
+  GaugeChart,
+  LineChart,
+  PictorialBarChart,
+  PieChart,
+  RadarChart,
+  ScatterChart,
+} from 'echarts/charts';
 import { LabelLayout, UniversalTransition } from 'echarts/features';
+import { useCallback, useEffect, useRef } from 'react';
 import { CanvasRenderer } from 'echarts/renderers';
+import { debounce, isEqual } from 'lodash';
+import * as echarts from 'echarts/core';
 
 export type ECOption = echarts.ComposeOption<
   | BarSeriesOption

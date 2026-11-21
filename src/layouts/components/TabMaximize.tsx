@@ -1,6 +1,6 @@
-import { Icon } from '@iconify/react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useTabsStore } from '@/stores';
+import { Icon } from '@iconify/react';
 
 function TabMaximize() {
   // 是否窗口最大化

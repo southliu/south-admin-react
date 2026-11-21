@@ -1,23 +1,23 @@
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useRef, useState, useEffect } from 'react';
-import type { BaseFormData } from '#/form';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { usePublicStore } from '@/stores/public';
-import { useTabsStore } from '@/stores/tabs';
-import { useSingleTab } from '@/hooks/useSingleTab';
 import type { PagePermission } from '#/public';
+import type { BaseFormData } from '#/form';
+import { getArticleById, createArticle, updateArticle } from '@/servers/content/article';
+import { Form, type FormInstance, message, Spin } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useEffectOnActive } from 'keepalive-for-react';
 import { checkPermission } from '@/utils/permissions';
+import { useRef, useState, useEffect } from 'react';
+import { useSingleTab } from '@/hooks/useSingleTab';
+import { usePublicStore } from '@/stores/public';
+import { useTranslation } from 'react-i18next';
+import { useTabsStore } from '@/stores/tabs';
+import { useShallow } from 'zustand/shallow';
+import { getUrlParam } from '@/utils/helper';
+import { createList } from './model';
+import SubmitBottom from '@/components/Bottom/SubmitBottom';
 import BaseContent from '@/components/Content/BaseContent';
 import BaseCard from '@/components/Card/BaseCard';
 import BaseForm from '@/components/Form/BaseForm';
-import SubmitBottom from '@/components/Bottom/SubmitBottom';
-import { Form, type FormInstance, message, Spin } from 'antd';
-import { createList } from './model';
-import { useShallow } from 'zustand/shallow';
-import { getUrlParam } from '@/utils/helper';
-import { useEffectOnActive } from 'keepalive-for-react';
-import { getArticleById, createArticle, updateArticle } from '@/servers/content/article';
 
 // 初始化新增数据
 const initCreate = {
@@ -58,30 +58,6 @@ function Page() {
     update: checkPermission(`${permissionPrefix}/update`, permissions),
   };
 
-  useEffect(() => {
-    if (id) {
-      handleUpdate(id);
-    } else {
-      handleCreate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffectOnActive(() => {
-    const { href } = window.location;
-    const newId = href.split('?')[1]?.split('=')[1];
-
-    // 获取url参数
-    if (currentId.current !== newId) {
-      if (newId) {
-        handleUpdate(newId);
-      } else {
-        handleCreate();
-      }
-      currentId.current = newId || '';
-    }
-  }, []);
-
   /** 处理新增 */
   const handleCreate = () => {
     setCreateId('');
@@ -103,6 +79,21 @@ function Page() {
       setLoading(false);
     }
   };
+
+  useEffectOnActive(() => {
+    const { href } = window.location;
+    const newId = href.split('?')[1]?.split('=')[1];
+
+    // 获取url参数
+    if (currentId.current !== newId) {
+      if (newId) {
+        handleUpdate(newId);
+      } else {
+        handleCreate();
+      }
+      currentId.current = newId || '';
+    }
+  }, []);
 
   /** 表格提交 */
   const handleSubmit = () => {
@@ -141,6 +132,13 @@ function Page() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      handleUpdate(id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <BaseContent isPermission={id ? pagePermission.update : pagePermission.create}>

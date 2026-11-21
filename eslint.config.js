@@ -1,11 +1,18 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import reactHooks from 'eslint-plugin-react-hooks';
+import importOrder from './scripts/eslint/import-order.mjs';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
+import globals from 'globals';
+import js from '@eslint/js';
 
 export default tseslint.config(
   { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,mjs,jsx,ts,tsx}'],
+    ignores: ['.agents/**', '.claude/**'],
+    plugins: { local: { rules: { 'import-order': importOrder } } },
+    rules: { 'local/import-order': 'error' },
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

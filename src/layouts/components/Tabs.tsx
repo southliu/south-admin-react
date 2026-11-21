@@ -1,6 +1,5 @@
-import { useMenuStore } from '@/stores/menu';
-import type { TabsProps } from 'antd';
 import type { KeepAliveRef } from 'keepalive-for-react';
+import type { TabsProps } from 'antd';
 import {
   type DragEndEvent,
   closestCenter,
@@ -8,22 +7,23 @@ import {
   PointerSensor,
   useSensor,
 } from '@dnd-kit/core';
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import DraggableTabNode from './DraggableTabNode';
 import { useCallback, useEffect, useMemo, useState, memo, useRef, type RefObject } from 'react';
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
-import { message, Tabs, Dropdown } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useTabsStore, usePublicStore } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
+import { message, Tabs, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { getTabTitle } from '../utils/helper';
+import { useMenuStore } from '@/stores/menu';
 import { setTitle } from '@/utils/helper';
+import DraggableTabNode from './DraggableTabNode';
 import styles from '../index.module.less';
-import TabRefresh from './TabRefresh';
 import TabMaximize from './TabMaximize';
+import TabRefresh from './TabRefresh';
 import TabOptions from './TabOptions';
 
 interface LayoutTabsProps {
@@ -108,7 +108,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   // 初始化标签 & 路由变化时同步
   useEffect(() => {
     handleAddTab();
-  }, [pathname]);
+  }, [handleAddTab]);
 
   // 语言切换
   useEffect(() => {
@@ -133,7 +133,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         if (title) setTitle(t, title);
       });
     },
-    [urlParamsMap, navigate, setActiveKey],
+    [urlParamsMap, navigate, setActiveKey, t, tabs],
   );
 
   /**
@@ -150,7 +150,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         handleNavigateTo(key);
       });
     },
-    [handleNavigateTo],
+    [handleNavigateTo, setOpenKeys, setSelectedKeys],
   );
 
   /**
@@ -171,7 +171,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
 
       closeTabs(targetKey, aliveRef.current?.destroy);
     },
-    [closeTabs, aliveRef, activeKey],
+    [closeTabs, aliveRef, activeKey, tabs, handleAddTab, navigate],
   );
 
   /**

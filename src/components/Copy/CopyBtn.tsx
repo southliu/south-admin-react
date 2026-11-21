@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import type { ButtonProps } from 'antd';
+import { useClipboard } from '@/hooks/useClipboard';
+import { useTranslation } from 'react-i18next';
 import { Button, message } from 'antd';
 import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
-import { useClipboard } from '@/hooks/useClipboard';
+import { useEffect } from 'react';
 
 interface Props extends ButtonProps {
   text: string;

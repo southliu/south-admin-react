@@ -1,7 +1,7 @@
-import BaseContent from '@/components/Content/BaseContent';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { checkPermission } from '@/utils/permissions';
 import { useTranslation } from 'react-i18next';
+import BaseContent from '@/components/Content/BaseContent';
 
 function Page() {
   const { t } = useTranslation();

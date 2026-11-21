@@ -1,6 +1,6 @@
 import { type TableProps, type CheckboxProps, Button, Popover, Divider, Checkbox } from 'antd';
-import { useEffect, useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
+import { useMemo, useState, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TableColumn } from '#/public';
 import DragContent from './DragContent';
@@ -25,48 +25,33 @@ function TableFilter(props: Props) {
   const { columns, cacheColumns, className, getTableChecks } = props;
   const { t } = useTranslation();
   const [isOpen, setOpen] = useState(false);
-  const [list, setList] = useState<CheckboxList[]>([]);
-  const [checkedList, setCheckedList] = useState<string[]>([]);
+  const [order, setOrder] = useState<string[] | undefined>();
+  const [checks, setChecks] = useState<string[] | undefined>();
+  const list = useMemo(() => {
+    const items = (columns || [])
+      .filter((column) => (column as TableColumn).dataIndex)
+      .map((column) => ({
+        label: column.title as string,
+        value: String((column as TableColumn).dataIndex),
+      }));
+    return order ? items.sort((a, b) => order.indexOf(a.value) - order.indexOf(b.value)) : items;
+  }, [columns, order]);
+  const checkedList =
+    checks ??
+    (columns || [])
+      .filter((column) => !column.hidden && (column as TableColumn).dataIndex)
+      .map((column) => String((column as TableColumn).dataIndex));
+  const setCheckedList = setChecks;
+  const setList = (items: CheckboxList[]) => setOrder(items.map((item) => item.value));
   const checkAll = list.length === checkedList.length;
   const indeterminate = checkedList.length > 0 && checkedList.length < list.length;
   const params: Partial<Props> = { ...props };
   delete params.getTableChecks;
   delete params.cacheColumns;
 
-  useEffect(() => {
-    filterColumns(columns);
-  }, []);
-
   /** 处理点击事件 */
   const handleClick = () => {
     setOpen(!isOpen);
-  };
-
-  /**
-   * 过滤表格数据为多选组数据
-   * @param columns - 表格数据
-   */
-  const filterColumns = (columns: TableProps['columns']) => {
-    if (!columns?.length) return [];
-    const result: CheckboxList[] = [],
-      currentOptions: string[] = [];
-
-    for (let i = 0; i < columns?.length; i++) {
-      const item = columns[i];
-      const { dataIndex } = item as { dataIndex: string };
-
-      if (!item.hidden && dataIndex) {
-        currentOptions?.push(dataIndex);
-      }
-
-      result.push({
-        label: item.title as string,
-        value: dataIndex,
-      });
-    }
-
-    setList(result);
-    setCheckedList(currentOptions);
   };
 
   /**

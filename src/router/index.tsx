@@ -1,10 +1,10 @@
+import { HashRouter as Router } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
 import { App } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { HashRouter as Router } from 'react-router-dom';
-import nprogress from 'nprogress';
 import RouterPage from './components/Router';
 import StaticMessage from '@south/message';
+import nprogress from 'nprogress';
 
 // antd
 import { theme, ConfigProvider } from 'antd';

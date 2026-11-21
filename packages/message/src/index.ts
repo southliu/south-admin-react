@@ -1,12 +1,13 @@
-import type { MessageInstance } from 'antd/es/message/interface';
 import type { NotificationInstance } from 'antd/es/notification/interface';
 import type { ModalStaticFunctions } from 'antd/es/modal/confirm';
+import type { MessageInstance } from 'antd/es/message/interface';
 import {
   message as antdMessage,
   notification as antdNotification,
   Modal as antdModal,
   App,
 } from 'antd';
+import { useLayoutEffect } from 'react';
 
 // antd v6 对象配置省略 duration 时会合成 duration: undefined，
 // rc-notification 将非 number 视为 0，导致提示永不自动关闭。
@@ -45,9 +46,11 @@ let modal: Omit<ModalStaticFunctions, 'warn'> = resetFns;
 function StaticMessage() {
   const staticFunctions = App.useApp();
 
-  message = withDefaultDuration(staticFunctions.message);
-  notification = staticFunctions.notification;
-  modal = staticFunctions.modal;
+  useLayoutEffect(() => {
+    message = withDefaultDuration(staticFunctions.message);
+    notification = staticFunctions.notification;
+    modal = staticFunctions.modal;
+  }, [staticFunctions]);
 
   return null;
 }

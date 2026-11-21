@@ -1,18 +1,19 @@
-import LoadingComponent from '@/components/Form/components/LoadingComponent';
-import type { TFunction } from 'i18next';
 import type { ComponentType, BaseFormList, ComponentProps } from '#/form';
-import { initCompProps } from './helper';
-import { CreateBusiness } from '@/components/Business';
 import type { FormInstance, InputProps } from 'antd';
-import { Input, Spin } from 'antd';
-import { type KeyboardEvent, lazy, Suspense } from 'react';
+import type { TFunction } from 'i18next';
+import { CreateBusiness } from '@/components/Business';
+import { type KeyboardEvent, lazy } from 'react';
+import { initCompProps } from './helper';
 import { cloneDeep } from 'lodash';
+import { Input } from 'antd';
+import LoadingComponent from '@/components/Form/components/LoadingComponent';
+import LazyComponentWrapper from '../components/LazyComponentWrapper';
 
 // 存储已加载的组件
-const loadedComponents = new Map<string, React.ComponentType<any>>();
+const loadedComponents = new Map<string, React.ElementType>();
 
 // 使用React.lazy创建懒加载组件
-const lazyComponents = new Map<string, React.LazyExoticComponent<any>>();
+const lazyComponents = new Map<string, ReturnType<typeof lazy>>();
 
 // 注册懒加载组件
 lazyComponents.set(
@@ -110,63 +111,6 @@ lazyComponents.set(
   lazy(() => import('@/components/WangEditor')),
 );
 
-// 创建一个包装组件，确保在Suspense加载期间也能保持表单数据
-function LazyComponentWrapper({
-  componentType,
-  t,
-  componentProps,
-  fallback,
-  form,
-  name,
-}: {
-  componentType: ComponentType;
-  t: TFunction;
-  componentProps: any;
-  fallback: React.ReactNode;
-  form: FormInstance;
-  name: string | string[];
-}) {
-  const LazyComponent = lazyComponents.get(componentType as ComponentType);
-
-  if (!LazyComponent) {
-    return <Spin>{fallback}</Spin>;
-  }
-
-  // 使用getFieldValue获取表单字段的当前值，否则在懒加载中会获取不到值
-  const fieldValue = form ? form.getFieldValue(name) : undefined;
-
-  /** 使用setFieldValue设置表单字段的值，改为非受控组件 */
-  const handleChange = (newValue: unknown) => {
-    // 处理e.target.value情况
-    let actualValue = newValue;
-    if (newValue && typeof newValue === 'object' && 'target' in newValue) {
-      const event = newValue as React.ChangeEvent<HTMLInputElement>;
-      actualValue = event.target.value;
-    }
-
-    if (form && name) {
-      form?.setFieldValue?.(name, actualValue);
-    }
-    // 如果有onChange回调，也调用它
-    if (componentProps?.onChange) {
-      componentProps.onChange(actualValue);
-    }
-  };
-
-  const mergedProps = {
-    ...initCompProps(t, componentType as ComponentType),
-    ...componentProps,
-    value: fieldValue !== undefined ? fieldValue : componentProps?.value,
-    onChange: handleChange,
-  };
-
-  return (
-    <Suspense fallback={fallback}>
-      <LazyComponent {...mergedProps} />
-    </Suspense>
-  );
-}
-
 /**
  * 处理输入框组件多余参数
  * @param componentProps - 组件参数
@@ -237,6 +181,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
     return (
       <LazyComponentWrapper
         componentType={component}
+        component={LazyComponent}
         t={t}
         componentProps={componentProps}
         fallback={<LoadingComponent />}
@@ -266,7 +211,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
  * @param name - 组件名
  * @param component - 组件
  */
-export function addComponent(name: ComponentType, component: any): void {
+export function addComponent(name: ComponentType, component: React.ElementType): void {
   loadedComponents.set(name, component);
 }
 

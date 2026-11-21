@@ -1,14 +1,14 @@
-import { useLogout } from '@/hooks/useLogout';
 import type { FormProps } from 'antd/es/form/Form';
 import { Ref, useImperativeHandle } from 'react';
+import { updatePassword } from '@/servers/login';
+import { useTranslation } from 'react-i18next';
+import { PASSWORD_RULE } from '@/utils/config';
+import { useLogout } from '@/hooks/useLogout';
+import { message } from '@south/message';
 import { useState } from 'react';
 import { Form } from 'antd';
-import { message } from '@south/message';
-import { useTranslation } from 'react-i18next';
-import { updatePassword } from '@/servers/login';
-import { PASSWORD_RULE } from '@/utils/config';
-import BaseModal from '@/components/Modal/BaseModal';
 import PasswordStrength from '@/components/PasswordStrength';
+import BaseModal from '@/components/Modal/BaseModal';
 
 export interface PasswordModal {
   open: () => void;

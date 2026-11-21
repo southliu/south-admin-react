@@ -1,9 +1,9 @@
-import { useTranslation } from 'react-i18next';
-import { checkPermission } from '@/utils/permissions';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import VirtualList from './components/VirtualList';
-import VirtualTable from './components/VirtualTable';
+import { checkPermission } from '@/utils/permissions';
+import { useTranslation } from 'react-i18next';
 import BaseContent from '@/components/Content/BaseContent';
+import VirtualTable from './components/VirtualTable';
+import VirtualList from './components/VirtualList';
 
 function VirtualScroll() {
   const { t } = useTranslation();

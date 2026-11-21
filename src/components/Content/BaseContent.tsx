@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import Forbidden from '@/pages/403';
 import { useToken } from '@/hooks/useToken';
+import Forbidden from '@/pages/403';
 
 interface Props {
   isPermission?: boolean;

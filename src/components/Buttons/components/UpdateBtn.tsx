@@ -1,6 +1,6 @@
 import type { ButtonProps } from 'antd';
-import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { Button } from 'antd';
 
 interface Props extends ButtonProps {
   isLoading?: boolean;

@@ -1,8 +1,8 @@
-import type { BreadcrumbProps } from 'antd';
 import type { NavData } from '@/menus/utils/helper';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import type { BreadcrumbProps } from 'antd';
 import { useCommonStore } from '@/hooks/useCommonStore';
+import { useTranslation } from 'react-i18next';
+import { useCallback } from 'react';
 
 interface Props {
   className?: string;
@@ -14,7 +14,6 @@ function Nav(props: Props) {
   const { i18n } = useTranslation();
   // 是否手机端
   const { isPhone } = useCommonStore();
-  const [nav, setNav] = useState<BreadcrumbProps['items']>([]);
 
   // 数据处理
   const handleList = useCallback(
@@ -37,33 +36,23 @@ function Nav(props: Props) {
     [i18n.language],
   );
 
-  useEffect(() => {
-    setNav(handleList(list));
-  }, [handleList, list]);
+  const nav = handleList(list);
 
-  return useMemo(
-    () => (
-      <>
-        {!isPhone && (
-          <div className={`${className} flex items-center text-truncate ellipsis break-all`}>
-            {nav?.map((item, index) => (
-              <span key={index}>
-                {index !== 0 && (
-                  <span className="px-4px color-#000073 breadcrumb-separator">/</span>
-                )}
-                <span
-                  className={`px-4px ${index !== nav.length - 1 ? 'breadcrumb-separator' : ''}`}
-                >
-                  {item.title}
-                </span>
+  return (
+    <>
+      {!isPhone && (
+        <div className={`${className} flex items-center text-truncate ellipsis break-all`}>
+          {nav?.map((item, index) => (
+            <span key={index}>
+              {index !== 0 && <span className="px-4px color-#000073 breadcrumb-separator">/</span>}
+              <span className={`px-4px ${index !== nav.length - 1 ? 'breadcrumb-separator' : ''}`}>
+                {item.title}
               </span>
-            ))}
-          </div>
-        )}
-      </>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [nav],
+            </span>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 

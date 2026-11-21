@@ -1,7 +1,7 @@
 import type { ButtonProps } from 'antd';
-import { Button, Popconfirm } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { DeleteOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { Button, Popconfirm } from 'antd';
 
 interface Props extends ButtonProps {
   isLoading?: boolean;

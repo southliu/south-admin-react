@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import type { ButtonProps } from 'antd';
+import type { ReactNode } from 'react';
 import { Button } from 'antd';
 
 interface Props extends ButtonProps {

@@ -1,8 +1,8 @@
-import { Button } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { useWatermark } from '@/hooks/useWatermark';
-import { checkPermission } from '@/utils/permissions';
 import { useCommonStore } from '@/hooks/useCommonStore';
+import { checkPermission } from '@/utils/permissions';
+import { useWatermark } from '@/hooks/useWatermark';
+import { useTranslation } from 'react-i18next';
+import { Button } from 'antd';
 import BaseContent from '@/components/Content/BaseContent';
 
 function Watermark() {

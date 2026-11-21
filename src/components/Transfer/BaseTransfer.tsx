@@ -1,5 +1,5 @@
-import type { TransferProps } from 'antd';
 import type { TransferItem } from 'antd/es/transfer';
+import type { TransferProps } from 'antd';
 import { useState } from 'react';
 import { Transfer } from 'antd';
 

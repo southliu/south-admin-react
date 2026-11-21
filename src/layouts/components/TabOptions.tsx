@@ -1,7 +1,7 @@
+import { useDropdownMenu } from '../hooks/useDropdownMenu';
+import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { Dropdown } from 'antd';
-import { Icon } from '@iconify/react';
-import { useDropdownMenu } from '../hooks/useDropdownMenu';
 
 interface Props {
   activeKey: string;

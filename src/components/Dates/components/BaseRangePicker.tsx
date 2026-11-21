@@ -1,6 +1,6 @@
-import { DatePicker } from 'antd';
 import type { RangePickerProps } from 'antd/es/date-picker';
 import { stringRang2DayjsRang } from '../utils/helper';
+import { DatePicker } from 'antd';
 
 const { RangePicker } = DatePicker;
 

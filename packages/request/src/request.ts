@@ -1,4 +1,3 @@
-import axios from 'axios';
 import type {
   AxiosResponse,
   AxiosInstance,
@@ -6,12 +5,16 @@ import type {
   AxiosRequestConfig,
 } from 'axios';
 import type { RequestInterceptors, CreateRequestConfig, ServerResult } from './types';
+import axios from 'axios';
 
 interface NewAxiosRequestConfig extends AxiosRequestConfig {
   _mapKey?: string;
+  _controller?: AbortController;
+  _signalCleanup?: () => void;
 }
 
 class AxiosRequest {
+  private requestSequence = 0;
   // axios 实例
   instance: AxiosInstance;
   // 拦截器对象
@@ -28,24 +31,29 @@ class AxiosRequest {
     this.instance.interceptors.request.use(
       (res: InternalAxiosRequestConfig) => {
         const controller = new AbortController();
-
+        const callerSignal = res.signal;
+        const abort = () => controller.abort();
+        if (callerSignal?.aborted) controller.abort();
+        else callerSignal?.addEventListener?.('abort', abort, { once: true });
+        (res as NewAxiosRequestConfig)._signalCleanup = () =>
+          callerSignal?.removeEventListener?.('abort', abort);
         res.signal = controller.signal;
 
         const mapKey = this.generateMapKey(res);
         // 保存key到请求配置中，供响应拦截器使用
         (res as NewAxiosRequestConfig)._mapKey = mapKey;
+        (res as NewAxiosRequestConfig)._controller = controller;
 
         // 如果存在则删除该请求
         if (this.abortControllerMap.get(mapKey)) {
           console.warn('取消重复请求：', mapKey);
           this.cancelRequest(mapKey);
-        } else {
-          this.abortControllerMap.set(mapKey, controller);
         }
+        this.abortControllerMap.set(mapKey, controller);
 
         return res;
       },
-      (err: object) => err,
+      (err: unknown) => Promise.reject(err),
     );
 
     // 使用实例拦截器
@@ -62,12 +70,22 @@ class AxiosRequest {
       // 因为我们接口的数据都在res.data下，所以我们直接返回res.data
       (res: AxiosResponse) => {
         // 从请求配置中获取之前保存的key
-        const mapKey = (res.config as NewAxiosRequestConfig)._mapKey || '';
-        this.abortControllerMap.delete(mapKey);
+        this.releaseRequest(res.config);
         return res.data;
       },
-      (err: object) => err,
+      (err: unknown) => {
+        if (axios.isAxiosError(err)) this.releaseRequest(err.config);
+        return Promise.reject(err);
+      },
     );
+  }
+
+  private releaseRequest(config?: NewAxiosRequestConfig) {
+    config?._signalCleanup?.();
+    const key = config?._mapKey;
+    if (key && this.abortControllerMap.get(key) === config?._controller) {
+      this.abortControllerMap.delete(key);
+    }
   }
   /**
    * 取消全部请求
@@ -85,8 +103,18 @@ class AxiosRequest {
   cancelRequest(url: string | string[]) {
     const urlList = Array.isArray(url) ? url : [url];
     for (const _url of urlList) {
-      this.abortControllerMap.get(_url)?.abort();
-      this.abortControllerMap.delete(_url);
+      for (const [key, controller] of this.abortControllerMap) {
+        const requestUrl = key.slice(key.indexOf('^') + 1);
+        if (
+          key === _url ||
+          requestUrl === _url ||
+          requestUrl.startsWith(`${_url}&`) ||
+          requestUrl.startsWith(`${_url}#`)
+        ) {
+          controller.abort();
+          this.abortControllerMap.delete(key);
+        }
+      }
     }
   }
   /**
@@ -134,25 +162,19 @@ class AxiosRequest {
    * 生成请求的唯一key（考虑参数）
    */
   private generateMapKey(requestConfig: NewAxiosRequestConfig) {
-    let url = requestConfig.method || '';
-    if (requestConfig.url) url += `^${requestConfig.url}`;
-    // 如果存在参数
-    if (requestConfig.params) {
-      for (const key in requestConfig.params) {
-        url += `&${key}=${requestConfig.params[key]}`;
-      }
-    }
-    // 如果存在post数据
+    let url = `${requestConfig.method || 'get'}^${requestConfig.url || ''}`;
+    if (requestConfig.params) url += `&${JSON.stringify(requestConfig.params)}`;
+    const data: unknown = requestConfig.data;
     if (
-      requestConfig.data &&
-      requestConfig.data?.[0] === '{' &&
-      requestConfig.data?.[requestConfig.data?.length - 1] === '}'
+      data &&
+      typeof data === 'object' &&
+      !Array.isArray(data) &&
+      Object.getPrototypeOf(data) !== Object.prototype
     ) {
-      const obj = JSON.parse(requestConfig.data);
-      for (const key in obj) {
-        url += `#${key}=${obj[key]}`;
-      }
+      // 文件等非 JSON 请求不能用空对象序列化结果去重。
+      return `${url}#request=${++this.requestSequence}`;
     }
+    if (data !== undefined) url += `#${JSON.stringify(data)}`;
     return url;
   }
 

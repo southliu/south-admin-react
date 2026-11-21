@@ -1,13 +1,13 @@
 import type { TabsData } from '@/stores/tabs';
-import { useTranslation } from 'react-i18next';
 import { getMenuByKey, getMenuName, getOpenMenuByRouter } from '@/menus/utils/helper';
+import { useEffectOnActive } from 'keepalive-for-react';
 import { ADD_TITLE, EDIT_TITLE } from '@/utils/config';
-import { setTitle } from '@/utils/helper';
+import { useMenuStore, useTabsStore } from '@/stores';
 import { useCommonStore } from './useCommonStore';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
-import { useEffectOnActive } from 'keepalive-for-react';
-import { useMenuStore, useTabsStore } from '@/stores';
+import { setTitle } from '@/utils/helper';
 
 interface Props {
   fatherPath: string;
@@ -29,6 +29,42 @@ export function useSingleTab(props: Props) {
   const { setOpenKeys, setSelectedKeys } = useMenuStore((state) => state);
   const { isPhone, isCollapsed, menuList, permissions } = useCommonStore();
   const { addTabs, setNav, setActiveKey } = useTabsStore((state) => state);
+
+  /** 获取路由对应名称 */
+  function getNameByRoute(): string {
+    const route = search?.substring(1, search.length);
+    const list = route?.split('&');
+
+    for (let i = 0; i < list?.length; i++) {
+      const item = list[i];
+      const arr = item?.split('=');
+      const key = arr?.[0];
+      const value = arr?.[1];
+      if (key === name) {
+        return value;
+      }
+    }
+
+    return '';
+  }
+
+  /** 设置标题 */
+  function handleGetTitle() {
+    let newUpdateTitle: string, newCreateTitle: string;
+    const routeName = getNameByRoute();
+    const title = i18n.language === 'zh' ? zhTitle : enTitle;
+
+    if (!title) {
+      const menuName = getMenuName(menuList, fatherPath, i18n.language);
+      newCreateTitle = `${title || ADD_TITLE(t)}${menuName}`;
+      newUpdateTitle = `${EDIT_TITLE(t, routeName, menuName)}`;
+    } else {
+      const label = routeName ? `(${routeName})` : '';
+      newCreateTitle = `${title || ADD_TITLE(t)}${label}`;
+      newUpdateTitle = `${title}${label}`;
+    }
+    return routeName ? newUpdateTitle : newCreateTitle;
+  }
 
   /** 初始化操作 */
   const handleInit = useCallback(() => {
@@ -95,45 +131,6 @@ export function useSingleTab(props: Props) {
     handleAddTab();
     handleInit();
   }, []);
-
-  /** 获取路由对应名称 */
-  const getNameByRoute = (): string => {
-    const route = search?.substring(1, search.length);
-    const list = route?.split('&');
-
-    for (let i = 0; i < list?.length; i++) {
-      const item = list[i];
-      const arr = item?.split('=');
-      const key = arr?.[0];
-      const value = arr?.[1];
-      if (key === name) {
-        return value;
-      }
-    }
-
-    return '';
-  };
-
-  /** 设置标题 */
-  const handleGetTitle = () => {
-    let result = '',
-      newUpdateTitle = '',
-      newCreateTitle = '';
-    const routeName = getNameByRoute();
-    const title = i18n.language === 'zh' ? zhTitle : enTitle;
-
-    if (!title) {
-      const menuName = getMenuName(menuList, fatherPath, i18n.language);
-      newCreateTitle = `${title || ADD_TITLE(t)}${menuName}`;
-      newUpdateTitle = `${EDIT_TITLE(t, routeName, menuName)}`;
-    } else {
-      const label = routeName ? `(${routeName})` : '';
-      newCreateTitle = `${title || ADD_TITLE(t)}${label}`;
-      newUpdateTitle = `${title}${label}`;
-    }
-    result = routeName ? newUpdateTitle : newCreateTitle;
-    return result;
-  };
 
   return [];
 }

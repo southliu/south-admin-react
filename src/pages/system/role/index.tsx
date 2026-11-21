@@ -1,20 +1,5 @@
-import { useTranslation } from 'react-i18next';
-import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { checkPermission } from '@/utils/permissions';
-import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
-import BaseContent from '@/components/Content/BaseContent';
-import BaseCard from '@/components/Card/BaseCard';
-import BaseSearch from '@/components/Search/BaseSearch';
-import BaseTable from '@/components/Table/BaseTable';
-import BasePagination from '@/components/Pagination/BasePagination';
-import BaseForm from '@/components/Form/BaseForm';
-import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Button, Drawer, Form, type FormInstance, message, Spin } from 'antd';
-import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
-import { useEffectOnActive } from 'keepalive-for-react';
-import { searchList, createList, tableColumns } from './model';
+import type { BaseFormData } from '#/form';
 import {
   getRolePage,
   getRoleById,
@@ -22,6 +7,21 @@ import {
   updateRole,
   deleteRole,
 } from '@/servers/system/role';
+import { Button, Drawer, Form, type FormInstance, message, Spin } from 'antd';
+import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
+import { useCallback, useRef, useState, useEffect } from 'react';
+import { searchList, createList, tableColumns } from './model';
+import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useEffectOnActive } from 'keepalive-for-react';
+import { checkPermission } from '@/utils/permissions';
+import { useTranslation } from 'react-i18next';
+import BasePagination from '@/components/Pagination/BasePagination';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseForm from '@/components/Form/BaseForm';
 
 // 当前行数据
 interface RowData {
@@ -149,7 +149,9 @@ function Page() {
       setCreateLoading(true);
       const { code, data } = await getRoleById(id);
       if (Number(code) !== 200) return;
-      const { id: _id, createdAt, updatedAt, ...rest } = data;
+      const rest = Object.fromEntries(
+        Object.entries(data).filter(([key]) => !['id', 'createdAt', 'updatedAt'].includes(key)),
+      );
       setCreateData(rest);
     } finally {
       setCreateLoading(false);
@@ -217,44 +219,33 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender = useCallback(
-    (_: unknown, record: object) => {
-      return (
-        <div className="flex flex-wrap gap-5px">
-          {pagePermission.update === true && (
-            <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
-          )}
-          {pagePermission.create === true && (
-            <Button
-              type="primary"
-              className="small-btn"
-              onClick={() => onCopy((record as RowData).id)}
-            >
-              {t('public.copy')}
-            </Button>
-          )}
-          {pagePermission.delete === true && (
-            <DeleteBtn
-              name={(record as RowData).name}
-              handleDelete={() => onDelete((record as RowData).id)}
-            />
-          )}
-        </div>
-      );
-    },
-    [
-      pagePermission.update,
-      pagePermission.create,
-      pagePermission.delete,
-      onUpdate,
-      onCopy,
-      onDelete,
-      t,
-    ],
-  );
+  const optionRender = (_: unknown, record: object) => {
+    return (
+      <div className="flex flex-wrap gap-5px">
+        {pagePermission.update === true && (
+          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
+        )}
+        {pagePermission.create === true && (
+          <Button
+            type="primary"
+            className="small-btn"
+            onClick={() => onCopy((record as RowData).id)}
+          >
+            {t('public.copy')}
+          </Button>
+        )}
+        {pagePermission.delete === true && (
+          <DeleteBtn
+            name={(record as RowData).name}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
+        )}
+      </div>
+    );
+  };
 
-  // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  // 列配置
+  const columns = tableColumns(t, optionRender);
 
   return (
     <BaseContent isPermission={pagePermission.page}>

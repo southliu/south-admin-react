@@ -1,8 +1,8 @@
-import BaseSelect from './BaseSelect';
 import BaseTreeSelect from './BaseTreeSelect';
-import ApiSelect from './ApiSelect';
 import ApiTreeSelect from './ApiTreeSelect';
 import ApiPageSelect from './ApiPageSelect';
+import BaseSelect from './BaseSelect';
+import ApiSelect from './ApiSelect';
 
 export const MAX_TAG_COUNT = 'responsive'; // 最多显示多少个标签，responsive：自适应
 

@@ -1,11 +1,11 @@
-import { useToken } from '@/hooks/useToken';
+import { cancelAllRequest } from '@/utils/request';
 import { usePublicStore } from '@/stores/public';
+import { useNavigate } from 'react-router-dom';
 import { useTabsStore } from '@/stores/tabs';
 import { useUserStore } from '@/stores/user';
 import { useMenuStore } from '@/stores/menu';
-import { useNavigate } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
-import { cancelAllRequest } from '@/utils/request';
+import { useToken } from '@/hooks/useToken';
 
 /**
  * 获取常用的状态数据

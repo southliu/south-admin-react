@@ -1,6 +1,6 @@
-import { useTranslation } from 'react-i18next';
-import { useEcharts } from '@/hooks/useEcharts';
 import type { EChartsCoreOption } from 'echarts';
+import { useEcharts } from '@/hooks/useEcharts';
+import { useTranslation } from 'react-i18next';
 
 function Line() {
   const { t } = useTranslation();

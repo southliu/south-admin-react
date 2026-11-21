@@ -1,6 +1,6 @@
-import type { TFunction } from 'i18next';
-import type { TabsData } from '@/stores/tabs';
 import type { MessageInstance } from 'antd/es/message/interface';
+import type { TabsData } from '@/stores/tabs';
+import type { TFunction } from 'i18next';
 import { LANG, VERSION } from '@/utils/config';
 import axios from 'axios';
 

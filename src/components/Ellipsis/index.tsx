@@ -1,5 +1,4 @@
 import { Tooltip } from 'antd';
-import { useEffect, useState } from 'react';
 
 /**
  * 文字超出省略组件
@@ -15,24 +14,6 @@ interface Props {
 
 function Ellipsis(props: Props) {
   const { tooltip, length, lines, fullWidthRecognition, children } = props;
-  const [content, setContent] = useState('');
-
-  useEffect(() => {
-    if (children !== content) {
-      let con = children;
-
-      if (length && length > 0) {
-        if (fullWidthRecognition) {
-          con = countFullWidthChars(children, length);
-        } else {
-          con = con.substring(0, length) + '...';
-        }
-      }
-
-      setContent(con);
-    }
-  }, [children, content, fullWidthRecognition, length]);
-
   /**
    * 计算全角数量
    * @param str
@@ -59,6 +40,15 @@ function Ellipsis(props: Props) {
     }
     return result;
   };
+
+  const content =
+    length && length > 0
+      ? fullWidthRecognition
+        ? countFullWidthChars(children, length)
+        : children.length > length
+          ? children.slice(0, length) + '...'
+          : children
+      : children;
 
   const renderContent = (
     <div className="inline-block">

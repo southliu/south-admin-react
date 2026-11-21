@@ -1,17 +1,17 @@
-import { useTranslation } from 'react-i18next';
+import type { BaseFormData } from '#/form';
 import { useState, useCallback, useEffect } from 'react';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import { checkPermission } from '@/utils/permissions';
-import type { BaseFormData } from '#/form';
-import BaseContent from '@/components/Content/BaseContent';
-import BaseCard from '@/components/Card/BaseCard';
-import BaseSearch from '@/components/Search/BaseSearch';
-import { searchList } from './model';
 import { useEffectOnActive } from 'keepalive-for-react';
+import { checkPermission } from '@/utils/permissions';
 import { getDataTrends } from '@/servers/dashboard';
-import Bar from './components/Bar';
-import Line from './components/Line';
+import { useTranslation } from 'react-i18next';
+import { searchList } from './model';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseCard from '@/components/Card/BaseCard';
 import Block from './components/Block';
+import Line from './components/Line';
+import Bar from './components/Bar';
 
 // 初始化搜索
 const initSearch = {

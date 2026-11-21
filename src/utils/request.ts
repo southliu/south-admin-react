@@ -1,5 +1,6 @@
-import { TOKEN } from '@/utils/config';
 import { creteRequest } from '@south/request';
+import { TOKEN } from '@/utils/config';
+import i18n from '@/locales/config';
 
 // 生成环境所用的接口
 const prefixUrl = import.meta.env.VITE_BASE_URL as string;
@@ -7,6 +8,7 @@ const baseURL = process.env.NODE_ENV !== 'development' ? prefixUrl : '/api';
 
 // 业务侧统一请求实例（get/post/put/patch/delete/sse）
 export const request = creteRequest(baseURL, TOKEN, {
+  getNetworkErrorMessage: () => i18n.t('public.networkError'),
   // 权限过期处理：自动兼容 HashRouter 与 BrowserRouter。
   // HashRouter 路由在 hash（形如 "#/ai-refund/workbench"），改 hash 后需 reload；
   // BrowserRouter 路由在 pathname，改 location.href 会自动整页加载。

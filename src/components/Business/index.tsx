@@ -1,5 +1,5 @@
-import { lazy } from 'react';
 import { addComponent } from '../Form/utils/componentMap';
+import { lazy } from 'react';
 
 // 自定义组件名
 export type BusinessComponents = 'GameSelect' | 'PartnerSelect';

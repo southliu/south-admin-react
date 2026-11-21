@@ -1,5 +1,5 @@
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Tooltip } from 'antd';
-import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react';
 
 interface EllipsisTextProps {
   text: string;
@@ -14,18 +14,18 @@ const EllipsisText = (props: EllipsisTextProps) => {
   const textRef = useRef<HTMLSpanElement>(null);
   const [isOverflowed, setIsOverflowed] = useState(false);
 
-  // 计算文本是否溢出
-  const calculateOverflow = useCallback(() => {
-    const element = textRef.current;
-    if (element) {
-      // 检查文本是否溢出
-      setIsOverflowed(element.scrollWidth > element.clientWidth);
-    }
-  }, [text, width, textRef.current]);
-
   useEffect(() => {
-    calculateOverflow();
-  }, [calculateOverflow]);
+    const element = textRef.current;
+    if (!element) return;
+    const measure = () => setIsOverflowed(element.scrollWidth > element.clientWidth);
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    const frame = requestAnimationFrame(measure);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [text, width]);
 
   const textStyle = {
     color,

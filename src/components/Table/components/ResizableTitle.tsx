@@ -1,6 +1,6 @@
 import type { ResizeCallbackData } from 'react-resizable';
-import React from 'react';
 import { Resizable } from 'react-resizable';
+import React from 'react';
 
 /** 自定义拖拽  */
 function ResizableTitle(

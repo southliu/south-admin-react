@@ -1,5 +1,5 @@
-import type { ArrayData } from '#/public';
 import type { Constant } from './constants';
+import type { ArrayData } from '#/public';
 import type { TFunction } from 'i18next';
 import { TITLE_SUFFIX } from '@/utils/config';
 

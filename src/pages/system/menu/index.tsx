@@ -1,21 +1,5 @@
-import { useTranslation } from 'react-i18next';
-import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { checkPermission } from '@/utils/permissions';
-import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
-import BaseContent from '@/components/Content/BaseContent';
-import BaseCard from '@/components/Card/BaseCard';
-import BaseSearch from '@/components/Search/BaseSearch';
-import BaseTable from '@/components/Table/BaseTable';
-import BasePagination from '@/components/Pagination/BasePagination';
-import BaseModal from '@/components/Modal/BaseModal';
-import BaseForm from '@/components/Form/BaseForm';
-import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Button, Form, type FormInstance, message, Popconfirm } from 'antd';
-import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
-import { useEffectOnActive } from 'keepalive-for-react';
-import { searchList, createList, tableColumns } from './model';
+import type { BaseFormData } from '#/form';
 import {
   getMenuPage,
   getMenuById,
@@ -24,6 +8,22 @@ import {
   deleteMenu,
   batchDeleteMenu,
 } from '@/servers/system/menu';
+import { Button, Form, type FormInstance, message, Popconfirm } from 'antd';
+import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
+import { useCallback, useRef, useState, useEffect } from 'react';
+import { searchList, createList, tableColumns } from './model';
+import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useEffectOnActive } from 'keepalive-for-react';
+import { checkPermission } from '@/utils/permissions';
+import { useTranslation } from 'react-i18next';
+import BasePagination from '@/components/Pagination/BasePagination';
+import BaseContent from '@/components/Content/BaseContent';
+import BaseSearch from '@/components/Search/BaseSearch';
+import BaseTable from '@/components/Table/BaseTable';
+import BaseModal from '@/components/Modal/BaseModal';
+import BaseCard from '@/components/Card/BaseCard';
+import BaseForm from '@/components/Form/BaseForm';
 
 // 当前行数据
 interface RowData {
@@ -233,47 +233,29 @@ function Page() {
    * @param _ - 当前值
    * @param record - 当前行参数
    */
-  const optionRender = useCallback(
-    (_: unknown, record: object) => {
-      return (
-        <div className="flex flex-wrap gap-5px">
-          {pagePermission.create === true && (record as RowData)?.type <= 2 && (
-            <Button
-              className="small-btn"
-              type="primary"
-              onClick={() => onCreate(record as RowData)}
-            >
-              {t('systems:menu.addChildMenu')}
-            </Button>
-          )}
-          {pagePermission.update === true && (
-            <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
-          )}
-          {pagePermission.delete === true && (
-            <DeleteBtn
-              name={
-                i18n.language === 'zh' ? (record as RowData).label : (record as RowData).labelEn
-              }
-              handleDelete={() => onDelete((record as RowData).id)}
-            />
-          )}
-        </div>
-      );
-    },
-    [
-      pagePermission.create,
-      pagePermission.update,
-      pagePermission.delete,
-      t,
-      i18n.language,
-      onCreate,
-      onUpdate,
-      onDelete,
-    ],
-  );
+  const optionRender = (_: unknown, record: object) => {
+    return (
+      <div className="flex flex-wrap gap-5px">
+        {pagePermission.create === true && (record as RowData)?.type <= 2 && (
+          <Button className="small-btn" type="primary" onClick={() => onCreate(record as RowData)}>
+            {t('systems:menu.addChildMenu')}
+          </Button>
+        )}
+        {pagePermission.update === true && (
+          <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
+        )}
+        {pagePermission.delete === true && (
+          <DeleteBtn
+            name={i18n.language === 'zh' ? (record as RowData).label : (record as RowData).labelEn}
+            handleDelete={() => onDelete((record as RowData).id)}
+          />
+        )}
+      </div>
+    );
+  };
 
-  // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  // 列配置
+  const columns = tableColumns(t, optionRender);
 
   return (
     <BaseContent isPermission={pagePermission.page}>

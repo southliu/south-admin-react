@@ -1,6 +1,6 @@
 import type { TimePickerProps } from 'antd';
-import { TimePicker } from 'antd';
 import { string2Dayjs } from '../utils/helper';
+import { TimePicker } from 'antd';
 
 function BaseTimePicker(props: TimePickerProps) {
   const { value } = props;

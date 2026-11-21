@@ -1,11 +1,11 @@
 import type { SideMenu } from '#/public';
-import { Fragment } from 'react';
-import { Icon } from '@iconify/react';
+import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
+import { useCommonStore } from '@/hooks/useCommonStore';
+import { useMenuStore, useTabsStore } from '@/stores';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
-import { useMenuStore, useTabsStore } from '@/stores';
+import { Icon } from '@iconify/react';
+import { Fragment } from 'react';
 
 interface Props {
   list: SideMenu[]; // 列表
