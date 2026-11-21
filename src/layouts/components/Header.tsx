@@ -29,7 +29,7 @@ function Header() {
   const [handleLogout] = useLogout();
   const { t } = useTranslation();
   const { modal } = App.useApp();
-  const { isCollapsed, isMaximize, username, name, nav } = useCommonStore();
+  const { isCollapsed, isMaximize, username, name, nav, permissions, menuList } = useCommonStore();
   // 是否窗口最大化
   const passwordRef = useRef<PasswordModal>(null);
   const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);
@@ -113,10 +113,15 @@ function Header() {
   /** icon渲染 */
   const IconRender = () => {
     return (
-      <div className="text-lg cursor-pointer" onClick={() => toggleCollapsed(!isCollapsed)}>
+      <button
+        type="button"
+        className="text-lg cursor-pointer border-0 bg-transparent p-0 inline-flex items-center"
+        aria-label={t(isCollapsed ? 'public.expandMenu' : 'public.collapseMenu')}
+        onClick={() => toggleCollapsed(!isCollapsed)}
+      >
         {isCollapsed && <MenuUnfoldOutlined />}
         {!isCollapsed && <MenuFoldOutlined />}
-      </div>
+      </button>
     );
   };
 
@@ -137,7 +142,7 @@ function Header() {
         `}
       >
         <div className="flex item-center">
-          <IconRender />
+          {permissions.length > 0 && menuList.length > 0 && <IconRender />}
 
           <Nav className="ml-15px" list={nav} />
         </div>

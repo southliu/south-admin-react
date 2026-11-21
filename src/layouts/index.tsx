@@ -2,7 +2,7 @@ import { usePublicStore } from '@/stores/public';
 import { useToken } from '@/hooks/useToken';
 import { useCallback, useEffect, useMemo, useState, memo, useDeferredValue } from 'react';
 import { useOutlet } from 'react-router-dom';
-import { Skeleton, message } from 'antd';
+import { Button, Result, Skeleton, message } from 'antd';
 import { debounce } from 'lodash';
 import { useShallow } from 'zustand/shallow';
 import { useLocation } from 'react-router-dom';
@@ -30,6 +30,7 @@ function Layout() {
   const outlet = useOutlet();
   const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const setAliveRef = usePublicStore(useShallow((state) => state.setAliveRef));
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
@@ -48,7 +49,8 @@ function Layout() {
     })),
   );
 
-  const { permissions, userId, isMaximize, isCollapsed, isPhone } = useCommonStore();
+  const { permissions, isMaximize, isCollapsed, isPhone } = useCommonStore();
+  const hasSidebar = permissions.length > 0 && menuList.length > 0;
 
   // 使用 useDeferredValue 延迟非关键的路由更新，提升响应性
   const deferredPathname = useDeferredValue(pathname);
@@ -65,45 +67,41 @@ function Layout() {
     }
   }, [keepaliveRef.current]);
 
-  /** 获取用户信息和权限 */
-  const getUserInfo = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
-      if (Number(code) !== 200) return;
-      const { user, permissions } = data;
-      setUserInfo(user);
-      setPermissions(permissions);
-    } catch (err) {
-      console.error('获取用户数据失败:', err);
-      setPermissions([]);
-    } finally {
+  const loadData = useCallback(async () => {
+    if (!token) {
       setLoading(false);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /** 获取菜单数据 */
-  const getMenuData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { code, data } = await getMenuList();
-      if (Number(code) !== 200) return;
-      setMenuList(data || []);
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    setLoadFailed(false);
+    const requests: Promise<void>[] = [];
+    const user = useUserStore.getState();
+    if (!user.userInfo.id || !user.permissions.length) {
+      requests.push(
+        getUserRefreshPermissions({ refresh_cache: false }).then(({ code, data }) => {
+          if (Number(code) !== 200) throw new Error('Failed to load user');
+          setUserInfo(data.user);
+          setPermissions(data.permissions);
+        }),
+      );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // 用户信息与菜单独立缓存，用户已就绪不能作为跳过菜单请求的依据。
+    if (!useMenuStore.getState().menuList.length) {
+      requests.push(
+        getMenuList().then(({ code, data }) => {
+          if (Number(code) !== 200) throw new Error('Failed to load menus');
+          setMenuList(data || []);
+        }),
+      );
+    }
+    const results = await Promise.allSettled(requests);
+    setLoadFailed(results.some((result) => result.status === 'rejected'));
+    setLoading(false);
+  }, [token, setUserInfo, setPermissions, setMenuList]);
 
   useEffect(() => {
-    // 当用户信息缓存不存在时则重新获取
-    if (token && !userId) {
-      getUserInfo();
-      getMenuData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void loadData();
+  }, [loadData]);
 
   // 组件卸载时确保关闭进度条（退出登录场景）
   useEffect(() => {
@@ -160,9 +158,10 @@ function Layout() {
         ${styles.header}
         ${isCollapsed ? styles['header-close-menu'] : ''}
         ${isMaximize ? styles['header-none'] : ''}
+        ${!hasSidebar ? styles['header-no-menu'] : ''}
         ${isPhone ? `!left-0 z-999` : ''}
       `,
-    [isCollapsed, isMaximize, isPhone],
+    [hasSidebar, isCollapsed, isMaximize, isPhone],
   );
 
   const contentClassName = useMemo(
@@ -173,28 +172,36 @@ function Layout() {
         ${styles.con}
         ${isMaximize ? styles['con-maximize'] : ''}
         ${isCollapsed ? styles['con-close-menu'] : ''}
+        ${!hasSidebar ? styles['con-no-menu'] : ''}
         ${isPhone ? `!left-0 !w-full` : ''}
       `,
-    [isMaximize, isCollapsed, isPhone],
+    [hasSidebar, isMaximize, isCollapsed, isPhone],
   );
 
   return (
     <div id="layout">
       {contextHolder}
-      {permissions.length > 0 && menuList.length > 0 && <Menu />}
+      {hasSidebar && <Menu />}
 
       <div className={styles.layout_right}>
         <div id="header" className={headerClassName}>
           <Header />
-          {permissions.length > 0 && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
+          {hasSidebar && <Tabs aliveRef={keepaliveRef} />}
         </div>
         <div id="layout-content" className={contentClassName}>
-          {isLoading && permissions.length === 0 && (
+          {isLoading && !hasSidebar && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
-          {!isLoading && permissions.length === 0 && Boolean(token) && <Forbidden />}
+          {!isLoading && loadFailed && (
+            <Result
+              status="error"
+              title={t('public.loadFailed')}
+              extra={<Button onClick={() => void loadData()}>{t('public.reload')}</Button>}
+            />
+          )}
+          {!isLoading && !loadFailed && !hasSidebar && Boolean(token) && <Forbidden />}
           <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
-            {permissions.length > 0 && (
+            {hasSidebar && !loadFailed && (
               <motion.div
                 key={deferredPathname}
                 initial={{ opacity: 0, scale: 0.95 }}

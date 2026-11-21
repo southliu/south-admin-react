@@ -106,7 +106,7 @@ function Login() {
       const { user, permissions } = data;
       setUserInfo(user);
       setPermissions(permissions);
-      handleGoMenu(permissions);
+      await handleGoMenu(permissions);
     } finally {
       setLoading(false);
     }
@@ -124,6 +124,8 @@ function Login() {
       if (Number(code) !== 200) return;
       setMenuList(data || []);
       result = data;
+    } catch (error) {
+      console.error('获取菜单数据失败:', error);
     } finally {
       setLoading(false);
     }
@@ -150,7 +152,7 @@ function Login() {
       menuData = (await getMenuData()) as SideMenu[];
     }
 
-    // 菜单仍为空（接口失败或返回空），无法确定跳转目标
+    // 菜单仍为空时留在登录页，避免带着空菜单进入布局。
     if (!menuData?.length) {
       return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
     }
