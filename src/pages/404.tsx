@@ -11,12 +11,12 @@ import { Button } from 'antd';
 import styles from './all.module.less';
 
 function NotFound() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { permissions, menuList } = useCommonStore();
   const { setMenuList } = useMenuStore();
   const { setPermissions, setUserInfo } = useUserStore();
   const { addTabs, setActiveKey } = useTabsStore();
+  const navigate = useNavigate();
 
   /** 获取用户权限 */
   const fetchPermissions = async (): Promise<string[]> => {

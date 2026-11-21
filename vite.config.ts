@@ -1,7 +1,7 @@
-import { createVitePlugins } from './build/plugins';
-import { buildOptions } from './build/vite/build';
-import { handleEnv } from './build/utils/helper';
-import { createProxy } from './build/vite/proxy';
+import { createVitePlugins } from './build/plugins/index.ts';
+import { buildOptions } from './build/vite/build.ts';
+import { handleEnv } from './build/utils/helper.ts';
+import { createProxy } from './build/vite/proxy.ts';
 import { defineConfig, loadEnv } from 'vite';
 
 // https://vitejs.dev/config/

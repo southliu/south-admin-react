@@ -33,23 +33,6 @@ interface LayoutTabsProps {
 function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
-  const navigate = useNavigate();
-
-  // 使用 useMemo 缓存传感器配置，避免每次渲染重新创建
-  const sensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 5, // 降低激活距离，更容易触发拖拽
-    },
-  });
-
-  const [messageApi, contextHolder] = message.useMessage();
-  const [refreshTime, setRefreshTime] = useState<NodeJS.Timeout | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const tabsContainerRef = useRef<HTMLDivElement>(null);
-  const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuKey, setContextMenuKey] = useState<string | null>(null);
-
-  const setRefresh = usePublicStore((state) => state.setRefresh);
   const { setOpenKeys, setSelectedKeys } = useMenuStore(
     useShallow((state) => ({
       setOpenKeys: state.setOpenKeys,
@@ -73,6 +56,23 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
     );
 
   const { permissions, isMaximize, menuList } = useCommonStore();
+  const [isContextMenuVisible, setContextMenuVisible] = useState(false);
+  const [refreshTime, setRefreshTime] = useState<NodeJS.Timeout | null>(null);
+  const [contextMenuKey, setContextMenuKey] = useState<string | null>(null);
+
+  const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
+
+  // 使用 useMemo 缓存传感器配置，避免每次渲染重新创建
+  const sensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 5, // 降低激活距离，更容易触发拖拽
+    },
+  });
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  const setRefresh = usePublicStore((state) => state.setRefresh);
 
   // 使用 Map 缓存 URL 参数查询，避免每次都遍历
   const urlParamsMap = useMemo(
@@ -268,7 +268,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
                   }}
                 >
                   <Dropdown
-                    open={contextMenuVisible && contextMenuKey === key}
+                    open={isContextMenuVisible && contextMenuKey === key}
                     onOpenChange={(open) => {
                       setContextMenuVisible(open);
                       if (!open) {
@@ -289,7 +289,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         </SortableContext>
       </DndContext>
     ),
-    [sensor, tabs, onDragEnd, dropdownItems, onDropdownClick, contextMenuVisible, contextMenuKey],
+    [sensor, tabs, onDragEnd, dropdownItems, onDropdownClick, isContextMenuVisible, contextMenuKey],
   );
 
   // 操作按钮渲染

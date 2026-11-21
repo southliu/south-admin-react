@@ -23,17 +23,17 @@ interface Props {
 }
 
 function SearchModal(props: Props) {
-  const navigate = useNavigate();
-  const inputRef = useRef<InputRef>(null);
   const { modalRef } = props;
   const { t } = useTranslation();
   const { permissions, menuList } = useCommonStore();
+  const { addTabs, setActiveKey } = useTabsStore((state) => state);
+  const [isOpen, setOpen] = useState(false);
   const [value, setValue] = useState(''); // 输入框值
   const [active, setActive] = useState(''); // 选中值
   const [list, setList] = useState<SideMenu[]>([]);
-  const [isOpen, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const inputRef = useRef<InputRef>(null);
   const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
-  const { addTabs, setActiveKey } = useTabsStore((state) => state);
 
   // 抛出外部方法
   useImperativeHandle(modalRef, () => ({

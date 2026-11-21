@@ -26,7 +26,6 @@ dayjs.locale('zh-cn');
 
 // 性能监控
 import { initPerformanceMonitoring } from '@/utils/performance';
-import { initSentry } from '@/utils/sentry';
 
 // 初始化全局错误处理（防止应用崩溃和自动刷新）- 必须同步执行
 if (typeof window !== 'undefined') {
@@ -60,7 +59,9 @@ const deferredInit = () => {
   initPerformanceMonitoring();
 
   // 初始化 Sentry (需要在 .env 中配置 VITE_SENTRY_DSN)
-  initSentry();
+  if (import.meta.env.VITE_SENTRY_DSN) {
+    void import('@/utils/sentry').then(({ initSentry }) => initSentry());
+  }
 };
 
 // 检查是否支持 requestIdleCallback

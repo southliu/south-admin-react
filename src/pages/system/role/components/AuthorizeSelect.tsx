@@ -10,8 +10,8 @@ interface Props extends SelectProps {
 
 function AuthorizeSelect(props: Props) {
   const { id, value, onChange } = props;
-  const [list, setList] = useState<PermissionData[]>([]);
   const [isLoading, setLoading] = useState(false);
+  const [list, setList] = useState<PermissionData[]>([]);
 
   /** 获取数据 */
   const getList = useCallback(async () => {

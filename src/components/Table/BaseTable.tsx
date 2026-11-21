@@ -51,8 +51,11 @@ function BaseTable(props: Props) {
   } = props;
   const { t } = useTranslation();
   const { isPhone } = useCommonStore();
-  const [handleFilterTable] = useFiler();
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [tableFilters, setTableFilters] = useState<string[] | undefined>(undefined);
+  const [sortList, setSortList] = useState<string[] | undefined>(undefined);
+  const [tableHeight, setTableHeight] = useState(450);
+  const [handleFilterTable] = useFiler();
   const columns = useMemo(
     () =>
       filterTableColumns((props.columns || []) as TableColumn[]).map((column) => ({
@@ -62,9 +65,6 @@ function BaseTable(props: Props) {
     [props.columns, columnWidths],
   );
   const tableRef = useRef<HTMLDivElement>(null);
-  const [tableFilters, setTableFilters] = useState<string[] | undefined>(undefined);
-  const [sortList, setSortList] = useState<string[] | undefined>(undefined);
-  const [tableHeight, setTableHeight] = useState(450);
 
   // 清除自定义属性
   const params: Partial<Props> = { ...props };

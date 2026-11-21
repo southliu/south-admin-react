@@ -9,9 +9,9 @@ import { getUrlAllParam } from '@/utils/helper';
 import { type FormInstance } from 'antd';
 
 export const useSearchUrlParams = (form: FormInstance) => {
-  const [, setSearchParams] = useSearchParams();
   const { pathname, search } = useLocation();
   const { setTabs } = useTabsStore((state) => state);
+  const [, setSearchParams] = useSearchParams();
 
   /** url参数带入搜索表单中 */
   const handleSetSearchForm = useCallback(() => {

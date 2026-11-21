@@ -225,4 +225,4 @@ export function deleteComponent(name: ComponentType): void {
 }
 
 // 业务组件注入
-CreateBusiness();
+CreateBusiness(addComponent);

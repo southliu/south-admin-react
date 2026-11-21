@@ -69,6 +69,10 @@ pnpm build
 pnpm build:analyze
 ```
 
+构建使用 Vite 8 默认的 Rolldown + Oxc，CSS 由 Lightning CSS 压缩。面向 Vite 默认的现代浏览器目标（Chrome/Edge 111+、Firefox 114+、Safari/iOS 16.4+），不再生成 legacy 兼容包。页面模块保持按路由懒加载，分包交由构建器自动处理。
+
+TypeScript 使用 `~6.0.3`：当前 `typescript-eslint` 的支持范围为 `<6.1`，升级 TypeScript 7 前需同步验证 lint 和测试所用的编译器 API。
+
 ## 🌐 后端项目
 ![Go](https://img.shields.io/badge/-Go-black?style=plastic&logo=go) [south-admin-gin](https://github.com/southliu/south-admin-gin)<br/>
 ![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-fastApi](https://github.com/southliu/south-admin-fastApi)<br/>

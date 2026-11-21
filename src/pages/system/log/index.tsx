@@ -25,6 +25,7 @@ interface RowData {
 
 function Page() {
   const { t } = useTranslation();
+  const { permissions } = useCommonStore();
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -34,7 +35,6 @@ function Page() {
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const { permissions } = useCommonStore();
 
   // 权限前缀
   const permissionPrefix = '/authority/log';

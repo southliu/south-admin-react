@@ -12,8 +12,8 @@ export function useApiOptions(
   }: { api?: ApiFn; params?: ApiParams; key?: string; revision?: number },
   enabled: boolean,
 ) {
-  const [options, setOptions] = useState<DefaultOptionType[]>([]);
   const [isLoading, setLoading] = useState(false);
+  const [options, setOptions] = useState<DefaultOptionType[]>([]);
   useEffect(() => {
     let active = true;
     void Promise.resolve().then(async () => {

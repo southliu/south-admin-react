@@ -1,43 +1,23 @@
 import type { PluginOption } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { versionUpdatePlugin } from './version';
-import { nojekyllPlugin } from './nojekyll';
-import { timePlugin } from './time';
+import { versionUpdatePlugin } from './version.ts';
+import { nojekyllPlugin } from './nojekyll.ts';
+import { timePlugin } from './time.ts';
 import viteCompression from 'vite-plugin-compression';
-import react from '@vitejs/plugin-react-swc';
-import legacy from '@vitejs/plugin-legacy';
+import react from '@vitejs/plugin-react';
 import unocss from 'unocss/vite';
 
 export function createVitePlugins() {
   const isDev = process.env.NODE_ENV === 'development';
-  
+
   // 插件参数
-  const vitePlugins: PluginOption[] = [
-    // React SWC 插件，配置以支持 React 19
-    react({
-      // 确保使用正确的 JSX 运行时
-      tsDecorators: false,
-    }),
-    unocss(),
-  ];
+  const vitePlugins: PluginOption[] = [react(), unocss()];
 
   // 生产环境才启用这些插件
   if (!isDev) {
     vitePlugins.push(
       // 压缩包
       viteCompression(),
-      // 兼容低版本
-      legacy({
-        targets: [ 
-          'Android > 39', 
-          'Chrome >= 60', 
-          'Safari >= 10.1', 
-          'iOS >= 10.3', 
-          'Firefox >= 54', 
-          'Edge >= 15', 
-        ], 
-        additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-      }),
       // 版本控制
       versionUpdatePlugin(),
       // 生成 .nojekyll 空文件

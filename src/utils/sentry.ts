@@ -82,12 +82,12 @@ export function initSentry(config: SentryConfig = {}): void {
         blockAllMedia: true,
       }),
       Sentry.breadcrumbsIntegration({
-        console: true,
         dom: true,
         fetch: true,
         history: true,
         xhr: true,
       }),
+      Sentry.consoleIntegration(),
     ],
 
     // 设置追踪采样率

@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "composite": true,
+    "rewriteRelativeImportExtensions": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true

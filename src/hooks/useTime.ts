@@ -5,8 +5,8 @@ import dayjs from 'dayjs';
  * @description 获取本地时间
  */
 export const useTimes = () => {
-  const timer = useRef<NodeJS.Timeout | null>(null);
   const [time, setTime] = useState(dayjs().format('YYYY年MM月DD日 HH:mm:ss'));
+  const timer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     timer.current = setInterval(() => {

@@ -26,7 +26,6 @@ interface RowData {
 
 function Page() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { permissions } = useCommonStore();
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -36,6 +35,7 @@ function Page() {
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
   const setRefreshPage = usePublicStore((state) => state.setRefreshPage);
   const isRefreshPage = usePublicStore((state) => state.isRefreshPage);
 

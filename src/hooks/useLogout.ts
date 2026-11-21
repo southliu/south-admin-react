@@ -11,9 +11,9 @@ import { useToken } from '@/hooks/useToken';
  * 获取常用的状态数据
  */
 export const useLogout = () => {
+  const { closeAllTab, setActiveKey } = useTabsStore((state) => state);
   const [, , removeToken] = useToken();
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
-  const { closeAllTab, setActiveKey } = useTabsStore((state) => state);
   const setPermissions = useUserStore((state) => state.setPermissions);
   const setMenuList = useMenuStore((state) => state.setMenuList);
   const clearInfo = useUserStore((state) => state.clearInfo);

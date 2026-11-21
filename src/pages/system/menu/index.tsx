@@ -40,11 +40,11 @@ const initCreate = {
 };
 
 function Page() {
+  const { permissions } = useCommonStore();
   const { t, i18n } = useTranslation();
-  const createFormRef = useRef<FormInstance>(null);
   const [isFetch, setFetch] = useState(false);
-  const [isCreateOpen, setCreateOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [isCreateOpen, setCreateOpen] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
   const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
   const [createId, setCreateId] = useState('');
@@ -57,8 +57,8 @@ function Page() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
+  const createFormRef = useRef<FormInstance>(null);
   const type = Form.useWatch('type', form);
-  const { permissions } = useCommonStore();
 
   // 权限前缀
   const permissionPrefix = '/authority/menu';

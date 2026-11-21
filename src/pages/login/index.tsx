@@ -32,19 +32,19 @@ const USER_PASSWORD = 'login_password';
 
 function Login() {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const [getToken, setToken] = useToken();
+  const { search } = useLocation();
+  const { permissions } = useCommonStore();
+  const { setPermissions, setUserInfo } = useUserStore((state) => state);
   const [isLoading, setLoading] = useState(false);
   const [isRemember, setRemember] = useState(
     () => localStorage.getItem(CHECK_REMEMBER) !== 'false',
   );
+  const [form] = Form.useForm();
+  const [getToken, setToken] = useToken();
   const [messageApi, contextHolder] = message.useMessage();
-  const { search } = useLocation();
-  const { permissions } = useCommonStore();
+  const navigate = useNavigate();
   const setMenuList = useMenuStore((state) => state.setMenuList);
   const setThemeValue = usePublicStore((state) => state.setThemeValue);
-  const { setPermissions, setUserInfo } = useUserStore((state) => state);
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;
 
   useEffect(() => {

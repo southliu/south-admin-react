@@ -1,6 +1,6 @@
 # AGENTS.md
 
-中后台管理前端项目：React 19 + TypeScript + Vite 7 + Ant Design 6 + Zustand，pnpm monorepo。详细说明可参考 `CLAUDE.md` 与 `README.md`。
+中后台管理前端项目：React 19 + TypeScript + Vite 8 + Ant Design 6 + Zustand，pnpm monorepo。详细说明可参考 `CLAUDE.md` 与 `README.md`。
 
 ## 常用命令
 
@@ -71,6 +71,8 @@ pnpm test:e2e         # Playwright 浏览器回归测试
 - 图标用 Iconify（`@iconify/react`）
 - TypeScript 严格模式，Hooks、组件、工具函数与类型均使用显式导入，类型使用 `import type`。
 - 导入按 `import type`、具名 `import {}`、默认 `import xxx` 分组，同组按整条导入语句长度降序排列，等长保留原序；不调整花括号内成员顺序。`pnpm lint` 自动修复。副作用导入和导入间的注释作为边界，保留初始化顺序与注释归属。
+- Hook 变量声明优先按 `const { ... }`（对象解构）、`const [ ... ]`（数组解构）、`const xxx`（普通变量）的顺序排列；各类内部按业务语义分组，不按文字长度排序。保留初始化依赖顺序，不为排序将变量移到其依赖声明之前。
+- `useState` 声明中，布尔状态放在其他状态之前，状态变量必须以 `is` 开头（如 `isFetch`、`isLoading`、`isCreateOpen`、`isCreateLoading`）；同一业务的状态按语义排列，如弹窗开关在弹窗加载状态之前，其后依次为标题、ID、表单数据。setter 保留 `setFetch`、`setLoading` 等命名，无需加 `is`。新建 CRUD 页面也必须遵循此约定。
 
 ## 其他工具
 

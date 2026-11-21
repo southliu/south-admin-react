@@ -23,18 +23,18 @@ function ApiPageSelect({
   ...props
 }: ApiPageSelectProps) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+  const [isMoreAvailable, setHasMore] = useState(true);
   const [query, setQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(page);
   const [options, setOptions] = useState<DefaultOptionType[]>([]);
-  const [isLoading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+
+  const [source, setSource] = useState({ api, params, apiResultKey, page, pageSize });
   const requestId = useRef(0);
   const hasValue =
     value !== undefined && value !== null && (!Array.isArray(value) || value.length > 0);
-  const enabled = open || hasValue;
-
-  const [source, setSource] = useState({ api, params, apiResultKey, page, pageSize });
+  const enabled = isOpen || hasValue;
   if (
     source.api !== api ||
     source.params !== params ||
@@ -122,7 +122,7 @@ function ApiPageSelect({
         if (
           target.scrollTop + target.clientHeight >= target.scrollHeight - 10 &&
           !isLoading &&
-          hasMore
+          isMoreAvailable
         ) {
           setLoading(true);
           setCurrentPage((previous) => previous + 1);
@@ -133,7 +133,7 @@ function ApiPageSelect({
         <>
           {menu}
           {isLoading && <Spin size="small" />}
-          {!hasMore && options.length > 0 && (
+          {!isMoreAvailable && options.length > 0 && (
             <div className="text-center">{t('public.noMoreData')}</div>
           )}
         </>

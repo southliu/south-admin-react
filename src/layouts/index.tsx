@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useMemo, useState, memo, useDeferredValue } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo, Suspense } from 'react';
 import { getUserRefreshPermissions } from '@/servers/system/user';
 import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
-import { Button, Result, Skeleton, message } from 'antd';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useUserStore } from '@/stores';
 import { resolveErrorMessage } from '@south/request';
 import { loadMenuList } from '@/menus/utils/load';
 import { usePublicStore } from '@/stores/public';
+import { Button, Result, message } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { versionCheck } from './utils/helper';
 import { useOutlet } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useToken } from '@/hooks/useToken';
-import { motion } from 'motion/react';
 import { debounce } from 'lodash';
+import ContentLoading from './components/ContentLoading';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import styles from './index.module.less';
@@ -25,18 +25,8 @@ import nprogress from 'nprogress';
 import axios from 'axios';
 
 function Layout() {
-  const [getToken] = useToken();
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const token = getToken();
-  const outlet = useOutlet();
-  const keepaliveRef = useKeepAliveRef();
-  const [isLoading, setLoading] = useState(true);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [loadError, setLoadError] = useState<string>();
-  const [messageApi, contextHolder] = message.useMessage();
-  const setAliveRef = usePublicStore(useShallow((state) => state.setAliveRef));
-  const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const { setPermissions, setUserInfo } = useUserStore(
     useShallow((state) => ({
       setPermissions: state.setPermissions,
@@ -53,15 +43,17 @@ function Layout() {
   );
 
   const { permissions, isMaximize, isCollapsed, isPhone } = useCommonStore();
+  const [isLoading, setLoading] = useState(true);
+  const [isLoadFailed, setLoadFailed] = useState(false);
+  const [loadError, setLoadError] = useState<string>();
+  const [getToken] = useToken();
+  const [messageApi, contextHolder] = message.useMessage();
+  const token = getToken();
+  const outlet = useOutlet();
+  const keepaliveRef = useKeepAliveRef();
+  const setAliveRef = usePublicStore(useShallow((state) => state.setAliveRef));
+  const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const hasSidebar = permissions.length > 0 && menuList.length > 0;
-
-  // 使用 useDeferredValue 延迟非关键的路由更新，提升响应性
-  const deferredPathname = useDeferredValue(pathname);
-
-  /** Keepalive当前路由缓存 */
-  const currentCacheKey = useMemo(() => {
-    return deferredPathname;
-  }, [deferredPathname]);
 
   // 只在 ref 变化时更新 store，避免每次渲染都触发更新
   useEffect(() => {
@@ -216,10 +208,8 @@ function Layout() {
           {hasSidebar && <Tabs aliveRef={keepaliveRef} />}
         </div>
         <div id="layout-content" className={contentClassName}>
-          {isLoading && !hasSidebar && (
-            <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
-          )}
-          {!isLoading && loadFailed && (
+          {isLoading && <ContentLoading />}
+          {!isLoading && isLoadFailed && (
             <Result
               status="error"
               title={loadError || t('public.networkError')}
@@ -237,17 +227,19 @@ function Layout() {
               }
             />
           )}
-          {!isLoading && !loadFailed && !hasSidebar && Boolean(token) && <Forbidden />}
-          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
-            {hasSidebar && !loadFailed && (
-              <motion.div
-                key={deferredPathname}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-              >
-                <ErrorBoundary>{outlet}</ErrorBoundary>
-              </motion.div>
+          {!isLoading && !isLoadFailed && !hasSidebar && Boolean(token) && <Forbidden />}
+          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={pathname} max={10}>
+            {hasSidebar && !isLoading && !isLoadFailed && (
+              <ErrorBoundary>
+                <Suspense fallback={<ContentLoading />}>
+                  <div
+                    key={pathname}
+                    className={styles['page-enter']}
+                  >
+                    {outlet}
+                  </div>
+                </Suspense>
+              </ErrorBoundary>
             )}
           </KeepAlive>
         </div>

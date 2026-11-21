@@ -26,10 +26,10 @@ import Nav from './Nav';
 type MenuKey = 'password' | 'logout';
 
 function Header() {
-  const [handleLogout] = useLogout();
   const { t } = useTranslation();
   const { modal } = App.useApp();
   const { isCollapsed, isMaximize, username, name, nav, permissions, menuList } = useCommonStore();
+  const [handleLogout] = useLogout();
   // 是否窗口最大化
   const passwordRef = useRef<PasswordModal>(null);
   const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);

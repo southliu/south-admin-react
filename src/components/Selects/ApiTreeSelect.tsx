@@ -15,13 +15,13 @@ function ApiTreeSelect({
   ...props
 }: ApiTreeSelectProps) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
   const [revision, setRevision] = useState(0);
   const hasValue =
     value !== undefined && value !== null && (!Array.isArray(value) || value.length > 0);
   const { options, isLoading } = useApiOptions(
     { api, params, key: apiResultKey, revision },
-    open || hasValue,
+    isOpen || hasValue,
   );
   return (
     <TreeSelect

@@ -149,10 +149,12 @@ export function getXXXPage(data: PaginationData) {
 
 ### Build Configuration
 - Vite plugins in `build/plugins/index.ts`
-- React SWC for fast compilation
+- Vite 8 uses Rolldown + Oxc with `@vitejs/plugin-react`
 - UnoCSS for atomic CSS
-- Legacy plugin for browser compatibility (production only)
+- Modern browsers only (Vite's Baseline Widely Available target); no legacy bundle
 - Hooks, components, utilities, and types use explicit imports; use `import type` for types.
+- Order Hook variable declarations by binding shape: object destructuring (`const { ... }`), array destructuring (`const [ ... ]`), then plain bindings (`const xxx`). Within each category, group by business meaning rather than text length, while preserving initialization dependencies.
+- Put boolean `useState` declarations before other state declarations and prefix their state names with `is` (e.g. `isFetch`, `isLoading`, `isCreateOpen`, `isCreateLoading`). Keep related state in semantic order: modal open, modal loading, title, ID, then form data. Setter names such as `setFetch` and `setLoading` do not need an `is` prefix. Apply these conventions to generated CRUD pages as well.
 
 ### Code Snippets
 VS Code snippets are in `.vscode/south.code-snippets`:

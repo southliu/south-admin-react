@@ -11,8 +11,8 @@ interface EllipsisTextProps {
 
 const EllipsisText = (props: EllipsisTextProps) => {
   const { width, text, color, className = '', style } = props;
-  const textRef = useRef<HTMLSpanElement>(null);
   const [isOverflowed, setIsOverflowed] = useState(false);
+  const textRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const element = textRef.current;

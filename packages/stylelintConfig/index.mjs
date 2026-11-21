@@ -24,11 +24,14 @@ export default {
       customSyntax: 'postcss-less',
       extends: ['stylelint-config-recommended-less'],
       files: ['*.less', '**/*.less'],
+      rules: {
+        // CSS 值解析器无法识别 Less 的 calc() 变量表达式。
+        'value-no-invalid': null,
+      },
     },
   ],
   plugins: [
     'stylelint-order',
-    '@stylistic/stylelint-plugin',
     'stylelint-prettier',
     'stylelint-less',
   ],
@@ -96,5 +99,6 @@ export default {
       },
     ],
     'selector-not-notation': null,
+    'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['global', 'deep'] }],
   },
 };

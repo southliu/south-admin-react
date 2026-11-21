@@ -7,10 +7,10 @@ import { Button } from 'antd';
 import styles from './all.module.less';
 
 function Forbidden() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { permissions, menuList } = useCommonStore();
   const { addTabs, setActiveKey } = useTabsStore();
+  const navigate = useNavigate();
 
   /** 跳转首页 */
   const goIndex = () => {

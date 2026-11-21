@@ -111,7 +111,9 @@ test('登录不预加载后台页面，菜单持续失败后可恢复并折叠',
   await expect(page.locator('#layout-menu')).toHaveClass(/ant-menu-inline-collapsed/);
   await page.getByRole('button', { name: '展开菜单' }).click();
   await expect(page.locator('#layout-menu')).not.toHaveClass(/ant-menu-inline-collapsed/);
-  await expect(page.getByRole('menuitem', { name: '用户管理', exact: true })).toBeVisible();
+  await expect(
+    page.locator('#layout-menu').getByRole('menuitem', { name: '用户管理', exact: true }),
+  ).toBeVisible();
   await page.screenshot({ path: '.codex-temp/evidence/menu-restored.png', fullPage: true });
   await page.getByRole('button', { name: /新增/ }).first().click();
   const dialog = page.getByRole('dialog');

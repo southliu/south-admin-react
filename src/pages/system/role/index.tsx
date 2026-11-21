@@ -36,10 +36,10 @@ const initCreate = {
 
 function Page() {
   const { t } = useTranslation();
-  const createFormRef = useRef<FormInstance>(null);
+  const { permissions, roles } = useCommonStore();
   const [isFetch, setFetch] = useState(false);
-  const [isCreateOpen, setCreateOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [isCreateOpen, setCreateOpen] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
   const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
   const [createId, setCreateId] = useState('');
@@ -51,7 +51,7 @@ function Page() {
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
-  const { permissions, roles } = useCommonStore();
+  const createFormRef = useRef<FormInstance>(null);
 
   // 权限前缀
   const permissionPrefix = '/authority/role';

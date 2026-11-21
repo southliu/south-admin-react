@@ -20,8 +20,8 @@ const initSearch = {
 
 function Dashboard() {
   const { t } = useTranslation();
-  const [isLoading, setLoading] = useState(false);
   const { permissions, isPhone } = useCommonStore();
+  const [isLoading, setLoading] = useState(false);
   const isPermission = checkPermission('/dashboard', permissions);
 
   /**

@@ -35,17 +35,17 @@ function getChildKeys(item?: PermissionData): Key[] {
 
 function MenuAuthorize(props: Props) {
   const { isBordered = true, treeData, defaultCheckedKeys, onChange, isLoading = false } = props;
-  const theme = usePublicStore((state) => state.theme);
   const [selection, setSelection] = useState<{ source: Key[] | undefined; keys: Key[] }>({
     source: defaultCheckedKeys,
     keys: defaultCheckedKeys?.map(String) || [],
   });
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
+  const theme = usePublicStore((state) => state.theme);
   const checkedKeys =
     selection.source === defaultCheckedKeys
       ? selection.keys
       : defaultCheckedKeys?.map(String) || [];
   const setCheckedKeys = (keys: Key[]) => setSelection({ source: defaultCheckedKeys, keys });
-  const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
   const list = treeData;
 
   /** 更新选中状态 */

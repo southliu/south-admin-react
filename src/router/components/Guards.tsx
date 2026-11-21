@@ -20,6 +20,8 @@ function getTokenSync() {
 
 function Guards() {
   const { t } = useTranslation();
+
+  const [isRedirected, setRedirected] = useState(false);
   const outlet = useOutlet();
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,8 +57,6 @@ function Guards() {
     // 其他情况正常渲染
     return { token, isValid: !!token || isLoginRoute, shouldRedirect: false, redirectPath: '' };
   }, [location.pathname, location.search]);
-
-  const [redirected, setRedirected] = useState(false);
   const isRedirectingRef = useRef(false);
 
   useEffect(() => {
@@ -106,7 +106,7 @@ function Guards() {
   }, [token, isValid]);
 
   // 重定向时不渲染任何内容
-  if (shouldRedirect || redirected) {
+  if (shouldRedirect || isRedirected) {
     return (
       <div className="absolute left-50% top-50% -translate-x-1/2 -translate-y-1/2 text-center">
         <Spin spinning={true} />

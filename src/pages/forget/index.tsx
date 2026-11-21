@@ -27,11 +27,11 @@ interface ForgetData {
 function Forget() {
   const { t, i18n } = useTranslation();
   const { search } = useLocation();
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
   const [isLoading, setLoading] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
   const [verificationTime, setVerificationTime] = useState(0);
+  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
   const timer = useRef<NodeJS.Timeout | null>(null);
   const setThemeValue = usePublicStore((state) => state.setThemeValue);
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;

@@ -21,10 +21,10 @@ interface Props {
 function UpdatePassword(props: Props) {
   const { passwordRef } = props;
   const { t } = useTranslation();
-  const [form] = Form.useForm();
-  const [handleLogout] = useLogout();
   const [isOpen, setOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [form] = Form.useForm();
+  const [handleLogout] = useLogout();
 
   // 抛出外部方法
   useImperativeHandle(passwordRef, () => ({

@@ -46,7 +46,6 @@ function filterMenuIcon(menus: SideMenu[]): SideMenu[] {
 }
 
 function LayoutMenu() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { pathname } = useLocation();
 
@@ -68,6 +67,7 @@ function LayoutMenu() {
       setOpenKeys: state.setOpenKeys,
     })),
   );
+  const navigate = useNavigate();
 
   const currentOpenKeys = openKeys || [];
   const currentSelectedKeys = selectedKeys ? [selectedKeys] : [];
@@ -82,6 +82,7 @@ function LayoutMenu() {
 
   // 刷新页面根据路由选中对应的菜单
   useEffect(() => {
+    if (isCollapsed) return;
     const newOpenKey = getOpenMenuByRouter(pathname);
 
     requestAnimationFrame(() => {
@@ -89,7 +90,7 @@ function LayoutMenu() {
       setSelectedKeys(pathname);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, isCollapsed]);
 
   /**
    * 路由跳转
@@ -182,6 +183,7 @@ function LayoutMenu() {
    */
   const onOpenChange = useCallback(
     (openKeys: string[]) => {
+      if (isCollapsed) return;
       const newOpenKey: string[] = [];
 
       if (openKeys.length > 0) {
@@ -201,7 +203,7 @@ function LayoutMenu() {
 
       setCurrentOpenKeys(newOpenKey);
     },
-    [diffOpenMenu, setCurrentOpenKeys],
+    [diffOpenMenu, isCollapsed, setCurrentOpenKeys],
   );
 
   /** 点击logo */

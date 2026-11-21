@@ -17,8 +17,8 @@ interface State {
 
 // 错误内容组件
 const ErrorContent = ({ error }: { error: Error | null }) => {
-  const [handleLogout] = useLogout();
   const { t } = useTranslation();
+  const [handleLogout] = useLogout();
 
   /** 刷新当前页面 */
   const handleRefresh = () => {
