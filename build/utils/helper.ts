@@ -8,7 +8,7 @@ interface ViteEnv {
 
 /**
  * 处理转化env
- * @param envConfigs
+ * @param envConfigs - 原始环境变量，用于解析开发端口和代理配置
  */
 export function handleEnv(envConfigs: EnvConfigs): ViteEnv {
   const { VITE_SERVER_PORT, VITE_PROXY } = envConfigs;

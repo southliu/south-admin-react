@@ -63,7 +63,10 @@ export function getUrlParam(search: string, key: string) {
   return new URLSearchParams(search).get(key) || '';
 }
 
-/** 登录回跳仅接受本站页面，避免外部地址或登录页循环。 */
+/**
+ * 登录回跳仅接受本站页面，避免外部地址或登录页循环。
+ * @param search - 登录页查询字符串，用于提取并校验回跳地址
+ */
 export function getLoginRedirect(search: string): string {
   const redirect = new URLSearchParams(search).get('redirect') || '';
   if (

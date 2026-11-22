@@ -5,9 +5,7 @@ import { Spin, Tooltip } from 'antd';
 
 const SearchModal = lazy(() => import('./components/SearchModal'));
 
-/**
- * @description: 全局搜索菜单组件
- */
+/** 全局搜索菜单组件 */
 function GlobalSearch() {
   const { t } = useTranslation();
   const [isSearchLoaded, setSearchLoaded] = useState(false);

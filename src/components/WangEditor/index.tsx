@@ -46,6 +46,7 @@ function WangEditor(props: EditorProps) {
 
   /**
    * 更改富文本内容
+   * @param editor - 富文本编辑器实例，用于读取最新内容
    */
   const handleChange = (editor: IDomEditor) => {
     onChange(editor.getHtml());

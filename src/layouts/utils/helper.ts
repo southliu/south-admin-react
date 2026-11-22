@@ -5,7 +5,11 @@ import { LANG, VERSION } from '@/utils/config';
 import { createElement } from 'react';
 import axios from 'axios';
 
-/** 版本监控 */
+/**
+ * 版本监控
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ * @param messageApi - 消息提示实例，用于展示版本更新提醒
+ */
 export const versionCheck = async (t: TFunction, messageApi: MessageInstance) => {
   if (import.meta.env.MODE === 'development') return;
 

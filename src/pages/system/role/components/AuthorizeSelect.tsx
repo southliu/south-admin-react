@@ -32,7 +32,10 @@ function AuthorizeSelect(props: Props) {
     void getList();
   }, [getList]);
 
-  /** 点击复选框 */
+  /**
+   * 点击复选框
+   * @param checkedKeys - 已选中的权限标识，用于同步授权数据
+   */
   const handleCheckedKeysChange = (checkedKeys: Key[]) => {
     // 将字符串数组转换为整数数组
     const numberKeys = checkedKeys.map((key) =>

@@ -26,6 +26,7 @@ import styles from '../index.module.less';
 
 /**
  * 转换菜单icon格式
+ * @param menus - 菜单列表，用于递归处理菜单结构
  */
 function filterMenuIcon(menus: SideMenu[]): SideMenu[] {
   if (!menus?.length) return [];
@@ -94,6 +95,7 @@ function LayoutMenu() {
 
   /**
    * 路由跳转
+   * @param path - 目标路由路径，用于定位页面
    */
   const goPath = useCallback(
     (path: string) => {
@@ -102,15 +104,14 @@ function LayoutMenu() {
     [navigate],
   );
 
-  /**
-   * 隐藏菜单（手机端）
-   */
+  /** 隐藏菜单（手机端） */
   const hiddenMenu = useCallback(() => {
     toggleCollapsed(true);
   }, [toggleCollapsed]);
 
   /**
    * 点击菜单
+   * @param key - 目标标签或菜单的标识
    */
   const onClickMenu: MenuProps['onClick'] = useCallback(
     ({ key }: { key: string }) => {
@@ -173,6 +174,8 @@ function LayoutMenu() {
 
   /**
    * 对比当前展开目录是否是同一层级
+   * @param arr - 当前展开菜单的路径数组
+   * @param lastArr - 上次展开菜单的路径数组，用于比较菜单层级
    */
   const diffOpenMenu = useCallback((arr: string[], lastArr: string[]) => {
     return arr.every((item, index) => item === lastArr[index]);
@@ -180,6 +183,7 @@ function LayoutMenu() {
 
   /**
    * 展开/关闭回调
+   * @param openKeys - 展开菜单的标识列表，用于同步目录展开状态
    */
   const onOpenChange = useCallback(
     (openKeys: string[]) => {

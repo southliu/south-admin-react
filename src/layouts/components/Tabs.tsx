@@ -14,6 +14,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useTabsStore, usePublicStore } from '@/stores';
+import { getTabPath, getNextTab } from '../utils/tabs';
 import { useShallow } from 'zustand/react/shallow';
 import { message, Tabs, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -55,9 +56,13 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
       })),
     );
 
-  const { permissions, isMaximize, menuList } = useCommonStore(['permissions', 'isMaximize', 'menuList']);
+  const { permissions, isMaximize, menuList } = useCommonStore([
+    'permissions',
+    'isMaximize',
+    'menuList',
+  ]);
   const [isContextMenuVisible, setContextMenuVisible] = useState(false);
-  const [refreshTime, setRefreshTime] = useState<NodeJS.Timeout | null>(null);
+  const [isRefreshing, setRefreshing] = useState(false);
   const [contextMenuKey, setContextMenuKey] = useState<string | null>(null);
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -70,6 +75,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
     },
   });
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const cooldownRef = useRef<NodeJS.Timeout | null>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
   const setRefresh = usePublicStore((state) => state.setRefresh);
@@ -82,6 +88,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
 
   /**
    * 添加标签
+   * @param path - 目标路由路径，用于定位页面
    */
   const handleAddTab = useCallback(
     (path = pathname) => {
@@ -117,6 +124,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
 
   /**
    * 路由跳转
+   * @param key - 目标标签或菜单的标识
    */
   const handleNavigateTo = useCallback(
     (key: string) => {
@@ -138,6 +146,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
 
   /**
    * Tab 切换
+   * @param key - 目标标签或菜单的标识
    */
   const onChange = useCallback(
     (key: string) => {
@@ -159,13 +168,13 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
    */
   const remove = useCallback(
     (targetKey: string) => {
+      if (tabs.length <= 1) return;
       // 如果删除的是当前选中的，则跳转至上一个
       if (activeKey === targetKey) {
-        const currentIndex = tabs.findIndex((tab) => tab.key === activeKey);
-        const nextPath = tabs[currentIndex > 0 ? currentIndex - 1 : 0].key;
-        if (nextPath) {
-          handleAddTab(nextPath);
-          navigate(nextPath);
+        const nextTab = getNextTab(tabs, targetKey);
+        if (nextTab) {
+          handleAddTab(nextTab.key);
+          navigate(getTabPath(tabs, nextTab.key));
         }
       }
 
@@ -195,8 +204,9 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const onClickRefresh = useCallback(
     (key = activeKey) => {
       if (typeof key !== 'string') return;
-      if (timerRef.current || refreshTime) return;
+      if (timerRef.current || cooldownRef.current) return;
 
+      setRefreshing(true);
       setRefresh(true);
       aliveRef.current?.refresh(key);
 
@@ -209,21 +219,18 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         timerRef.current = null;
       }, 300);
 
-      if (refreshTime) {
-        clearTimeout(refreshTime);
-      }
-
-      setRefreshTime(
-        setTimeout(() => {
-          setRefreshTime(null);
-        }, 1000),
-      );
+      cooldownRef.current = setTimeout(() => {
+        setRefreshing(false);
+        cooldownRef.current = null;
+      }, 1000);
     },
-    [activeKey, refreshTime, messageApi, t, setRefresh, aliveRef],
+    [activeKey, messageApi, t, setRefresh, aliveRef],
   );
 
   /**
    * 拖拽结束
+   * @param active - 当前拖拽的标签，用于确定原始位置
+   * @param over - 拖拽覆盖的标签，用于确定目标位置
    */
   const onDragEnd = useCallback(
     ({ active, over }: DragEndEvent) => {
@@ -244,12 +251,14 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   );
   const [dropdownItems, onDropdownClick] = useDropdownMenu(dropdownMenuParams);
 
-  /**
-   * 渲染 TabBar
-   */
+  /** 渲染 TabBar */
   const renderTabBar: TabsProps['renderTabBar'] = useMemo(
     () => (tabBarProps, DefaultTabBar) => (
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd} collisionDetection={closestCenter}>
+      <DndContext
+        sensors={[sensor]}
+        onDragEnd={onDragEnd}
+        collisionDetection={closestCenter}
+      >
         <SortableContext
           items={tabs.map((i) => ({ id: i.key }))}
           strategy={horizontalListSortingStrategy}
@@ -296,14 +305,24 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const tabOptions = useMemo(
     () => [
       {
-        element: <TabRefresh isRefresh={!!refreshTime} onClick={onClickRefresh} />,
+        element: (
+          <TabRefresh
+            isRefresh={isRefreshing}
+            onClick={onClickRefresh}
+          />
+        ),
       },
       {
-        element: <TabOptions activeKey={activeKey} handleRefresh={onClickRefresh} />,
+        element: (
+          <TabOptions
+            activeKey={activeKey}
+            handleRefresh={onClickRefresh}
+          />
+        ),
       },
       { element: <TabMaximize /> },
     ],
-    [refreshTime, onClickRefresh, activeKey],
+    [isRefreshing, onClickRefresh, activeKey],
   );
 
   // 清理定时器
@@ -313,11 +332,13 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
-      if (refreshTime) {
-        clearTimeout(refreshTime);
+      if (cooldownRef.current) {
+        clearTimeout(cooldownRef.current);
+        cooldownRef.current = null;
       }
+      setRefresh(false);
     };
-  }, [refreshTime]);
+  }, [setRefresh]);
 
   return (
     <div

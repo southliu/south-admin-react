@@ -30,9 +30,15 @@ export const useUserStore = create<UserState>()(
         phone: '',
         roles: [],
       },
-      /** 设置用户信息 */
+      /**
+       * 设置用户权限
+       * @param permissions - 用户权限列表，用于判断可访问的菜单或操作
+       */
       setPermissions: (permissions) => set({ permissions }),
-      /** 设置权限 */
+      /**
+       * 设置用户信息
+       * @param userInfo - 用户信息，用于更新当前登录状态
+       */
       setUserInfo: (userInfo) => set({ userInfo }),
       /** 清除用户信息 */
       clearInfo: () =>

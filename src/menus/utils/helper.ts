@@ -1,3 +1,4 @@
+import type { ItemType } from 'antd/es/menu/interface';
 import type { Langs } from '@/components/I18n';
 import type { SideMenu } from '#/public';
 import { isRouteExist } from '@/router/utils/helper';
@@ -29,6 +30,7 @@ export function getOpenMenuByRouter(router: string): string[] {
 
 /**
  * 匹配路径内的字段
+ * @param lang - 当前语言，用于选择菜单显示文案
  * @param path - 路径
  * @param arr - 路径经过数组
  */
@@ -172,12 +174,8 @@ interface GetMenuByKeyProps {
 }
 
 /**
- * 根据key获取菜单当前值
- * @param menus - 菜单
- * @param permissions - 权限列表
- * @param key - 路由值
- * @param fatherNav - 父级面包屑
- * @param result - 返回值
+ * 根据路由标识获取菜单信息
+ * @param data - 菜单查询配置，包含菜单、权限、目标路由和递归结果
  */
 export function getMenuByKey(data: GetMenuByKeyProps): GetMenuByKeyResult | undefined {
   const { menus, permissions, key } = data;
@@ -319,6 +317,7 @@ export function filterMenus(menus: SideMenu[], permissions: string[]): SideMenu[
  * 获取第一个有效权限路由
  * @param menus - 菜单
  * @param permissions - 权限
+ * @param result - 递归过程中已找到的有效路由，用于提前结束查找
  */
 export function getFirstMenu(menus: SideMenu[], permissions: string[], result = ''): string {
   // 有结构时直接返回
@@ -379,38 +378,46 @@ function getChildrenKey(menus: SideMenu[] | undefined, level: number) {
   return result;
 }
 
+const MENU_ITEM_PROPS = new Set([
+  'key',
+  'label',
+  'icon',
+  'type',
+  'disabled',
+  'danger',
+  'title',
+  'extra',
+  'className',
+  'style',
+  'popupClassName',
+  'popupOffset',
+  'theme',
+  'dashed',
+  'expandIcon',
+  'onClick',
+  'onTitleClick',
+  'onMouseEnter',
+  'onMouseLeave',
+]);
+
 /**
- * 菜单数据处理-去除多余字段
- * @param menus - 菜单数据
- * @param level - 层级
+ * 将业务菜单转换为 Menu 的展示属性。
+ * @param menus - 菜单列表，用于递归处理菜单结构
+ * @param level - 当前菜单层级，用于区分顶级与子级展示
  */
-export function handleFilterMenus(menus: SideMenu[], level = 0): SideMenu[] {
-  const currentItem: SideMenu[] = [];
-
-  for (let i = 0; i < menus?.length; i++) {
-    const item = menus[i];
-    let children: SideMenu[] = [];
-
-    // 如果菜单children为空数组则删除
-    if (item.children !== undefined && !item.children?.length) {
-      delete item.children;
-    }
-
-    if (item.children?.length) {
-      const newLevel = level + 1;
-      children = handleFilterMenus(item.children, newLevel);
-    }
-
-    const data: Partial<SideMenu> = { ...item };
-    if (children?.length) (data as SideMenu).children = children;
-    if (!data.key) data.key = getChildrenKey(data.children, level);
-    delete data.labelZh;
-    delete data.labelEn;
-
-    currentItem.push(data as SideMenu);
-  }
-
-  return currentItem;
+export function handleFilterMenus(menus: SideMenu[], level = 0): ItemType[] {
+  return menus.map((item) => {
+    // 后端菜单记录包含业务字段，只有展示属性可以交给 Menu，否则会透传到 li。
+    const data = Object.fromEntries(
+      Object.entries(item).filter(([key, value]) => {
+        if (key === 'type') return ['item', 'submenu', 'group', 'divider'].includes(String(value));
+        return MENU_ITEM_PROPS.has(key) || key.startsWith('data-') || key.startsWith('aria-');
+      }),
+    );
+    if (!data.key) data.key = getChildrenKey(item.children, level);
+    if (item.children?.length) data.children = handleFilterMenus(item.children, level + 1);
+    return data as ItemType;
+  });
 }
 
 /**

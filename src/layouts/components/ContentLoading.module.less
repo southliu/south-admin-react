@@ -1,0 +1,153 @@
+/*
+ * From Uiverse.io by arthur_6104 - https://uiverse.io/arthur_6104/spotty-snake-91
+ * MIT License, Copyright (c) alexruix (Alex Ruiz), arthur_6104 (Arthur Feltz)
+ */
+.loader {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  transform: scale(0.5);
+}
+
+.box1,
+.box2,
+.box3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: block;
+  background-color: #c1c1c1;
+  border-radius: 10px;
+}
+
+.box1 {
+  width: 112px;
+  height: 48px;
+  margin-top: 64px;
+  margin-left: 0;
+  animation: abox1 3s forwards ease-in-out infinite;
+}
+
+.box2 {
+  width: 48px;
+  height: 48px;
+  margin-top: 0;
+  margin-left: 0;
+  animation: abox2 3s forwards ease-in-out infinite;
+}
+
+.box3 {
+  width: 48px;
+  height: 48px;
+  margin-top: 0;
+  margin-left: 64px;
+  animation: abox3 3s forwards ease-in-out infinite;
+}
+
+@keyframes abox1 {
+  0% {
+    width: 112px;
+    height: 48px;
+    margin-top: 64px;
+    margin-left: 0;
+  }
+
+  12.5%,
+  25%,
+  37.5%,
+  50%,
+  62.5% {
+    width: 48px;
+    height: 48px;
+    margin-top: 64px;
+    margin-left: 0;
+  }
+
+  75% {
+    width: 48px;
+    height: 112px;
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  87.5%,
+  100% {
+    width: 48px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 0;
+  }
+}
+
+@keyframes abox2 {
+  0%,
+  12.5%,
+  25%,
+  37.5% {
+    width: 48px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  50% {
+    width: 112px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  62.5%,
+  75%,
+  87.5%,
+  100% {
+    width: 48px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 64px;
+  }
+}
+
+@keyframes abox3 {
+  0%,
+  12.5% {
+    width: 48px;
+    height: 48px;
+    margin-top: 0;
+    margin-left: 64px;
+  }
+
+  25% {
+    width: 48px;
+    height: 112px;
+    margin-top: 0;
+    margin-left: 64px;
+  }
+
+  37.5%,
+  50%,
+  62.5%,
+  75%,
+  87.5% {
+    width: 48px;
+    height: 48px;
+    margin-top: 64px;
+    margin-left: 64px;
+  }
+
+  100% {
+    width: 112px;
+    height: 48px;
+    margin-top: 64px;
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box1,
+  .box2,
+  .box3 {
+    animation: none;
+  }
+}

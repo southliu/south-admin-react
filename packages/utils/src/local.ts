@@ -1,9 +1,7 @@
 import { encryption, decryption } from './crypto';
 import { message } from '@south/message';
 
-/**
- * @description: localStorage封装
- */
+/** @description: localStorage封装 */
 
 // 默认缓存期限为2天
 const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 2;

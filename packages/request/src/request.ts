@@ -87,9 +87,7 @@ class AxiosRequest {
       this.abortControllerMap.delete(key);
     }
   }
-  /**
-   * 取消全部请求
-   */
+  /** 取消全部请求 */
   cancelAllRequest() {
     for (const [, controller] of this.abortControllerMap) {
       controller.abort();
@@ -129,6 +127,7 @@ class AxiosRequest {
    * post请求
    * @param url - 链接
    * @param options - 参数
+   * @param config - 请求配置，用于设置请求头、超时等选项
    */
   post<T = object>(url: string, options = {}, config?: AxiosRequestConfig<object>) {
     return this.instance.post(url, options, config) as Promise<ServerResult<T>>;
@@ -137,6 +136,7 @@ class AxiosRequest {
    * put请求
    * @param url - 链接
    * @param options - 参数
+   * @param config - 请求配置，用于设置请求头、超时等选项
    */
   put<T = object>(url: string, options = {}, config?: AxiosRequestConfig<object>) {
     return this.instance.put(url, options, config) as Promise<ServerResult<T>>;
@@ -145,6 +145,7 @@ class AxiosRequest {
    * patch请求
    * @param url - 链接
    * @param options - 参数
+   * @param config - 请求配置，用于设置请求头、超时等选项
    */
   patch<T = object>(url: string, options = {}, config?: AxiosRequestConfig<object>) {
     return this.instance.patch(url, options, config) as Promise<ServerResult<T>>;
@@ -160,6 +161,7 @@ class AxiosRequest {
 
   /**
    * 生成请求的唯一key（考虑参数）
+   * @param requestConfig - 请求配置，用于按方法、地址和参数生成唯一标识
    */
   private generateMapKey(requestConfig: NewAxiosRequestConfig) {
     let url = `${requestConfig.method || 'get'}^${requestConfig.url || ''}`;

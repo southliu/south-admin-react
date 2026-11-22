@@ -5,9 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { TableColumn } from '#/public';
 import DragContent from './DragContent';
 
-/**
- * 表格字段筛选
- */
+/** 表格字段筛选 */
 
 export interface CheckboxList {
   label: string;
@@ -63,7 +61,11 @@ function TableFilter(props: Props) {
     handleFilter(checkedValue);
   };
 
-  /** 处理筛选 */
+  /**
+   * 处理筛选
+   * @param checkedList - 勾选的列标识列表，用于控制表格列的显示
+   * @param currentList - 当前列配置列表，用于保留列的展示顺序
+   */
   const handleFilter = (checkedList: string[], currentList = list) => {
     getTableChecks(
       checkedList,
@@ -71,7 +73,10 @@ function TableFilter(props: Props) {
     );
   };
 
-  /** 全选 */
+  /**
+   * 全选
+   * @param e - 全选复选框事件，用于读取是否勾选全部列
+   */
   const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
     const checkedList = e.target.checked ? list.map((item) => item.value) : [];
     setCheckedList(checkedList);
@@ -98,7 +103,10 @@ function TableFilter(props: Props) {
     handleFilter(allCheckedList, newList);
   };
 
-  /** 处理拖拽结束 */
+  /**
+   * 处理拖拽结束
+   * @param list - 拖拽后的列配置，用于保存新的列顺序
+   */
   const handleDragEnd = (list: CheckboxList[]) => {
     setList(list);
     getTableChecks(
@@ -107,7 +115,7 @@ function TableFilter(props: Props) {
     );
   };
 
-  // 渲染内容
+  /** 渲染内容 */
   const content = () => {
     return (
       <div className="min-w-140px flex flex-col">

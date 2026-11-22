@@ -4,6 +4,7 @@ import { Input } from 'antd';
 
 /**
  * 自定义输入
+ * @param props - 组件配置，用于设置展示内容和交互回调
  */
 function CustomizeInput(props: InputProps) {
   const { t } = useTranslation();

@@ -43,11 +43,7 @@ function I18n() {
     },
   ];
 
-  /**
-   * 设置浏览器标签
-   * @param list - 菜单列表
-   * @param path - 路径
-   */
+  /** 设置浏览器标签 */
   const handleSetTitle = useCallback(() => {
     const path = `${pathname}${search || ''}`;
     // 通过路由获取标签名
@@ -56,7 +52,10 @@ function I18n() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  /** 点击更换语言 */
+  /**
+   * 点击更换语言
+   * @param e - 语言菜单点击事件，用于读取目标语言标识
+   */
   const onClick: MenuProps['onClick'] = (e) => {
     i18n.changeLanguage(e.key as Langs);
     localStorage.setItem(LANG, e.key);

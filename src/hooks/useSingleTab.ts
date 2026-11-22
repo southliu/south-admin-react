@@ -18,10 +18,8 @@ interface Props {
 }
 
 /**
- * 单标签设置
- * @param fatherPath - 父级路径
- * @param title - 标题
- * @param name - 名称
+ * 配置独立操作页面的标签和导航
+ * @param props - 标签配置，包含父级路径、中英文标题和记录名称
  */
 export function useSingleTab(props: Props) {
   const { fatherPath, zhTitle, enTitle, name } = props;

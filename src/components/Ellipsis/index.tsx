@@ -1,8 +1,6 @@
 import { Tooltip } from 'antd';
 
-/**
- * 文字超出省略组件
- */
+/** 文字超出省略组件 */
 
 interface Props {
   tooltip?: boolean; // 移动到文本展示完整内容的提示
@@ -16,9 +14,8 @@ function Ellipsis(props: Props) {
   const { tooltip, length, lines, fullWidthRecognition, children } = props;
   /**
    * 计算全角数量
-   * @param str
-   * @param len
-   * @returns
+   * @param str - 待截取的文本内容
+   * @param len - 允许保留的字符数量，用于控制省略位置
    */
   const countFullWidthChars = (str: string, len: number) => {
     let count = 0,

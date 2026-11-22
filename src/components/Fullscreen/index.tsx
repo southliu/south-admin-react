@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'antd';
 
-/**
- * @description: 全屏组件
- */
+/** 全屏组件 */
 function Fullscreen() {
   const { t } = useTranslation();
   const [isFullscreen, toggleFullscreen] = useFullscreen();

@@ -48,13 +48,19 @@ function MenuAuthorize(props: Props) {
   const setCheckedKeys = (keys: Key[]) => setSelection({ source: defaultCheckedKeys, keys });
   const list = treeData;
 
-  /** 更新选中状态 */
+  /**
+   * 更新选中状态
+   * @param keys - 选中的节点标识列表，用于更新授权状态
+   */
   const updateCheckedKeys = (keys: Key[]) => {
     setCheckedKeys(keys);
     onChange?.(keys);
   };
 
-  /** 获取所有节点的key */
+  /**
+   * 获取所有节点的key
+   * @param data - 权限树数据，用于收集全部节点标识
+   */
   const getAllKeys = useCallback((data: PermissionData[]): Key[] => {
     const keys: Key[] = [];
 
@@ -71,7 +77,11 @@ function MenuAuthorize(props: Props) {
     return keys;
   }, []);
 
-  /** 处理节点选中/取消选中 */
+  /**
+   * 处理节点选中/取消选中
+   * @param checked - 是否选中当前节点，用于决定添加或移除权限
+   * @param item - 当前权限节点，用于联动处理其子节点
+   */
   const handleCheck = (checked: boolean, item: PermissionData) => {
     const { key } = item;
     const childrenKeys = getChildKeys(item);
@@ -105,7 +115,10 @@ function MenuAuthorize(props: Props) {
     updateCheckedKeys(newKeys);
   };
 
-  /** 全选/取消全选 */
+  /**
+   * 全选/取消全选
+   * @param e - 全选复选框事件，用于决定是否选中全部权限节点
+   */
   const handleCheckAll = (e: CheckboxChangeEvent) => {
     const checked = e.target.checked;
     let newKeys: Key[] = [];
@@ -117,7 +130,10 @@ function MenuAuthorize(props: Props) {
     updateCheckedKeys(newKeys);
   };
 
-  /** 切换展开/收起状态 */
+  /**
+   * 切换展开/收起状态
+   * @param key - 目标标签或菜单的标识
+   */
   const toggleExpand = useCallback((key: Key) => {
     setExpandedKeys((prev) => {
       if (prev.includes(key)) {
@@ -127,7 +143,10 @@ function MenuAuthorize(props: Props) {
     });
   }, []);
 
-  /** 获取所有可展开的节点key */
+  /**
+   * 获取所有可展开的节点key
+   * @param data - 权限树数据，用于收集含子节点的可展开项
+   */
   const getAllExpandableKeys = useCallback((data: PermissionData[]): Key[] => {
     const keys: Key[] = [];
 
@@ -156,7 +175,11 @@ function MenuAuthorize(props: Props) {
     }
   }, [expandedKeys.length, list, getAllExpandableKeys]);
 
-  /** 渲染树节点 */
+  /**
+   * 渲染树节点
+   * @param list - 当前层级的权限节点，用于渲染授权树
+   * @param step - 当前树节点层级，用于计算缩进距离
+   */
   const renderTreeNode = (list: PermissionData[], step = 0) => {
     if (!list?.length) return null;
     const isAuthorizeBtn = list.every((item) => item.type === 3);

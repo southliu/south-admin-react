@@ -43,19 +43,16 @@ if (typeof window !== 'undefined') {
 
 // 优先渲染应用，减少首屏加载时间
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
+  <StyleProvider
+    hashPriority="high"
+    transformers={[legacyLogicalPropertiesTransformer]}
+  >
     <Router />
   </StyleProvider>,
 );
 
-// 关闭loading
-const firstElement = document.getElementById('first');
-if (firstElement && firstElement.style?.display !== 'none') {
-  firstElement.style.display = 'none';
-}
-
 // 延迟初始化非关键服务，不阻塞首屏渲染
-// 使用 requestIdleCallback 在浏览器空闲时初始化，或使用 setTimeout 作为降级方案
+/** 使用 requestIdleCallback 在浏览器空闲时初始化，或使用 setTimeout 作为降级方案 */
 const deferredInit = () => {
   // 初始化性能监控
   initPerformanceMonitoring();

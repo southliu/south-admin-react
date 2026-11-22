@@ -1,13 +1,15 @@
+import type { ErrorInfo, ReactNode } from 'react';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
-import { Component, ErrorInfo, ReactNode } from 'react';
 import { createLog } from '@/servers/system/log';
 import { Button, Result, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useLogout } from '@/hooks/useLogout';
 import { useUserStore } from '@/stores/user';
+import { Component } from 'react';
 
 interface Props {
   children: ReactNode;
+  resetKey?: string;
 }
 
 interface State {
@@ -15,7 +17,10 @@ interface State {
   error: Error | null;
 }
 
-// 错误内容组件
+/**
+ * 错误内容组件
+ * @param error - 页面异常对象，用于展示错误详情
+ */
 const ErrorContent = ({ error }: { error: Error | null }) => {
   const { t } = useTranslation();
   const [handleLogout] = useLogout();
@@ -32,17 +37,29 @@ const ErrorContent = ({ error }: { error: Error | null }) => {
         title={t('public.pageErrorTitle')}
         subTitle={
           <div className="flex">
-            <Tooltip title={String(error)} placement="top">
+            <Tooltip
+              title={String(error)}
+              placement="top"
+            >
               <MessageOutlined className="mr-5px rotate-y-180" />
             </Tooltip>
             {t('public.pagepageErrorSubTitle')}
           </div>
         }
         extra={[
-          <Button key="refresh" type="primary" icon={<RedoOutlined />} onClick={handleRefresh}>
+          <Button
+            key="refresh"
+            type="primary"
+            icon={<RedoOutlined />}
+            onClick={handleRefresh}
+          >
             {t('public.refreshPage')}
           </Button>,
-          <Button key="hard-refresh" icon={<LogoutOutlined />} onClick={handleLogout}>
+          <Button
+            key="hard-refresh"
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+          >
             {t('public.signOut')}
           </Button>,
         ]}
@@ -59,6 +76,12 @@ class ErrorBoundary extends Component<Props, State> {
 
   public static getDerivedStateFromError(): State {
     return { hasError: true, error: null };
+  }
+
+  public componentDidUpdate(previous: Props) {
+    if (this.state.hasError && previous.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false, error: null });
+    }
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {

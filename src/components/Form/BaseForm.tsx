@@ -1,12 +1,11 @@
+import type { ColProps, FormInstance, FormProps } from 'antd';
 import type { CSSProperties, ReactNode, Ref } from 'react';
 import type { BaseFormData, BaseFormList } from '#/form';
-import type { ColProps, FormInstance } from 'antd';
 import { filterEmptyStr, filterFormItem, handleValuePropName } from './utils/helper';
 import { getComponent } from './utils/componentMap';
 import { filterDayjs } from '../Dates/utils/helper';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
-import { FormProps } from 'antd';
+import { useEffect, useId } from 'react';
 import { Form } from 'antd';
 
 interface Props extends FormProps {
@@ -23,15 +22,22 @@ interface Props extends FormProps {
 }
 
 const BaseForm = (props: Props) => {
-  const { ref, list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
-    props;
+  const {
+    ref,
+    list,
+    data,
+    form,
+    style,
+    className,
+    children,
+    labelCol,
+    wrapperCol,
+    handleFinish,
+    name,
+    ...formProps
+  } = props;
   const { t } = useTranslation();
-
-  // 清除多余参数
-  const formProps: Partial<Props> = { ...props };
-  delete formProps.list;
-  delete formProps.data;
-  delete formProps.handleFinish;
+  const formId = useId();
 
   // 监听传入表单数据，如果变化则替换表单
   useEffect(() => {
@@ -77,15 +83,22 @@ const BaseForm = (props: Props) => {
    * @param item - 表单项
    */
   const renderFormItem = (item: BaseFormList) => (
-    <Form.Item {...filterFormItem(item)} valuePropName={handleValuePropName(item.component)}>
+    <Form.Item
+      {...filterFormItem(item)}
+      valuePropName={handleValuePropName(item.component)}
+    >
       {getComponent(t, item, form)}
     </Form.Item>
   );
 
   return (
-    <div className={className} style={style}>
+    <div
+      className={className}
+      style={style}
+    >
       <Form
         {...formProps}
+        name={name ?? formId}
         ref={ref}
         form={form}
         labelCol={labelCol ? labelCol : { span: 6 }}

@@ -2,7 +2,10 @@ import type { ApiFn, BaseFormList } from '#/form';
 import type { TFunction } from 'i18next';
 import { getPartnerDemo } from '@/servers/platform/partner';
 
-// 搜索数据
+/**
+ * 搜索数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const searchList = (t: TFunction): BaseFormList[] => [
   {
     label: t('public.date'),

@@ -10,7 +10,7 @@ import fs from 'fs';
 export const nojekyllPlugin = (): PluginOption => {
   return {
     name: 'vite-create-nojekyll',
-    // 在服务器关闭时被调用
+    /** 在服务器关闭时被调用 */
     closeBundle: () => {
       console.timeEnd('打包时间');
 

@@ -25,6 +25,7 @@ function Theme() {
 
   /**
    * 处理更新
+   * @param e - 鼠标点击事件，用于以点击位置为中心播放主题切换动画
    * @param type - 主题类型
    */
   const onChange = (e: MouseEvent, type: ThemeType) => {
@@ -58,6 +59,7 @@ function Theme() {
 
   /**
    * 切换主题
+   * @param type - 目标主题类型，用于同步主题状态和本地缓存
    */
   const toggleThemeScheme = (type: ThemeType) => {
     localStorage.setItem(THEME_KEY, type);

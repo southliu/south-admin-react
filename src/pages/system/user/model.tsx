@@ -20,7 +20,10 @@ for (let i = 0; i < 32; i++) {
   });
 }
 
-// 搜索数据
+/**
+ * 搜索数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const searchList = (t: TFunction): BaseSearchList[] => [
   {
     label: t('login.username'),
@@ -55,6 +58,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
 
 /**
  * 表格数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  * @param optionRender - 渲染操作函数
  */
 export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): TableColumn[] => {
@@ -112,7 +116,11 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
   ];
 };
 
-// 新增数据
+/**
+ * 新增数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ * @param isCreate - 是否为新增操作，用于控制表单字段的可编辑状态
+ */
 export const createList = (t: TFunction, isCreate: boolean): BaseFormList[] => [
   {
     label: t('login.username'),

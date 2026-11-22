@@ -83,6 +83,11 @@ test('首屏使用图标子集，图表慢加载不阻塞统计，弹窗首次�
     await expect(page.getByRole('dialog', { name: '修改密码' })).toBeVisible();
     await page.getByRole('dialog').locator('input[type="password"]').first()
 .fill('Testpass1');
+    const strengthBars = page.getByRole('dialog').locator('.h-5px');
+    await expect(strengthBars).toHaveCount(5);
+    await page.getByRole('dialog').locator('input[type="password"]').first()
+.fill('');
+    await expect(strengthBars).toHaveCount(0);
     await page
       .getByRole('dialog')
       .getByRole('button', { name: /取.*消/ })

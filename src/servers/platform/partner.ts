@@ -19,6 +19,7 @@ export function getPartner(data?: unknown) {
 
 /**
  * 获取公司数据-展示用的接口
+ * @param url - 请求地址，用于指定数据接口
  * @param data - 请求数据
  */
 export function getPartnerDemo(url: string, data?: unknown) {

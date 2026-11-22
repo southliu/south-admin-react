@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { MAX_TAG_COUNT } from './index';
 
 /**
- * @description: 基础下拉组件
+ * 基础下拉组件
+ * @param props - 组件配置，用于设置展示内容和交互回调
  */
 function BaseSelect(props: SelectProps) {
   const { options } = props;

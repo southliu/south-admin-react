@@ -12,7 +12,6 @@ import { Icon } from '@iconify/react';
 import { Modal, Input } from 'antd';
 import SearchResult from './SearchResult';
 import SearchFooter from './SearchFooter';
-import debounce from 'lodash/debounce';
 
 interface Props {
   isOpen: boolean;
@@ -35,23 +34,29 @@ function SearchModal(props: Props) {
 
   // 聚焦输入框
   useEffect(() => {
-    if (isOpen) {
-      // 防止聚焦失效
-      requestAnimationFrame(() => {
-        // 聚焦输入框
-        inputRef.current?.focus({
-          cursor: 'end',
-        });
-      });
-    }
-
-    // 退出时清空数据
-    return () => {
-      setValue('');
-      setActive('');
-      setList([]);
-    };
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      inputRef.current?.focus({ cursor: 'end' });
+    });
+    return () => cancelAnimationFrame(frame);
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const timer = setTimeout(() => {
+      const results = searchMenuValue({ menus: menuList, permissions, value });
+      setActive(results[0]?.key || '');
+      setList(results);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [isOpen, menuList, permissions, value]);
+
+  const handleClose = () => {
+    setValue('');
+    setActive('');
+    setList([]);
+    onClose();
+  };
 
   /**
    * 更改选中值
@@ -74,34 +79,12 @@ function SearchModal(props: Props) {
       const openKeys = getOpenMenuByRouter(active);
       setOpenKeys(openKeys);
       // 关闭
-      onClose();
+      handleClose();
     }
   };
 
-  /**
-   * 防抖处理搜索结果
-   * @param value - 搜索值
-   */
-  const debounceSearch = debounce((value: string) => {
-    const searchProps = { menus: menuList, permissions, value };
-    const searchValue = searchMenuValue(searchProps);
-    if (searchValue?.length) {
-      setActive((searchValue as SideMenu[])?.[0]?.key || '');
-      setList(searchValue as SideMenu[]);
-    } else {
-      setActive('');
-      setList([]);
-    }
-  }, 200);
-
-  /**
-   * 防抖处理值变化值变化
-   * @param event - 输入框参数
-   */
   const onChange: InputProps['onChange'] = (event) => {
-    const { value } = event.target;
-    setValue(value);
-    debounceSearch(value);
+    setValue(event.target.value);
   };
 
   /** 键盘上事件 */
@@ -136,7 +119,7 @@ function SearchModal(props: Props) {
 
   // 当列表值变化时监听按键事件
   useEffect(() => {
-    if (list.length) {
+    if (isOpen && list.length) {
       // 监听按键
       window.addEventListener('keydown', onKeyDown);
 
@@ -145,14 +128,14 @@ function SearchModal(props: Props) {
         window.removeEventListener('keydown', onKeyDown);
       };
     }
-  }, [list, active, onKeyDown]);
+  }, [isOpen, list, active, onKeyDown]);
 
   return (
     <Modal
       className="rounded-100px"
       open={isOpen}
       closable={false}
-      onCancel={onClose}
+      onCancel={handleClose}
       footer={<SearchFooter />}
     >
       <Input
@@ -173,7 +156,7 @@ function SearchModal(props: Props) {
       <SearchResult
         list={list}
         active={active}
-        onCancel={onClose}
+        onCancel={handleClose}
         changActive={changActive}
       />
     </Modal>

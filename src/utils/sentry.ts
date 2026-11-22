@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/react';
 
-/**
- * Sentry 配置接口
- */
+/** Sentry 配置接口 */
 interface SentryConfig {
   dsn?: string;
   environment?: string;
@@ -13,16 +11,17 @@ interface SentryConfig {
   beforeSend?: (event: Sentry.ErrorEvent) => Sentry.ErrorEvent | null;
 }
 
-/**
- * 默认配置
- */
+/** 默认配置 */
 const defaultConfig: SentryConfig = {
   environment: import.meta.env.MODE,
   tracesSampleRate: 0.1, // 10% 的用户会话将被追踪
   replaysSessionSampleRate: 0.1, // 10% 的正常会话被录制
   replaysOnErrorSampleRate: 1.0, // 100% 的错误会话被录制
 
-  // 发送前过滤敏感信息
+  /**
+   * 发送前过滤敏感信息
+   * @param event - 待上报的错误事件，用于清除请求中的敏感信息
+   */
   beforeSend(event) {
     // 移除敏感的请求头
     if (event.request?.headers) {
@@ -52,6 +51,7 @@ const defaultConfig: SentryConfig = {
 
 /**
  * 初始化 Sentry
+ * @param config - 监控配置，用于设置上报地址、环境和采样率
  */
 export function initSentry(config: SentryConfig = {}): void {
   // 如果没有提供 DSN，不初始化 Sentry
@@ -137,6 +137,8 @@ export function initSentry(config: SentryConfig = {}): void {
 
 /**
  * 手动捕获错误
+ * @param error - 需要上报的异常对象
+ * @param context - 异常上下文，用于补充排查问题所需的信息
  */
 export function captureException(error: Error, context?: Record<string, unknown>): void {
   Sentry.withScope((scope) => {
@@ -151,6 +153,8 @@ export function captureException(error: Error, context?: Record<string, unknown>
 
 /**
  * 捕获消息
+ * @param message - 需要上报的消息内容
+ * @param level - 消息级别，用于标识日志的严重程度
  */
 export function captureMessage(message: string, level: Sentry.SeverityLevel = 'info'): void {
   Sentry.captureMessage(message, level);
@@ -158,20 +162,22 @@ export function captureMessage(message: string, level: Sentry.SeverityLevel = 'i
 
 /**
  * 设置用户信息
+ * @param user - 用户标识信息，用于关联后续上报事件
  */
 export function setUser(user: { id: string; email?: string; username?: string }): void {
   Sentry.setUser(user);
 }
 
-/**
- * 清除用户信息
- */
+/** 清除用户信息 */
 export function clearUser(): void {
   Sentry.setUser(null);
 }
 
 /**
  * 添加面包屑
+ * @param message - 需要上报的消息内容
+ * @param category - 操作分类，用于区分面包屑记录的来源
+ * @param level - 操作记录级别，用于区分面包屑的重要程度
  */
 export function addBreadcrumb(
   message: string,

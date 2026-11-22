@@ -23,7 +23,11 @@ function BaseModal(props: Props) {
   const [cacheBounds, setCacheBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
   const draggleRef = useRef<HTMLDivElement>(null);
 
-  /** 开始拖拽对话框 */
+  /**
+   * 开始拖拽对话框
+   * @param _event - 拖拽事件，为兼容拖拽回调签名而保留
+   * @param uiData - 拖拽位置数据，用于计算对话框可移动的边界
+   */
   const onStartMouse = (_event: DraggableEvent, uiData: DraggableData) => {
     const { clientWidth, clientHeight } = window.document.documentElement;
     const targetRect = draggleRef.current?.getBoundingClientRect?.();
@@ -49,7 +53,10 @@ function BaseModal(props: Props) {
     setFullscreen(!isFullscreen);
   };
 
-  /** 点击关闭 */
+  /**
+   * 点击关闭
+   * @param e - 关闭按钮事件，用于阻止冒泡和默认行为
+   */
   const handleCancel: MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -97,7 +104,10 @@ function BaseModal(props: Props) {
     </div>
   );
 
-  /** 自定义渲染对话框 */
+  /**
+   * 自定义渲染对话框
+   * @param modal - 原始对话框节点，用于包装拖拽容器
+   */
   const modalRender = (modal: ReactNode) => (
     <Draggable
       nodeRef={draggleRef as RefObject<HTMLElement>}

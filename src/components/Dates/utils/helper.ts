@@ -4,9 +4,7 @@ import type { Dayjs } from 'dayjs';
 import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils/config';
 import dayjs from 'dayjs';
 
-/**
- * @description isDayjs必须使用dayjs.isDayjs形式，否则打包会失败
- */
+/** @description isDayjs必须使用dayjs.isDayjs形式，否则打包会失败 */
 
 // 区间值
 type EventValue<T> = T | null | undefined;
@@ -15,6 +13,7 @@ export type RangeValue<T> = [EventValue<T>, EventValue<T>] | null;
 /**
  * dayjs类型转字符串类型
  * @param value - dayjs时间类型值
+ * @param format - 日期格式模板，用于生成指定格式的时间字符串
  */
 export function dayjs2String(value: Dayjs | string, format = DATE_FORMAT): string {
   if (dayjs.isDayjs(value)) {
@@ -43,6 +42,7 @@ export function string2Dayjs(value: Dayjs | string | number): Dayjs {
 /**
  * dayjs数组类型转字符串类型
  * @param value - dayjs时间类型值
+ * @param format - 日期格式模板，用于生成指定格式的时间字符串
  */
 export function dayjsRang2StringRang(value: RangeValue<Dayjs>, format = DATE_FORMAT) {
   if (!value) return undefined;

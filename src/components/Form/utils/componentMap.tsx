@@ -136,9 +136,10 @@ const handleInputProps = (componentProps?: ComponentProps) => {
  * 获取组件
  * @param t - i18n 转换函数
  * @param item - 表单项
+ * @param form - 表单实例，用于提交表单或读取字段状态
  */
 export function getComponent(t: TFunction, item: BaseFormList, form: FormInstance) {
-  const { component, componentProps, name } = item;
+  const { component, componentProps } = item;
 
   const handlePressEnter = (e: KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -180,13 +181,10 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
   if (LazyComponent) {
     return (
       <LazyComponentWrapper
-        componentType={component}
         component={LazyComponent}
-        t={t}
-        componentProps={componentProps}
         fallback={<LoadingComponent />}
-        form={form}
-        name={name}
+        {...initCompProps(t, component)}
+        {...componentProps}
       />
     );
   }
@@ -201,7 +199,6 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
     <Comp
       {...initCompProps(t, component as ComponentType)}
       {...componentProps}
-      onPressEnter={handlePressEnter}
     />
   );
 }

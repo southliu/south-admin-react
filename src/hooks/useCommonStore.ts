@@ -41,7 +41,10 @@ function pick<T extends object>(state: T, keys?: readonly PropertyKey[]): Partia
   ) as Partial<T>;
 }
 
-/** 只订阅调用方需要的字段，避免标签、菜单变化带动无关页面渲染。 */
+/**
+ * 只订阅调用方需要的字段，避免标签、菜单变化带动无关页面渲染。
+ * @param keys - 需要订阅的状态字段，用于避免无关状态变化触发重渲染
+ */
 export function useCommonStore<K extends keyof CommonState = keyof CommonState>(
   keys?: readonly K[],
 ) {

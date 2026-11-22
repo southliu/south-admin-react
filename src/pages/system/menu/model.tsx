@@ -9,7 +9,10 @@ import { Icon } from '@iconify/react';
 import StateSwitch from './components/StateSwitch';
 import IconInput from './components/IconInput';
 
-// 搜索数据
+/**
+ * 搜索数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const searchList = (t: TFunction): BaseSearchList[] => [
   {
     label: t('systems:menu.label'),
@@ -36,6 +39,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
 
 /**
  * 表格数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  * @param optionRender - 渲染操作函数
  */
 export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): TableColumn[] => {
@@ -113,7 +117,12 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
   ];
 };
 
-// 新增数据
+/**
+ * 新增数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ * @param id - 当前记录标识，用于区分新增与编辑场景
+ * @param type - 菜单类型，用于控制目录、菜单和按钮对应的表单项
+ */
 export const createList = (t: TFunction, id: string, type?: number): BaseFormList[] => [
   {
     label: t('systems:menu.parentMenu'),

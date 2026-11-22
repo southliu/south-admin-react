@@ -1,25 +1,18 @@
 import type { BaseFormData, BaseSearchList, BaseFormList } from '#/form';
-import type { ColProps, FormInstance } from 'antd';
-import {
-  type CSSProperties,
-  type ReactNode,
-  type Ref,
-  useEffect,
-  useState,
-  useMemo,
-  useRef,
-} from 'react';
+import type { ColProps, FormInstance, FormProps } from 'antd';
+import type { CSSProperties, ReactNode, Ref } from 'react';
 import {
   filterEmptyStr,
   filterFormItem,
   handleValuePropName,
 } from '@/components/Form/utils/helper';
 import { SearchOutlined, ReloadOutlined, DownOutlined } from '@ant-design/icons';
+import { useEffect, useState, useMemo, useRef, useId } from 'react';
 import { getComponent } from '@/components/Form/utils/componentMap';
-import { type FormProps, Button, Col, Flex } from 'antd';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { filterDayjs } from '@/components/Dates';
 import { useTranslation } from 'react-i18next';
+import { Button, Col, Flex } from 'antd';
 import { Form } from 'antd';
 
 interface Props extends FormProps {
@@ -62,12 +55,15 @@ const BaseSearch = (props: Props) => {
     defaultColCount = 4,
     defaultRowExpand = 2,
     handleFinish,
+    name,
+    ...formProps
   } = props;
   const { t } = useTranslation();
   const { isPhone } = useCommonStore(['isPhone']);
   const [isExpand, setExpand] = useState(false);
   let [form] = Form.useForm();
   const isFirst = useRef(true);
+  const formId = useId();
 
   if (searchForm) {
     form = searchForm;
@@ -78,8 +74,8 @@ const BaseSearch = (props: Props) => {
     if (!isRowExpand) return false;
 
     const showNum = defaultColCount * defaultRowExpand;
-    return showNum < list.length;
-  }, [defaultColCount, defaultRowExpand, isRowExpand, list.length]);
+    return showNum < list.filter((item) => !item.hidden).length;
+  }, [defaultColCount, defaultRowExpand, isRowExpand, list]);
 
   // 初始化内容
   useEffect(() => {
@@ -93,14 +89,6 @@ const BaseSearch = (props: Props) => {
       console.warn('传入的搜索数据不是一个对象');
     }
   }, [data, form]);
-
-  // 清除多余参数
-  const formProps = { ...props };
-  delete formProps.type;
-  delete formProps.isSearch;
-  delete formProps.isReset;
-  delete formProps.isLoading;
-  delete formProps.handleFinish;
 
   /** 点击重置 */
   const onReset = () => {
@@ -129,21 +117,19 @@ const BaseSearch = (props: Props) => {
     // 默认显示个数
     const showNum = defaultColCount * defaultRowExpand;
 
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i];
-
-      if (i < showNum) {
-        item.hidden = false;
-        continue;
-      }
-
-      item.hidden = !isExpand;
-    }
-
-    return list;
+    let visibleIndex = 0;
+    return list.map((item) => {
+      if (item.hidden) return item;
+      const isFolded = !isExpand && visibleIndex >= showNum;
+      visibleIndex++;
+      return { ...item, hidden: isFolded };
+    });
   };
 
-  /** 获取表单label宽度 */
+  /**
+   * 获取表单label宽度
+   * @param item - 搜索项配置，用于确定标签宽度和栅格占比
+   */
   const getLabelCol = (item?: BaseSearchList) => {
     if (item?.labelWidth) {
       return { style: { width: item.labelWidth } };
@@ -155,7 +141,10 @@ const BaseSearch = (props: Props) => {
     return type === 'grid' && !isPhone ? { span: 6 } : undefined;
   };
 
-  /** 获取输入间隙 */
+  /**
+   * 获取输入间隙
+   * @param item - 搜索项配置，用于确定输入区域宽度和栅格占比
+   */
   const getWrapperCol = (item?: BaseSearchList) => {
     if (item?.wrapperWidth) {
       return { style: { width: item.wrapperWidth } };
@@ -253,12 +242,18 @@ const BaseSearch = (props: Props) => {
   );
 
   return (
-    <div id="searches" style={style} className={className}>
+    <div
+      id="searches"
+      style={style}
+      className={className}
+    >
       <Form
         layout={isPhone ? 'horizontal' : 'inline'}
         {...formProps}
+        name={name ?? formId}
         ref={ref}
         form={form}
+        initialValues={initialValues}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         onValuesChange={onValuesChange}
@@ -283,7 +278,10 @@ const BaseSearch = (props: Props) => {
         )}
 
         {type === 'grid' && (
-          <Flex wrap className="w-full">
+          <Flex
+            wrap
+            className="w-full"
+          >
             {filterList(list)?.map((item) => (
               <div
                 key={`${item.name}`}

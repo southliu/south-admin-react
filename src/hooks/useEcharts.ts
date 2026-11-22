@@ -24,8 +24,8 @@ echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChar
 
 /**
  * 使用Echarts
- * @param options -  绘制echarts的参数
- * @param data -  数据
+ * @param options - 绘制echarts的参数
+ * @param data - 数据
  */
 export const useEcharts = (options: echarts.EChartsCoreOption, data?: unknown) => {
   const echartsRef = useRef<echarts.EChartsType | null>(null);

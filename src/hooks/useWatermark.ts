@@ -8,9 +8,7 @@ interface Option {
   opacity: number; // 水印透明度（0~1之间取值）
 }
 
-/**
- * 水印
- */
+/** 水印 */
 export function useWatermark() {
   /**
    * 水印

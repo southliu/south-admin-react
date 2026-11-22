@@ -2,7 +2,10 @@ import type { ResizeCallbackData } from 'react-resizable';
 import { Resizable } from 'react-resizable';
 import React from 'react';
 
-/** 自定义拖拽  */
+/**
+ * 自定义拖拽
+ * @param props - 组件配置，用于设置展示内容和交互回调
+ */
 function ResizableTitle(
   props: React.HTMLAttributes<unknown> & {
     onResize: (e: React.SyntheticEvent<Element>, data: ResizeCallbackData) => void;

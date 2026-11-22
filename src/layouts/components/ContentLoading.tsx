@@ -1,5 +1,9 @@
+/*
+ * From Uiverse.io by arthur_6104 - https://uiverse.io/arthur_6104/spotty-snake-91
+ * MIT License, Copyright (c) alexruix (Alex Ruiz), arthur_6104 (Arthur Feltz)
+ */
 import { useTranslation } from 'react-i18next';
-import { Spin } from 'antd';
+import styles from './ContentLoading.module.less';
 
 function ContentLoading() {
   const { t } = useTranslation();
@@ -8,10 +12,14 @@ function ContentLoading() {
     <div
       role="status"
       aria-label={t('public.loading')}
-      className="absolute inset-0 flex flex-col items-center justify-center gap-16px"
+      aria-busy="true"
+      className="absolute inset-0 flex items-center justify-center"
     >
-      <Spin size="large" />
-      <span className="text-14px text-gray-500">{t('public.loading')}...</span>
+      <div aria-hidden="true" className={styles.loader}>
+        <div className={styles.box1} />
+        <div className={styles.box2} />
+        <div className={styles.box3} />
+      </div>
     </div>
   );
 }

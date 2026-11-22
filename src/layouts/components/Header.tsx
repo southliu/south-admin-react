@@ -56,7 +56,10 @@ function Header() {
     },
   ];
 
-  /** 点击菜单 */
+  /**
+   * 点击菜单
+   * @param e - 菜单点击事件，用于识别修改密码或退出登录操作
+   */
   const onClick: MenuProps['onClick'] = (e) => {
     switch (e.key as MenuKey) {
       case 'password':

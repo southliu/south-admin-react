@@ -202,9 +202,7 @@ function Page() {
     }
   };
 
-  /**
-   * 批量删除
-   */
+  /** 批量删除 */
   const onBatchDelete = async () => {
     if (selectedRowKeys.length === 0) {
       messageApi.warning(t('public.selectAtLeastOne'));

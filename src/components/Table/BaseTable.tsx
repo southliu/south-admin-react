@@ -117,6 +117,7 @@ function BaseTable(props: Props) {
   /**
    * 获取勾选表格数据
    * @param checks - 勾选
+   * @param newSortList - 排序后的列标识列表，用于更新表格列顺序
    */
   const getTableChecks = (checks: string[], newSortList: string[]) => {
     setTableFilters(checks);
@@ -125,7 +126,7 @@ function BaseTable(props: Props) {
 
   /**
    * 处理拖拽
-   * @param index - 下标
+   * @param column - 需要调整宽度的表格列配置
    */
   const handleResize = useCallback(
     (column: TableColumn) =>
@@ -253,6 +254,9 @@ function BaseTable(props: Props) {
 
   /**
    * 处理行内样式
+   * @param record - 当前行数据，用于计算自定义行样式
+   * @param index - 当前行下标，用于传递给行样式回调
+   * @param indent - 当前行缩进层级，用于传递给行样式回调
    */
   const handleRowClassName: TableProps<object>['rowClassName'] = (
     record: object,

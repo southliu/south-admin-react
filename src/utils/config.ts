@@ -1,7 +1,8 @@
 import type { TFunction } from 'i18next';
 
 /**
- * @description: 配置项
+ * 获取当前语言的系统标题后缀
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  */
 export const TITLE_SUFFIX = (t: TFunction) => t('public.currentName'); // 标题后缀
 export const WATERMARK_PREFIX = 'admin'; // 水印前缀
@@ -25,13 +26,20 @@ export const TIME_PICKER_FORMAT = 'HH:mm:ss';
 // 公共组件默认值
 export const FORM_REQUIRED = [{ required: true }]; // 表单必填校验
 
-// 新增/编辑标题
+/**
+ * 新增/编辑标题
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ * @param title - 业务标题，用于拼接新增页面或弹窗标题
+ */
 export const ADD_TITLE = (t: TFunction, title?: string) =>
   t('public.createTitle', { title: title ?? '' });
 export const EDIT_TITLE = (t: TFunction, name: string, title?: string) =>
   `${t('public.editTitle', { title: title ?? '' })}${name ? `(${name})` : ''}`;
 
-// 密码规则
+/**
+ * 密码规则
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const PASSWORD_RULE = (t: TFunction) => ({
   pattern: /^(?=.*\d)(?=.*[a-zA-Z])[\da-zA-Z~!@#$%^&*+\.\_\-*]{6,30}$/,
   message: t('login.passwordRuleMessage'),

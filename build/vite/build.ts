@@ -1,8 +1,6 @@
 import type { BuildOptions } from 'vite';
 
-/**
- * @description 分包配置
- */
+/** 分包配置 */
 export function buildOptions(): BuildOptions {
   return {
     chunkSizeWarningLimit: 1000, // 大于1000k才警告

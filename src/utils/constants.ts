@@ -2,13 +2,9 @@ import type { EnumShowType } from '#/public';
 import type { TFunction } from 'i18next';
 import { DefaultOptionType } from 'antd/es/select';
 
-/**
- * @description: 公用常量
- */
+/** @description: 公用常量 */
 
-/**
- * 颜色
- */
+/** 颜色 */
 export enum colors {
   success = '#87d068',
   primary = '#409EFF',
@@ -38,6 +34,7 @@ export interface Constant extends Omit<DefaultOptionType, 'children'> {
 
 /**
  * 开启状态
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  */
 export const OPEN_CLOSE = (t: TFunction): Constant[] => [
   { label: t('public.open'), value: 1, color: colors.green, type: 'tag' },
@@ -46,6 +43,7 @@ export const OPEN_CLOSE = (t: TFunction): Constant[] => [
 
 /**
  * 菜单状态
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  */
 export const MENU_STATUS = (t: TFunction): Constant[] => [
   { label: t('public.show'), value: 1, color: colors.green, type: 'tag' },
@@ -54,6 +52,7 @@ export const MENU_STATUS = (t: TFunction): Constant[] => [
 
 /**
  * 菜单类型
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  */
 export const MENU_TYPES = (t: TFunction): Constant[] => [
   { label: t('systems:menu.catalog'), value: 1, type: 'tag', color: colors.green },
@@ -63,6 +62,7 @@ export const MENU_TYPES = (t: TFunction): Constant[] => [
 
 /**
  * 菜单作用类型
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  */
 export const MENU_ACTIONS = (t: TFunction): Constant[] => [
   { value: 'create', label: t('system.create') },

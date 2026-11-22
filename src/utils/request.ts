@@ -9,16 +9,12 @@ const baseURL = process.env.NODE_ENV !== 'development' ? prefixUrl : '/api';
 // 业务侧统一请求实例（get/post/put/patch/delete/sse）
 export const request = creteRequest(baseURL, TOKEN, {
   getNetworkErrorMessage: () => i18n.t('public.networkError'),
-  // 权限过期处理：自动兼容 HashRouter 与 BrowserRouter。
-  // HashRouter 路由在 hash（形如 "#/ai-refund/workbench"），改 hash 后需 reload；
-  // BrowserRouter 路由在 pathname，改 location.href 会自动整页加载。
   onAuthExpired: () => {
     const isHashRouter = window.location.hash.startsWith('#');
     const currentRoute = isHashRouter
       ? window.location.hash.slice(1)
       : `${window.location.pathname}${window.location.search}`;
     // 已在登录页（含带 redirect 参数）时不再跳转，避免并发 401 把 redirect 参数嵌套成
-    // /login?redirect=/login?redirect=...
     if (currentRoute.startsWith('/login')) return;
     const redirect = currentRoute ? `?${new URLSearchParams({ redirect: currentRoute })}` : '';
     const loginPath = `/login${redirect}`;

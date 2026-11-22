@@ -15,7 +15,10 @@ function Nav(props: Props) {
   // 是否手机端
   const { isPhone } = useCommonStore(['isPhone']);
 
-  // 数据处理
+  /**
+   * 数据处理
+   * @param list - 待处理的数据列表
+   */
   const handleList = useCallback(
     (list: NavData[]) => {
       const result: BreadcrumbProps['items'] = [];

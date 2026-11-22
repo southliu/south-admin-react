@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCommonStore } from '@/hooks/useCommonStore';
+import { getTabPath, getNextTab } from '../utils/tabs';
 import { usePublicStore } from '@/stores/public';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/shallow';
@@ -31,18 +32,22 @@ export function useDropdownMenu(props: Props) {
   const { activeKey, onOpenChange, handleRefresh } = props;
   const { pathname } = useLocation();
   const { tabs } = useCommonStore(['tabs']);
-  const { closeLeft, closeOther, closeRight, closeTabs } = useTabsStore(
+  const { closeLeft, closeOther, closeRight, closeTabs, setActiveKey } = useTabsStore(
     useShallow((state) => ({
       closeLeft: state.closeLeft,
       closeOther: state.closeOther,
       closeRight: state.closeRight,
       closeTabs: state.closeTabs,
+      setActiveKey: state.setActiveKey,
     })),
   );
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const navigate = useNavigate();
 
-  // 菜单项
+  /**
+   * 菜单项
+   * @param key - 目标标签或菜单的标识
+   */
   const items: (key?: string) => MenuProps['items'] = (key = activeKey) => {
     const index = tabs.findIndex((item) => item.key === key);
     return [
@@ -79,7 +84,11 @@ export function useDropdownMenu(props: Props) {
     ];
   };
 
-  /** 点击菜单 */
+  /**
+   * 点击菜单
+   * @param type - 操作类型，用于确定执行的菜单动作
+   * @param key - 目标标签或菜单的标识
+   */
   const onClick = (type: string, key = activeKey) => {
     // 复原箭头
     onOpenChange?.(false);
@@ -92,11 +101,12 @@ export function useDropdownMenu(props: Props) {
 
       // 关闭当前
       case ITabEnums.CLOSE_CURRENT:
-        if (activeKey === pathname) {
-          const currentIndex = tabs.findIndex((tab) => tab.key === activeKey);
-          const nextPath = tabs[currentIndex > 0 ? currentIndex - 1 : 0].key;
-          if (nextPath) {
-            navigate(nextPath);
+        if (tabs.length <= 1) return;
+        if (key === pathname) {
+          const nextTab = getNextTab(tabs, key);
+          if (nextTab) {
+            setActiveKey(nextTab.key);
+            navigate(getTabPath(tabs, nextTab.key));
           }
         }
         closeTabs(key, aliveRef.current?.destroy);
@@ -106,19 +116,19 @@ export function useDropdownMenu(props: Props) {
       // 关闭其他
       case ITabEnums.CLOSE_OTHER:
         closeOther(key, aliveRef.current?.destroy);
-        navigate(key);
+        navigate(getTabPath(tabs, key));
         break;
 
       // 关闭左侧
       case ITabEnums.CLOSE_LEFT:
         closeLeft(key, aliveRef.current?.destroy);
-        navigate(key);
+        navigate(getTabPath(tabs, key));
         break;
 
       // 关闭右侧
       case ITabEnums.CLOSE_RIGHT:
         closeRight(key, aliveRef.current?.destroy);
-        navigate(key);
+        navigate(getTabPath(tabs, key));
         break;
 
       default:

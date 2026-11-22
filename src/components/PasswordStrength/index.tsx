@@ -1,38 +1,31 @@
 import type { InputProps } from 'antd';
 import { USER_LENGTH } from '@/utils/fieldLimits';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Input } from 'antd';
 import StrengthBar from './components/StrengthBar';
-import debounce from 'lodash/debounce';
+
+function getPasswordStrength(value: InputProps['value']): number {
+  const password = String(value ?? '');
+  let level = 0;
+  if (/\d/.test(password)) level++;
+  if (/[a-z]/.test(password)) level++;
+  if (/[A-Z]/.test(password)) level++;
+  if (password.length > 10) level++;
+  if (/[\.\~\@\#\$\^\&\*]/.test(password)) level++;
+  return level;
+}
 
 /**
- * @description: 密码强度组件
+ * 密码强度组件
+ * @param props - 组件配置，用于设置展示内容和交互回调
  */
 function PasswordStrength(props: InputProps) {
   const { value } = props;
   const { t } = useTranslation();
-  const [strength, setStrength] = useState(0);
-
-  /**
-   * 密码强度判断
-   * @param value - 值
-   */
-  const handleStrength = debounce((value: string) => {
-    if (!value) return;
-    let level = 0;
-    if (/\d/.test(value)) level++; // 有数字强度加1
-    if (/[a-z]/.test(value)) level++; // 有小写字母强度加1
-    if (/[A-Z]/.test(value)) level++; // 有大写字母强度加1
-    if (value.length > 10) level++; // 长度大于10强度加1
-    if (/[\.\~\@\#\$\^\&\*]/.test(value)) level++; // 有以下特殊字符强度加1
-    setStrength(level);
-  }, 500);
-
-  // 监听传入值变化
-  useEffect(() => {
-    handleStrength(value as string);
-  }, [handleStrength, value]);
+  const [inputValue, setInputValue] = useState(props.defaultValue);
+  const isControlled = Object.hasOwn(props, 'value');
+  const strength = getPasswordStrength(isControlled ? value : inputValue);
 
   return (
     <>
@@ -45,7 +38,7 @@ function PasswordStrength(props: InputProps) {
         {...props}
         onChange={(e) => {
           props.onChange?.(e);
-          handleStrength(e.target.value);
+          if (!isControlled) setInputValue(e.target.value);
         }}
       />
 

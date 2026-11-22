@@ -1,8 +1,6 @@
 import type { PluginOption } from 'vite';
 
-/**
- * 显示打包时间插件
- */
+/** 显示打包时间插件 */
 export const timePlugin = (): PluginOption => {
   return {
     name: 'vite-build-time',
@@ -14,7 +12,7 @@ export const timePlugin = (): PluginOption => {
     buildEnd: () => {
       // console.timeEnd('\n模块转义完成时间')
     },
-    // 在服务器关闭时被调用
+    /** 在服务器关闭时被调用 */
     closeBundle: () => {
       console.timeEnd('打包时间');
     },

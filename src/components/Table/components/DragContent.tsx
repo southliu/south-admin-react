@@ -20,7 +20,10 @@ interface DragContentProps {
   handleDragEnd: (list: CheckboxList[]) => void;
 }
 
-// 排序组件
+/**
+ * 排序组件
+ * @param props - 组件配置，用于设置展示内容和交互回调
+ */
 function SortableItem(props: SortableItemProps) {
   const { item } = props;
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -59,11 +62,17 @@ function SortableItem(props: SortableItemProps) {
   );
 }
 
-// 拖拽组件
+/**
+ * 拖拽组件
+ * @param props - 组件配置，用于设置展示内容和交互回调
+ */
 function DragContent(props: DragContentProps) {
   const { list, handleDragEnd } = props;
 
-  /** 拖拽结束操作 */
+  /**
+   * 拖拽结束操作
+   * @param event - 拖拽结束事件，用于读取原始项和目标项
+   */
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;

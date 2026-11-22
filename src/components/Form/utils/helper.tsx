@@ -11,6 +11,7 @@ import cloneDeep from 'lodash/cloneDeep';
 export function handleValuePropName(component: ComponentType): string {
   switch (component) {
     case 'Switch':
+    case 'Checkbox':
       return 'checked';
 
     case 'Upload':
@@ -23,12 +24,17 @@ export function handleValuePropName(component: ComponentType): string {
 
 /**
  * 初始化组件自定义属性
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  * @param component - 组件名
  */
 export function initCompProps(t: TFunction, component: ComponentType): ComponentProps {
   switch (component) {
     // 输入框
     case 'Input':
+    case 'TextArea':
+    case 'InputPassword':
+    case 'PasswordStrength':
+    case 'AutoComplete':
       return {
         allowClear: true,
         placeholder: t('public.inputPleaseEnter'),
@@ -36,6 +42,8 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
 
     // 下拉框
     case 'Select':
+    case 'ApiSelect':
+    case 'ApiPageSelect':
       return {
         allowClear: true,
         showSearch: true,
@@ -44,6 +52,7 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
 
     // 树形下拉框
     case 'TreeSelect':
+    case 'ApiTreeSelect':
       return {
         allowClear: true,
         showSearch: true,
@@ -93,13 +102,14 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
       };
 
     default:
-      return {
-        allowClear: true,
-      };
+      return {};
   }
 }
 
-/** 处理上传组件数据格式 */
+/**
+ * 处理上传组件数据格式
+ * @param e - 上传事件或文件列表，用于提取表单字段值
+ */
 const handleUploadData: FormItemProps['getValueFromEvent'] = (e) => {
   if (Array.isArray(e)) {
     return e;
@@ -112,7 +122,10 @@ const handleUploadData: FormItemProps['getValueFromEvent'] = (e) => {
  * @param data - 表单数据
  */
 export const filterFormItem = (data: BaseFormList): FormItemProps => {
-  const result = cloneDeep(data);
+  const result: Partial<BaseFormList> = cloneDeep(data);
+  delete result.component;
+  delete result.labelWidth;
+  delete result.unit;
   delete result.wrapperWidth;
   delete result.componentProps;
   delete result.render;
@@ -123,7 +136,7 @@ export const filterFormItem = (data: BaseFormList): FormItemProps => {
   }
 
   // 上传组建特殊处理
-  if (result.component === 'Upload' && !result?.getValueFromEvent) {
+  if (data.component === 'Upload' && !result?.getValueFromEvent) {
     result.getValueFromEvent = handleUploadData;
   }
 

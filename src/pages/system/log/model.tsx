@@ -20,7 +20,10 @@ export interface LogItem {
   updatedAt: string;
 }
 
-// 搜索数据
+/**
+ * 搜索数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const searchList = (t: TFunction): BaseSearchList[] => [
   {
     label: t('log.username'),
@@ -92,6 +95,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
 
 /**
  * 表格数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
  * @param optionRender - 渲染操作函数
  */
 export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): TableColumn[] => {

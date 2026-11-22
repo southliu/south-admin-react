@@ -63,7 +63,10 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
     baseURL: url,
     timeout: 180 * 1000,
     interceptors: {
-      // 接口请求拦截
+      /**
+       * 接口请求拦截
+       * @param res - 待发送的请求配置，用于注入认证信息
+       */
       requestInterceptors(res) {
         const tokenLocal = getLocalInfo(tokenKey) || '';
         if (res?.headers && tokenLocal) {
@@ -71,12 +74,18 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
         }
         return res;
       },
-      // 请求拦截超时
+      /**
+       * 请求拦截超时
+       * @param err - 请求阶段的异常，用于继续向调用方传递错误
+       */
       requestInterceptorsCatch(err) {
         handleError();
         return Promise.reject(err);
       },
-      // 接口响应拦截
+      /**
+       * 接口响应拦截
+       * @param res - 接口响应，用于处理业务状态和认证过期
+       */
       responseInterceptors(res) {
         const { data } = res;
         // 权限过期

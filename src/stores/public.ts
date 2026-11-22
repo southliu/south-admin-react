@@ -11,15 +11,30 @@ interface PublicState {
   isRefresh: boolean; // 重新加载
   isRefreshPage: boolean; // 重新加载页面
   aliveRef: RefObject<KeepAliveRef | null>; // keepalive ref
-  /** 设置主题 */
+  /**
+   * 设置主题
+   * @param theme - 目标主题，用于切换界面配色
+   */
   setThemeValue: (theme: ThemeType) => void;
-  /** 设置全屏 */
+  /**
+   * 设置全屏
+   * @param isFullscreen - 是否开启全屏，用于同步全屏显示状态
+   */
   setFullscreen: (isFullscreen: boolean) => void;
-  /** 设置重新加载 */
+  /**
+   * 设置重新加载
+   * @param isRefresh - 是否触发刷新，用于通知页面重新获取数据
+   */
   setRefresh: (isRefresh: boolean) => void;
-  /** 设置重新加载页面 */
+  /**
+   * 设置重新加载页面
+   * @param isRefreshPage - 是否重新加载页面，用于标记标签刷新状态
+   */
   setRefreshPage: (isRefreshPage: boolean) => void;
-  /** 设置keepalive ref */
+  /**
+   * 设置keepalive ref
+   * @param ref - 页面缓存引用，用于操作标签对应的缓存实例
+   */
   setAliveRef: (ref: RefObject<KeepAliveRef | null>) => void;
 }
 

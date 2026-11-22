@@ -7,9 +7,7 @@ import { useMenuStore } from '@/stores/menu';
 import { useShallow } from 'zustand/shallow';
 import { useToken } from '@/hooks/useToken';
 
-/**
- * 获取常用的状态数据
- */
+/** 获取常用的状态数据 */
 export const useLogout = () => {
   const { closeAllTab, setActiveKey } = useTabsStore(
     useShallow((state) => ({ closeAllTab: state.closeAllTab, setActiveKey: state.setActiveKey })),

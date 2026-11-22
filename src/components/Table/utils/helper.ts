@@ -3,7 +3,10 @@ import type { TableColumn } from '#/public';
 import { EMPTY_VALUE } from '@/utils/config';
 import cloneDeep from 'lodash/cloneDeep';
 
-/** 计算表格高度 */
+/**
+ * 计算表格高度
+ * @param element - 表格容器元素，用于计算剩余可用高度
+ */
 export function getTableHeight(element: HTMLDivElement | null): number {
   // 获取屏幕高度
   const clientHeight = document.documentElement.clientHeight || document.body.clientHeight;

@@ -8,7 +8,7 @@ interface Options {
 
 /**
  * 键盘按键事件
- * @param options
+ * @param options - 按键回调配置，用于为方向键和回车键分配处理逻辑
  */
 export function useKeyStroke(options: Options) {
   /**

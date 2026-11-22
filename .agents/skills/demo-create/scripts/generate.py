@@ -64,7 +64,7 @@ export function get{module_name}Page(data: Partial<BaseFormData> & PaginationDat
 
 /**
  * 根据ID获取数据
- * @param id - ID
+ * @param id - 记录标识
  */
 export function get{module_name}ById(id: string) {{
   return request.get<BaseFormData>(`${{API.URL}}/detail?id=${{id}}`);
@@ -188,13 +188,17 @@ export function batchDelete{module_name}(data: BaseFormData) {{
 
         content = f"""import type {{ TFunction }} from 'i18next';
 
-// 搜索数据
+/**
+ * 搜索数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const searchList = (t: TFunction): BaseSearchList[] => [
 {',\n'.join(search_list_items)}
 ];
 
 /**
  * 表格数据
+ * @param t - 国际化翻译函数，用于生成当前语言的列标题
  * @param optionRender - 渲染操作函数
  */
 export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): TableColumn[] => {{
@@ -203,7 +207,10 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
   ];
 }};
 
-// 新增数据
+/**
+ * 新增数据
+ * @param t - 国际化翻译函数，用于生成当前语言的文案
+ */
 export const createList = (t: TFunction): BaseFormList[] => [
 {',\n'.join(create_list_items)}
 ];

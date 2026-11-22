@@ -1,9 +1,7 @@
 import { setLocalInfo, getLocalInfo, removeLocalInfo } from '@south/utils';
 import { TOKEN } from '@/utils/config';
 
-/**
- * token存取方法
- */
+/** token存取方法 */
 
 /** 获取token */
 const getToken = () => {

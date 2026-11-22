@@ -16,7 +16,7 @@ export function getMenuPage(data: Partial<BaseFormData> & PaginationData) {
 
 /**
  * 根据ID获取数据
- * @param id - ID
+ * @param id - 记录标识
  */
 export function getMenuById(id: string) {
   return request.get<BaseFormData>(`${API.URL}/detail?id=${id}`);
@@ -55,10 +55,7 @@ export function batchDeleteMenu(ids: string[]) {
   return request.post(`${API.URL}/batchDelete`, { ids });
 }
 
-/**
- * 获取当前菜单数据
- * @param data - 请求数据
- */
+/** 获取当前菜单数据 */
 export function getMenuList() {
   return request.get<SideMenu[]>(`${API.URL}/list`);
 }

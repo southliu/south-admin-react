@@ -10,7 +10,7 @@ import { Spin } from 'antd';
 // 懒加载 Layout 组件，减少首屏加载体积
 const Layout = lazy(() => import('@/layouts'));
 
-// 同步方式获取token
+/** 同步方式获取token */
 function getTokenSync() {
   try {
     return getLocalInfo<string>(TOKEN) || '';

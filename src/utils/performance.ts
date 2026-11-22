@@ -1,8 +1,6 @@
 import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals';
 
-/**
- * 性能指标接口
- */
+/** 性能指标接口 */
 export interface PerformanceMetrics {
   // Cumulative Layout Shift - 累积布局偏移
   cls?: number;
@@ -16,16 +14,12 @@ export interface PerformanceMetrics {
   ttfb?: number;
 }
 
-/**
- * 性能监控类
- */
+/** 性能监控类 */
 class PerformanceMonitor {
   private metrics: PerformanceMetrics = {};
   private isInitialized = false;
 
-  /**
-   * 初始化性能监控
-   */
+  /** 初始化性能监控 */
   init(): void {
     if (this.isInitialized || typeof window === 'undefined') {
       return;
@@ -43,6 +37,8 @@ class PerformanceMonitor {
 
   /**
    * 处理性能指标
+   * @param name - 性能指标名称，用于定位记录项和评级阈值
+   * @param metric - 采集到的性能指标数据，用于记录数值和评估等级
    */
   private handleMetric(name: keyof PerformanceMetrics, metric: Metric): void {
     const value = metric.value;
@@ -59,6 +55,8 @@ class PerformanceMonitor {
 
   /**
    * 评估性能等级并输出
+   * @param name - 性能指标名称，用于选择对应的评级阈值
+   * @param value - 性能指标数值，用于与评级阈值比较
    */
   private logPerformanceRating(name: keyof PerformanceMetrics, value: number): void {
     const ratings = this.getRating(name, value);
@@ -68,6 +66,8 @@ class PerformanceMonitor {
 
   /**
    * 获取性能评级
+   * @param name - 性能指标名称，用于选择对应的评级阈值
+   * @param value - 性能指标数值，用于与评级阈值比较
    */
   private getRating(name: keyof PerformanceMetrics, value: number): string {
     const thresholds: Record<string, { good: number; poor: number }> = {
@@ -86,16 +86,12 @@ class PerformanceMonitor {
     return 'poor';
   }
 
-  /**
-   * 获取所有性能指标
-   */
+  /** 获取所有性能指标 */
   getMetrics(): PerformanceMetrics {
     return { ...this.metrics };
   }
 
-  /**
-   * 获取性能评分报告
-   */
+  /** 获取性能评分报告 */
   getReport(): string {
     const metrics = this.getMetrics();
     let report = '\n📊 性能监控报告\n';
@@ -111,6 +107,9 @@ class PerformanceMonitor {
 
   /**
    * 测量自定义性能
+   * @param markName - 性能测量名称，用于标识本次测量结果
+   * @param startMarkName - 起始性能标记名称，用于确定测量起点
+   * @param endMarkName - 结束性能标记名称，用于确定测量终点
    */
   measure(markName: string, startMarkName: string, endMarkName: string): number | null {
     if (typeof window === 'undefined' || !window.performance) {
@@ -129,6 +128,7 @@ class PerformanceMonitor {
 
   /**
    * 创建性能标记
+   * @param name - 性能标记名称，用于标识测量的时间点
    */
   mark(name: string): void {
     if (typeof window !== 'undefined' && window.performance) {
@@ -138,6 +138,7 @@ class PerformanceMonitor {
 
   /**
    * 清除性能标记和测量
+   * @param name - 需要清理的标记名称，省略时清除全部性能标记
    */
   clearMarks(name?: string): void {
     if (typeof window !== 'undefined' && window.performance) {
@@ -155,29 +156,26 @@ class PerformanceMonitor {
 // 创建单例
 const performanceMonitor = new PerformanceMonitor();
 
-/**
- * 初始化性能监控
- */
+/** 初始化性能监控 */
 export function initPerformanceMonitoring(): void {
   performanceMonitor.init();
 }
 
-/**
- * 获取性能指标
- */
+/** 获取性能指标 */
 export function getPerformanceMetrics(): PerformanceMetrics {
   return performanceMonitor.getMetrics();
 }
 
-/**
- * 获取性能报告
- */
+/** 获取性能报告 */
 export function getPerformanceReport(): string {
   return performanceMonitor.getReport();
 }
 
 /**
  * 测量性能
+ * @param markName - 性能测量名称，用于标识本次测量结果
+ * @param startMark - 起始性能标记名称，用于确定测量起点
+ * @param endMark - 结束性能标记名称，用于确定测量终点
  */
 export function measurePerformance(markName: string, startMark: string, endMark: string): number | null {
   return performanceMonitor.measure(markName, startMark, endMark);
@@ -185,6 +183,7 @@ export function measurePerformance(markName: string, startMark: string, endMark:
 
 /**
  * 创建性能标记
+ * @param name - 性能标记名称，用于标识测量的时间点
  */
 export function createMark(name: string): void {
   performanceMonitor.mark(name);
@@ -192,6 +191,7 @@ export function createMark(name: string): void {
 
 /**
  * 清除性能标记
+ * @param name - 需要清理的标记名称，省略时清除全部性能标记
  */
 export function clearMarks(name?: string): void {
   performanceMonitor.clearMarks(name);
@@ -199,6 +199,9 @@ export function clearMarks(name?: string): void {
 
 /**
  * 性能装饰器 - 用于测量函数执行时间
+ * @param _target - 被装饰的目标对象，为兼容方法装饰器签名而保留
+ * @param propertyKey - 被装饰的方法名，用于生成性能测量标识
+ * @param descriptor - 方法属性描述符，用于包装原方法并记录耗时
  */
 export function measureFunctionTime(
   _target: unknown,

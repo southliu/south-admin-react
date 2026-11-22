@@ -17,7 +17,7 @@ export function getUserPage(data: Partial<BaseFormData> & PaginationData) {
 
 /**
  * 根据ID获取数据
- * @param id - ID
+ * @param id - 记录标识
  */
 export function getUserById(id: string) {
   return request.get<BaseFormData>(`${API.URL}/detail?id=${id}`);

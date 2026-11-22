@@ -3,9 +3,7 @@ import { useSearchParams, useLocation } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { useTabsStore } from '@/stores/tabs';
 import { useEffect, useMemo } from 'react';
-/**
- * 将搜索参数带入url中
- */
+/** 将搜索参数带入url中 */
 import { getUrlAllParam } from '@/utils/helper';
 import { type FormInstance } from 'antd';
 
@@ -21,7 +19,10 @@ export const useSearchUrlParams = (form: FormInstance) => {
     form.setFieldsValue(searchData);
   }, [form, searchData]);
 
-  /** 将搜索参数带入url中 */
+  /**
+   * 将搜索参数带入url中
+   * @param searchParams - 搜索表单数据，用于更新地址栏查询参数
+   */
   const handleSetSearchParams = (searchParams: BaseFormData) => {
     // 去除 values 中值为 undefined 的属性
     const filteredValues = Object.fromEntries(
