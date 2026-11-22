@@ -69,6 +69,27 @@ pnpm build
 pnpm build:analyze
 ```
 
+## 🧪 回归测试
+
+```bash
+pnpm test             # Node 原生回归测试
+```
+
+首次运行浏览器测试，或升级 `@playwright/test` 后，先安装配套 Chromium，再执行测试：
+
+```bash
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+若出现 `browserType.launch: Executable doesn't exist`，表示配套浏览器尚未安装，请重新执行安装命令。浏览器版本要求见 [Playwright 官方说明](https://playwright.dev/docs/browsers#install-browsers)。
+
+也可以使用本机已安装的 Google Chrome：
+
+```bash
+pnpm exec cross-env PLAYWRIGHT_CHANNEL=chrome pnpm test:e2e
+```
+
 ## 🌐 后端项目
 ![Go](https://img.shields.io/badge/-Go-black?style=plastic&logo=go) [south-admin-gin](https://github.com/southliu/south-admin-gin)<br/>
 ![Python](https://img.shields.io/badge/-Python-black?style=plastic&logo=python) [south-admin-fastApi](https://github.com/southliu/south-admin-fastApi)<br/>

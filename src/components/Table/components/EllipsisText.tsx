@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Tooltip } from 'antd';
 
 interface EllipsisTextProps {
@@ -43,15 +44,11 @@ const EllipsisText = (props: EllipsisTextProps) => {
   );
 
   // 只有在文本溢出时才显示Tooltip
-  if (isOverflowed) {
-    return (
-      <Tooltip title={text} placement="top">
-        {content}
-      </Tooltip>
-    );
-  }
-
-  return content;
+  return (
+    <Tooltip title={isOverflowed ? text : undefined} placement="top">
+      {content}
+    </Tooltip>
+  );
 };
 
 export default EllipsisText;

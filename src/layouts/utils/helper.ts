@@ -1,9 +1,12 @@
 import type { MessageInstance } from 'antd/es/message/interface';
 import type { TabsData } from '@/stores/tabs';
 import type { TFunction } from 'i18next';
-import { LANG, VERSION } from '@/utils/config';
-import { createElement } from 'react';
+import { LANG } from '@/utils/config';
 import axios from 'axios';
+
+let isRefreshScheduled = false;
+// 每个页面独立建立基准，新标签和整页刷新不会继承旧页面的版本。
+let currentVersion: string | undefined;
 
 /**
  * 版本监控
@@ -11,10 +14,9 @@ import axios from 'axios';
  * @param messageApi - 消息提示实例，用于展示版本更新提醒
  */
 export const versionCheck = async (t: TFunction, messageApi: MessageInstance) => {
-  if (import.meta.env.MODE === 'development') return;
+  if (import.meta.env.MODE === 'development' || isRefreshScheduled) return;
 
   try {
-    const versionLocal = localStorage.getItem(VERSION);
     const {
       data: { version },
     } = await axios.get('version.json', {
@@ -23,28 +25,23 @@ export const versionCheck = async (t: TFunction, messageApi: MessageInstance) =>
       params: { t: Date.now() },
     });
 
-    // 首次进入则缓存本地数据
-    if (version && !versionLocal) {
-      return localStorage.setItem(VERSION, String(version));
+    if (!version) return;
+    const latestVersion = String(version);
+    if (currentVersion === undefined) {
+      currentVersion = latestVersion;
+      return;
     }
 
-    if (version && versionLocal !== String(version)) {
-      const refresh = () => {
-        localStorage.setItem(VERSION, String(version));
+    if (currentVersion !== latestVersion && !isRefreshScheduled) {
+      const seconds = Math.floor(Math.random() * 5) + 1;
+      isRefreshScheduled = true;
+      setTimeout(() => {
         window.location.reload();
-      };
+      }, seconds * 1000);
       messageApi.info({
-        content: createElement(
-          'button',
-          {
-            type: 'button',
-            className: 'cursor-pointer border-0 bg-transparent text-inherit',
-            onClick: refresh,
-          },
-          t('public.reloadPageMsg'),
-        ),
+        content: t('public.reloadPageMsg', { seconds }),
         key: 'reload',
-        duration: 0,
+        duration: seconds,
       });
     }
   } catch (error) {

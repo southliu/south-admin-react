@@ -68,7 +68,8 @@ export default {
   refreshPage: 'Refresh page',
   returnHome: 'Return home',
   pageErrorTitle: 'Page error',
-  reloadPageMsg: 'A new version is available. Save your changes, then click here to refresh.',
+  reloadPageMsg:
+    'A new version is available. The page will refresh automatically in {{seconds}} seconds.',
   pagepageErrorSubTitle:
     'Sorry, an error has occurred on this page and the content cannot be displayed properly.',
   notPermissionMessage:

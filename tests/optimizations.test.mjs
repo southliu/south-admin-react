@@ -49,50 +49,140 @@ test('未配置 rule 的菜单在显示、搜索、默认跳转和面包屑中�
   }
 });
 
-test('新版本只提示，保存后主动刷新才更新版本，不安排强制刷新', async () => {
+test('当前页面建立基准后发现新版本，在 1～5 秒自动刷新且只安排一次', async () => {
   const original = new Map();
-  const cache = new Map([['version', 'old']]);
+  const random = Math.random;
+  const timers = [];
   let reloads = 0;
-  let timers = 0;
+  for (const [key, value] of Object.entries({
+    window: { location: { reload: () => reloads++ } },
+    setTimeout: (callback, delay) => timers.push({ callback, delay }),
+  })) {
+    original.set(key, Object.getOwnPropertyDescriptor(globalThis, key));
+    Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
+  }
+  try {
+    for (const [sample, seconds] of [
+      [0, 1],
+      [0.5, 3],
+      [0.999999, 5],
+    ]) {
+      Math.random = () => sample;
+      timers.length = 0;
+      reloads = 0;
+      let version = 'old';
+      const notices = [];
+      const { versionCheck } = createLoader(
+        {
+          '@/utils/config': { LANG: 'lang' },
+          axios: { get: async () => ({ data: { version } }) },
+        },
+        (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
+      )('src/layouts/utils/helper.ts');
+      const translate = (key, values) => `${key}:${values.seconds}`;
+      const message = { info: (options) => notices.push(options) };
+      await Promise.all([versionCheck(translate, message), versionCheck(translate, message)]);
+      assert.equal(notices.length, 0);
+      assert.equal(timers.length, 0);
+      version = 'new';
+      await Promise.all([versionCheck(translate, message), versionCheck(translate, message)]);
+      await versionCheck(translate, message);
+      assert.equal(notices.length, 1);
+      assert.equal(notices[0].content, `public.reloadPageMsg:${seconds}`);
+      assert.equal(notices[0].duration, seconds);
+      assert.equal(reloads, 0);
+      assert.equal(timers.length, 1);
+      assert.equal(timers[0].delay, seconds * 1000);
+      timers[0].callback();
+      assert.equal(reloads, 1);
+    }
+  } finally {
+    Math.random = random;
+    for (const [key, descriptor] of original) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  }
+});
+
+test('新标签忽略旧缓存，旧标签仍能独立发现更新，刷新后的页面不会再次刷新', async () => {
+  const original = new Map();
+  const timers = [];
+  const notices = [];
+  const cache = new Map([['admin_version', 'legacy-version']]);
+  let version = 'v1';
+  let reloads = 0;
   for (const [key, value] of Object.entries({
     localStorage: {
       getItem: (key) => cache.get(key),
       setItem: (key, value) => cache.set(key, value),
     },
     window: { location: { reload: () => reloads++ } },
-    setTimeout: () => timers++,
+    setTimeout: (callback) => timers.push(callback),
   })) {
     original.set(key, Object.getOwnPropertyDescriptor(globalThis, key));
     Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
   }
   try {
-    const { versionCheck } = createLoader(
-      {
-        '@/utils/config': { LANG: 'lang', VERSION: 'version' },
-        axios: { get: async () => ({ data: { version: 'new' } }) },
-      },
-      (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
-    )('src/layouts/utils/helper.ts');
-    let notice;
-    await versionCheck((key) => key, {
-      info: (options) => {
-        notice = options;
-      },
-    });
-    assert.equal(notice.duration, 0);
-    assert.equal(cache.get('version'), 'old');
-    assert.equal(reloads, 0);
-    assert.equal(timers, 0);
-    assert.equal(notice.content.type, 'button');
-    notice.content.props.onClick();
-    assert.equal(cache.get('version'), 'new');
+    const newPage = () =>
+      createLoader(
+        {
+          '@/utils/config': { LANG: 'lang', VERSION: 'admin_version' },
+          axios: { get: async () => ({ data: { version } }) },
+        },
+        (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
+      )('src/layouts/utils/helper.ts').versionCheck;
+    const message = { info: (notice) => notices.push(notice) };
+    const oldPage = newPage();
+    await oldPage((key) => key, message);
+    assert.equal(timers.length, 0);
+    version = 'v2';
+    const freshPage = newPage();
+    await freshPage((key) => key, message);
+    assert.equal(timers.length, 0);
+    assert.equal(notices.length, 0);
+    await oldPage((key) => key, message);
+    assert.equal(timers.length, 1);
+    await freshPage((key) => key, message);
+    assert.equal(timers.length, 1);
+    timers[0]();
     assert.equal(reloads, 1);
+    await newPage()((key) => key, message);
+    assert.equal(timers.length, 1);
+    assert.equal(notices.length, 1);
   } finally {
     for (const [key, descriptor] of original) {
       if (descriptor) Object.defineProperty(globalThis, key, descriptor);
       else delete globalThis[key];
     }
   }
+});
+
+test('首次检查无效后可重新建立基准，开发环境不检查版本', async () => {
+  let version;
+  let requests = 0;
+  const load = (mode) =>
+    createLoader(
+      {
+        '@/utils/config': { LANG: 'lang' },
+        axios: {
+          get: async () => {
+            requests++;
+            return { data: { version } };
+          },
+        },
+      },
+      (source) => source.replaceAll('import.meta.env.MODE', JSON.stringify(mode)),
+    )('src/layouts/utils/helper.ts').versionCheck;
+  const message = { info: () => assert.fail('不应出现更新提示') };
+  const check = load('production');
+  await check((key) => key, message);
+  version = 'v1';
+  await check((key) => key, message);
+  await check((key) => key, message);
+  assert.equal(requests, 3);
+  await load('development')((key) => key, message);
+  assert.equal(requests, 3);
 });
 
 test('按需 store 订阅不响应无关字段；请求序号在替换、关闭和卸载后失效', async () => {

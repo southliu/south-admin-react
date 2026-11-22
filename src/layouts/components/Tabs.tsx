@@ -131,15 +131,12 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
       // 立即更新 Tab 选中状态
       setActiveKey(key);
 
-      // 使用 requestAnimationFrame 确保 Tab 状态先渲染，然后再跳转路由
-      requestAnimationFrame(() => {
-        const urlParams = urlParamsMap.get(key) || '';
-        navigate(`${key}${urlParams}`);
+      const urlParams = urlParamsMap.get(key) || '';
+      navigate(`${key}${urlParams}`);
 
-        // 刷新标题
-        const title = getTabTitle(tabs, key);
-        if (title) setTitle(t, title);
-      });
+      // 刷新标题
+      const title = getTabTitle(tabs, key);
+      if (title) setTitle(t, title);
     },
     [urlParamsMap, navigate, setActiveKey, t, tabs],
   );
@@ -155,9 +152,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
       setOpenKeys(newOpenKey);
       setSelectedKeys(key);
 
-      requestAnimationFrame(() => {
-        handleNavigateTo(key);
-      });
+      handleNavigateTo(key);
     },
     [handleNavigateTo, setOpenKeys, setSelectedKeys],
   );

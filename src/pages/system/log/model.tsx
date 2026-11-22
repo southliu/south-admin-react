@@ -147,9 +147,9 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
         if (!params) return '-';
         try {
           const parsed = JSON.parse(params);
-          return <span style={{ fontSize: 12 }}>{JSON.stringify(parsed).slice(0, 50)}...</span>;
+          return JSON.stringify(parsed);
         } catch {
-          return <span style={{ fontSize: 12 }}>{params.slice(0, 50)}...</span>;
+          return params;
         }
       },
     },
