@@ -21,7 +21,7 @@ import { useCommonStore } from '@/hooks/useCommonStore';
 
 function Page() {
   const { i18n } = useTranslation();
-  const { theme } = useCommonStore();
+  const { theme } = useCommonStore(['theme']);
 
   // 获取当前语言
   const currentLanguage = i18n.language;

@@ -51,21 +51,7 @@ export function valueToLabel(value: string | number | boolean, arr: Constant[]):
  */
 
 export function getUrlAllParam(search: string): Record<string, string> {
-  if (!search) return {};
-  // 去除首个字符串问号
-  if (search?.[0] === '?') search = search.substring(1, search.length);
-
-  const arr = search.split('&'); // 分割数组
-  const result: Record<string, string> = {};
-
-  for (let i = 0; i < arr.length; i++) {
-    const value = arr[i]?.split('=');
-    if (value?.length === 2) {
-      result[value[0]] = value[1];
-    }
-  }
-
-  return result;
+  return Object.fromEntries(new URLSearchParams(search));
 }
 
 /**
@@ -74,11 +60,24 @@ export function getUrlAllParam(search: string): Record<string, string> {
  * @param key - 搜索值
  */
 export function getUrlParam(search: string, key: string) {
-  if (!search || !key) return '';
-  // 去除首个字符串问号
-  if (search?.[0] === '?') search = search.substring(1, search.length);
-  const urlParams = getUrlAllParam(search);
-  return urlParams?.[key] || '';
+  return new URLSearchParams(search).get(key) || '';
+}
+
+/** 登录回跳仅接受本站页面，避免外部地址或登录页循环。 */
+export function getLoginRedirect(search: string): string {
+  const redirect = new URLSearchParams(search).get('redirect') || '';
+  if (
+    !redirect.startsWith('/') ||
+    redirect.startsWith('//') ||
+    redirect.includes('\\') ||
+    [...redirect].some(
+      (character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+    )
+  )
+    return '';
+  const pathname = redirect.split(/[?#]/)[0];
+  if (['/login', '/forget'].includes(pathname)) return '';
+  return redirect;
 }
 
 /**

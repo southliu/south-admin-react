@@ -17,7 +17,7 @@ interface Props extends Omit<ModalProps, 'onCancel'> {
 function BaseModal(props: Props) {
   const { width, children, wrapClassName, onCancel, isLoading = false } = props;
   const { t } = useTranslation();
-  const { isPhone } = useCommonStore();
+  const { isPhone } = useCommonStore(['isPhone']);
   const [isDisabled, setDisabled] = useState(true);
   const [isFullscreen, setFullscreen] = useState(false);
   const [cacheBounds, setCacheBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });

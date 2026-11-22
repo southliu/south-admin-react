@@ -46,6 +46,13 @@ test('首屏离线子集包含种子菜单图标，完整集合不在首屏 JS �
     'ion:settings-outline',
     'majesticons:article-search-line',
     'material-symbols:link',
+    'mdi:white-balance-sunny',
+    'mdi:moon-waning-crescent',
+    'mdi:arrow-up-thin',
+    'mdi:arrow-down-thin',
+    'gridicons:fullscreen',
+    'gridicons:fullscreen-exit',
+    'uil:search',
   ]) {
     const [prefix, key] = name.split(':');
     assert.ok(icons[prefix].icons[key].body, name);

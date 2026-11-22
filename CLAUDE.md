@@ -73,7 +73,7 @@ Stores are in `src/stores/`:
 **Important**: Use `useCommonStore()` hook from `src/hooks/useCommonStore.ts` which combines all stores with `useShallow` for optimized re-renders:
 
 ```typescript
-const { permissions, theme, menuList, tabs } = useCommonStore();
+const { permissions, theme, menuList, tabs } = useCommonStore(['permissions', 'theme', 'menuList', 'tabs']);
 ```
 
 ### Permission System
@@ -182,7 +182,7 @@ Translations in `src/locales/{zh,en}/` by feature.
 4. Create `index.tsx` - enter `demoPage` snippet
 
 ### Component Re-rendering
-The project uses `useShallow` from Zustand to prevent unnecessary re-renders. Always prefer `useCommonStore()` over direct store access in components.
+The project uses `useShallow` from Zustand to prevent unnecessary re-renders. Prefer `useCommonStore(['permissions', 'isPhone'])` with only the fields the component needs, rather than subscribing to all common state.
 
 ### Virtual Scrolling Tables
 Enable with `isVirtual` prop on `BaseTable`. Automatically calculates height and uses react-window for performance.

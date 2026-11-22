@@ -30,8 +30,15 @@ export function useDropdownMenu(props: Props) {
   const { t } = useTranslation();
   const { activeKey, onOpenChange, handleRefresh } = props;
   const { pathname } = useLocation();
-  const { tabs } = useCommonStore();
-  const { closeLeft, closeOther, closeRight, closeTabs } = useTabsStore((state) => state);
+  const { tabs } = useCommonStore(['tabs']);
+  const { closeLeft, closeOther, closeRight, closeTabs } = useTabsStore(
+    useShallow((state) => ({
+      closeLeft: state.closeLeft,
+      closeOther: state.closeOther,
+      closeRight: state.closeRight,
+      closeTabs: state.closeTabs,
+    })),
+  );
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const navigate = useNavigate();
 

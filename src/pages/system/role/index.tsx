@@ -9,11 +9,12 @@ import {
 } from '@/servers/system/role';
 import { Button, Drawer, Form, type FormInstance, message, Spin } from 'antd';
 import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useRequestSequence } from '@/hooks/useRequestSequence';
 import { searchList, createList, tableColumns } from './model';
 import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useEffectOnActive } from 'keepalive-for-react';
+import { useCallback, useRef, useState } from 'react';
 import { checkPermission } from '@/utils/permissions';
 import { useTranslation } from 'react-i18next';
 import BasePagination from '@/components/Pagination/BasePagination';
@@ -36,11 +37,13 @@ const initCreate = {
 
 function Page() {
   const { t } = useTranslation();
-  const { permissions, roles } = useCommonStore();
-  const [isFetch, setFetch] = useState(false);
+  const { begin: beginPageRequest } = useRequestSequence();
+  const { begin: beginDetailRequest, invalidate: invalidateDetail } = useRequestSequence();
+  const { permissions, roles } = useCommonStore(['permissions', 'roles']);
   const [isLoading, setLoading] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
+  const [isCreateReady, setCreateReady] = useState(false);
   const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
   const [createId, setCreateId] = useState('');
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
@@ -66,40 +69,30 @@ function Page() {
 
   /** 获取表格数据 */
   const getPage = useCallback(async () => {
+    const isCurrent = beginPageRequest();
     const params = { ...searchData, page, pageSize };
 
     try {
       setLoading(true);
       const res = await getRolePage(params);
+      if (!isCurrent()) return;
       const { code, data } = res;
       if (Number(code) !== 200) return;
       const { items, total } = data;
       setTotal(total || 0);
       setTableData(items || []);
+    } catch {
+      // 请求层负责错误提示。
     } finally {
-      setFetch(false);
-      setLoading(false);
+      if (isCurrent()) {
+        setLoading(false);
+      }
     }
-  }, [page, pageSize, searchData]);
+  }, [beginPageRequest, page, pageSize, searchData]);
 
-  useEffect(() => {
-    if (isFetch) getPage();
-  }, [getPage, isFetch]);
-
-  // 首次进入自动加载接口数据
-  useEffect(() => {
-    if (pagePermission.page) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagePermission.page]);
-
-  // 每次进入调用
-  useEffectOnActive(
-    () => {
-      getPage();
-    },
-    [],
-    true,
-  );
+  useEffectOnActive(() => {
+    if (pagePermission.page) void getPage();
+  }, [getPage, pagePermission.page]);
 
   /**
    * 点击搜索
@@ -108,11 +101,13 @@ function Page() {
   const onSearch = (values: BaseFormData) => {
     setPage(1);
     setSearchData(values);
-    setFetch(true);
   };
 
   /** 点击新增 */
   const onCreate = () => {
+    invalidateDetail();
+    setCreateReady(true);
+    setCreateLoading(false);
     setCreateOpen(true);
     setCreateTitle(ADD_TITLE(t));
     setCreateId('');
@@ -124,16 +119,23 @@ function Page() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
+    const isCurrent = beginDetailRequest();
+    setCreateReady(false);
+    setCreateData(initCreate);
     try {
       setCreateOpen(true);
       setCreateTitle(EDIT_TITLE(t, id));
       setCreateId(id);
       setCreateLoading(true);
       const { code, data } = await getRoleById(id);
+      if (!isCurrent()) return;
       if (Number(code) !== 200) return;
       setCreateData(data);
+      setCreateReady(true);
+    } catch {
+      // 请求层负责错误提示，详情失败时保持禁止提交。
     } finally {
-      setCreateLoading(false);
+      if (isCurrent()) setCreateLoading(false);
     }
   };
 
@@ -142,29 +144,39 @@ function Page() {
    * @param id - 唯一值
    */
   const onCopy = async (id: string) => {
+    const isCurrent = beginDetailRequest();
+    setCreateReady(false);
+    setCreateData(initCreate);
     try {
       setCreateOpen(true);
       setCreateTitle(ADD_TITLE(t));
       setCreateId('');
       setCreateLoading(true);
       const { code, data } = await getRoleById(id);
+      if (!isCurrent()) return;
       if (Number(code) !== 200) return;
       const rest = Object.fromEntries(
         Object.entries(data).filter(([key]) => !['id', 'createdAt', 'updatedAt'].includes(key)),
       );
       setCreateData(rest);
+      setCreateReady(true);
+    } catch {
+      // 请求层负责错误提示，详情失败时保持禁止提交。
     } finally {
-      setCreateLoading(false);
+      if (isCurrent()) setCreateLoading(false);
     }
   };
 
   /** 表单提交 */
   const createSubmit = () => {
+    if (!isCreateReady || isCreateLoading) return;
     createFormRef?.current?.submit();
   };
 
   /** 关闭新增/修改弹窗 */
   const closeCreate = () => {
+    invalidateDetail();
+    setCreateReady(false);
     setCreateOpen(false);
   };
 
@@ -173,6 +185,7 @@ function Page() {
    * @param values - 表单返回数据
    */
   const handleCreate = async (values: BaseFormData) => {
+    if (!isCreateReady || isCreateLoading) return;
     try {
       setCreateLoading(true);
       const functions = () => (createId ? updateRole(createId, values) : createRole(values));
@@ -211,7 +224,6 @@ function Page() {
   const onChangePagination = useCallback((page: number, pageSize: number) => {
     setPage(page);
     setPageSize(pageSize);
-    setFetch(true);
   }, []);
 
   /**
@@ -287,7 +299,12 @@ function Page() {
         footer={
           <div className="flex justify-end gap-10px">
             <Button onClick={closeCreate}>{t('public.cancel')}</Button>
-            <Button type="primary" onClick={createSubmit}>
+            <Button
+              type="primary"
+              disabled={!isCreateReady}
+              loading={isCreateLoading}
+              onClick={createSubmit}
+            >
               {t('public.confirm')}
             </Button>
           </div>

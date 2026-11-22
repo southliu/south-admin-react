@@ -20,7 +20,7 @@ export const request = creteRequest(baseURL, TOKEN, {
     // 已在登录页（含带 redirect 参数）时不再跳转，避免并发 401 把 redirect 参数嵌套成
     // /login?redirect=/login?redirect=...
     if (currentRoute.startsWith('/login')) return;
-    const redirect = currentRoute ? `?redirect=${currentRoute}` : '';
+    const redirect = currentRoute ? `?${new URLSearchParams({ redirect: currentRoute })}` : '';
     const loginPath = `/login${redirect}`;
     if (isHashRouter) {
       window.location.hash = loginPath;

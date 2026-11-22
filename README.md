@@ -23,8 +23,10 @@
 - 获取项目代码
 
 ```bash
-git clone https://github.com/southliu/south-admin-react.git
+git clone --depth 1 https://github.com/southliu/south-admin-react.git
 ```
+
+使用浅克隆，仅下载最近一次提交，减少下载量。后续如需完整提交历史，可在项目目录执行 `git fetch --unshallow`。
 
 - 选择目录
 

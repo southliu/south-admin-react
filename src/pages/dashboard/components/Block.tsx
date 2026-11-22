@@ -6,7 +6,7 @@ import Count from '@/components/Count';
 
 function Block() {
   const { t } = useTranslation();
-  const { isPhone } = useCommonStore();
+  const { isPhone } = useCommonStore(['isPhone']);
 
   const data = [
     { title: t('dashboard.usersNumber'), num: 14966, all: 16236, icon: 'icon-park:peoples' },

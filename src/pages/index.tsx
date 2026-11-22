@@ -4,7 +4,7 @@ import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Page() {
-  const { permissions, menuList } = useCommonStore();
+  const { permissions, menuList } = useCommonStore(['permissions', 'menuList']);
   const navigate = useNavigate();
 
   /** 跳转第一个有效菜单路径 */

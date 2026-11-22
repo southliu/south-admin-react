@@ -7,7 +7,7 @@ import BaseContent from '@/components/Content/BaseContent';
 
 function Watermark() {
   const { t } = useTranslation();
-  const { permissions } = useCommonStore();
+  const { permissions } = useCommonStore(['permissions']);
   const [Watermark, RemoveWatermark] = useWatermark();
   const isPermission = checkPermission('/demo/watermark', permissions);
 

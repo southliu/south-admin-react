@@ -64,7 +64,7 @@ const BaseSearch = (props: Props) => {
     handleFinish,
   } = props;
   const { t } = useTranslation();
-  const { isPhone } = useCommonStore();
+  const { isPhone } = useCommonStore(['isPhone']);
   const [isExpand, setExpand] = useState(false);
   let [form] = Form.useForm();
   const isFirst = useRef(true);

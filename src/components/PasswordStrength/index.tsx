@@ -2,9 +2,9 @@ import type { InputProps } from 'antd';
 import { USER_LENGTH } from '@/utils/fieldLimits';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import { debounce } from 'lodash';
 import { Input } from 'antd';
 import StrengthBar from './components/StrengthBar';
+import debounce from 'lodash/debounce';
 
 /**
  * @description: 密码强度组件

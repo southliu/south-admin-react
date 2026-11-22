@@ -1,4 +1,3 @@
-import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
 import {
   MenuFoldOutlined,
@@ -8,30 +7,39 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useCommonStore } from '@/hooks/useCommonStore';
+import { lazy, memo, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLogout } from '@/hooks/useLogout';
+import { App, Dropdown, Spin } from 'antd';
 import { useMenuStore } from '@/stores';
-import { useRef, memo } from 'react';
-import { App, Dropdown } from 'antd';
 import GlobalSearch from '@/components/GlobalSearch';
 import Fullscreen from '@/components/Fullscreen';
 import Avatar from '@/assets/images/avatar.png';
-import UpdatePassword from './UpdatePassword';
 import styles from '../index.module.less';
 import Github from '@/components/Github';
 import Theme from '@/components/Theme';
 import I18n from '@/components/I18n';
 import Nav from './Nav';
 
+const UpdatePassword = lazy(() => import('./UpdatePassword'));
+
 type MenuKey = 'password' | 'logout';
 
 function Header() {
   const { t } = useTranslation();
   const { modal } = App.useApp();
-  const { isCollapsed, isMaximize, username, name, nav, permissions, menuList } = useCommonStore();
+  const { isCollapsed, isMaximize, username, name, nav, permissions, menuList } = useCommonStore([
+    'isCollapsed',
+    'isMaximize',
+    'username',
+    'name',
+    'nav',
+    'permissions',
+    'menuList',
+  ]);
+  const [isPasswordLoaded, setPasswordLoaded] = useState(false);
+  const [isPasswordOpen, setPasswordOpen] = useState(false);
   const [handleLogout] = useLogout();
-  // 是否窗口最大化
-  const passwordRef = useRef<PasswordModal>(null);
   const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);
 
   // 下拉菜单内容
@@ -52,7 +60,8 @@ function Header() {
   const onClick: MenuProps['onClick'] = (e) => {
     switch (e.key as MenuKey) {
       case 'password':
-        passwordRef.current?.open();
+        setPasswordLoaded(true);
+        setPasswordOpen(true);
         break;
 
       case 'logout':
@@ -84,7 +93,10 @@ function Header() {
       <Fullscreen />
       <I18n />
       <Theme />
-      <Dropdown className="min-w-50px" menu={{ items, onClick }}>
+      <Dropdown
+        className="min-w-50px"
+        menu={{ items, onClick }}
+      >
         <div
           className="ant-dropdown-link flex items-center cursor-pointer"
           onClick={(e) => e.preventDefault()}
@@ -133,13 +145,30 @@ function Header() {
             </button>
           )}
 
-          <Nav className="ml-15px" list={nav} />
+          <Nav
+            className="ml-15px"
+            list={nav}
+          />
         </div>
 
         {rightRender}
       </header>
 
-      <UpdatePassword passwordRef={passwordRef} />
+      {isPasswordLoaded && (
+        <Suspense
+          fallback={
+            <Spin
+              fullscreen
+              description={t('public.loading')}
+            />
+          }
+        >
+          <UpdatePassword
+            isOpen={isPasswordOpen}
+            onClose={() => setPasswordOpen(false)}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

@@ -1,7 +1,7 @@
 import type { SizeType } from 'antd/es/config-provider/SizeContext';
 import type { TableColumn } from '#/public';
 import { EMPTY_VALUE } from '@/utils/config';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 /** 计算表格高度 */
 export function getTableHeight(element: HTMLDivElement | null): number {

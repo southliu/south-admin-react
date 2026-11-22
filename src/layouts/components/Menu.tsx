@@ -59,7 +59,7 @@ function LayoutMenu() {
   );
 
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
-    useCommonStore();
+    useCommonStore(['isMaximize', 'isCollapsed', 'isPhone', 'openKeys', 'selectedKeys', 'permissions', 'menuList']);
   const { toggleCollapsed, setSelectedKeys, setOpenKeys } = useMenuStore(
     useShallow((state) => ({
       toggleCollapsed: state.toggleCollapsed,

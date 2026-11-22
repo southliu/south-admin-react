@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useRef, lazy, Suspense } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { getLoginRedirect } from '@/utils/helper';
 import { useTranslation } from 'react-i18next';
 import { getLocalInfo } from '@south/utils';
 import { message } from '@south/message';
@@ -33,7 +34,7 @@ function Guards() {
 
     // 有token且访问登录页，需要重定向到首页
     if (token && isLoginRoute) {
-      const redirect = new URLSearchParams(location.search).get('redirect');
+      const redirect = getLoginRedirect(location.search);
       return {
         token,
         isValid: false,
@@ -45,7 +46,9 @@ function Guards() {
     // 无token且访问非登录页，需要重定向到登录页
     if (!token && !isLoginRoute) {
       const param =
-        location.pathname?.length > 1 ? `?redirect=${location.pathname}${location.search}` : '';
+        location.pathname?.length > 1
+          ? `?${new URLSearchParams({ redirect: `${location.pathname}${location.search}` })}`
+          : '';
       return {
         token,
         isValid: false,

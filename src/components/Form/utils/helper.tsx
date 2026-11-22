@@ -2,7 +2,7 @@ import type { ComponentProps, ComponentType, BaseFormList } from '#/form';
 import type { FormItemProps } from 'antd';
 import type { TFunction } from 'i18next';
 import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils/config';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 /**
  * 处理子节点的值的属性

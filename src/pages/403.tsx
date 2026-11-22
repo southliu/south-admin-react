@@ -8,7 +8,7 @@ import styles from './all.module.less';
 
 function Forbidden() {
   const { t } = useTranslation();
-  const { permissions, menuList } = useCommonStore();
+  const { permissions, menuList } = useCommonStore(['permissions', 'menuList']);
   const { addTabs, setActiveKey } = useTabsStore();
   const navigate = useNavigate();
 

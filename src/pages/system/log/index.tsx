@@ -2,7 +2,7 @@ import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import type { PagePermission } from '#/public';
 import type { BaseFormData } from '#/form';
 import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/system/log';
-import { useCallback, useState, useEffect } from 'react';
+import { useRequestSequence } from '@/hooks/useRequestSequence';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { checkPermission } from '@/utils/permissions';
@@ -10,6 +10,7 @@ import { searchList, tableColumns } from './model';
 import { INIT_PAGINATION } from '@/utils/config';
 import { DeleteBtn } from '@/components/Buttons';
 import { useTranslation } from 'react-i18next';
+import { useCallback, useState } from 'react';
 import { message } from 'antd';
 import BasePagination from '@/components/Pagination/BasePagination';
 import BaseContent from '@/components/Content/BaseContent';
@@ -25,8 +26,8 @@ interface RowData {
 
 function Page() {
   const { t } = useTranslation();
-  const { permissions } = useCommonStore();
-  const [isFetch, setFetch] = useState(false);
+  const { begin: beginPageRequest } = useRequestSequence();
+  const { permissions } = useCommonStore(['permissions']);
   const [isLoading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState<BaseFormData>({});
   const [page, setPage] = useState(INIT_PAGINATION.page);
@@ -49,41 +50,30 @@ function Page() {
 
   /** 获取表格数据 */
   const getPage = useCallback(async () => {
+    const isCurrent = beginPageRequest();
     const params = { ...searchData, page, pageSize };
 
     try {
       setLoading(true);
       const res = await getLogPage(params);
+      if (!isCurrent()) return;
       const { code, data } = res;
       if (Number(code) !== 200) return;
       const { items, total } = data;
       setTotal(total || 0);
       setTableData(items || []);
+    } catch {
+      // 请求层负责错误提示。
     } finally {
-      setFetch(false);
-      setLoading(false);
+      if (isCurrent()) {
+        setLoading(false);
+      }
     }
-  }, [page, pageSize, searchData]);
+  }, [beginPageRequest, page, pageSize, searchData]);
 
-  useEffect(() => {
-    if (isFetch) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFetch]);
-
-  // 首次进入自动加载接口数据
-  useEffect(() => {
-    if (pagePermission.page) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagePermission.page]);
-
-  // 每次进入调用
-  useEffectOnActive(
-    () => {
-      getPage();
-    },
-    [],
-    true,
-  );
+  useEffectOnActive(() => {
+    if (pagePermission.page) void getPage();
+  }, [getPage, pagePermission.page]);
 
   /**
    * 点击搜索
@@ -92,7 +82,6 @@ function Page() {
   const onSearch = (values: BaseFormData) => {
     setPage(1);
     setSearchData(values);
-    setFetch(true);
   };
 
   /**
@@ -156,7 +145,6 @@ function Page() {
   const onChangePagination = useCallback((page: number, pageSize: number) => {
     setPage(page);
     setPageSize(pageSize);
-    setFetch(true);
   }, []);
 
   /**

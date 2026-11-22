@@ -264,7 +264,7 @@ function Page() {{
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
-  const {{ permissions }} = useCommonStore();
+  const {{ permissions }} = useCommonStore(['permissions']);
 
   // 权限前缀
   const permissionPrefix = '{PERMISSION_PREFIX}';

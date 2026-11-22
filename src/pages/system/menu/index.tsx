@@ -10,11 +10,12 @@ import {
 } from '@/servers/system/menu';
 import { Button, Form, type FormInstance, message, Popconfirm } from 'antd';
 import { ADD_TITLE, INIT_PAGINATION, EDIT_TITLE } from '@/utils/config';
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useRequestSequence } from '@/hooks/useRequestSequence';
 import { searchList, createList, tableColumns } from './model';
 import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useEffectOnActive } from 'keepalive-for-react';
+import { useCallback, useRef, useState } from 'react';
 import { checkPermission } from '@/utils/permissions';
 import { useTranslation } from 'react-i18next';
 import BasePagination from '@/components/Pagination/BasePagination';
@@ -40,12 +41,14 @@ const initCreate = {
 };
 
 function Page() {
-  const { permissions } = useCommonStore();
+  const { permissions } = useCommonStore(['permissions']);
   const { t, i18n } = useTranslation();
-  const [isFetch, setFetch] = useState(false);
+  const { begin: beginPageRequest } = useRequestSequence();
+  const { begin: beginDetailRequest, invalidate: invalidateDetail } = useRequestSequence();
   const [isLoading, setLoading] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
+  const [isCreateReady, setCreateReady] = useState(false);
   const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
   const [createId, setCreateId] = useState('');
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
@@ -73,40 +76,30 @@ function Page() {
 
   /** 获取表格数据 */
   const getPage = useCallback(async () => {
+    const isCurrent = beginPageRequest();
     const params = { ...searchData, page, pageSize };
 
     try {
       setLoading(true);
       const res = await getMenuPage(params);
+      if (!isCurrent()) return;
       const { code, data } = res;
       if (Number(code) !== 200) return;
       const { items, total } = data;
       setTotal(total || 0);
       setTableData(items || []);
+    } catch {
+      // 请求层负责错误提示。
     } finally {
-      setFetch(false);
-      setLoading(false);
+      if (isCurrent()) {
+        setLoading(false);
+      }
     }
-  }, [page, pageSize, searchData]);
+  }, [beginPageRequest, page, pageSize, searchData]);
 
-  useEffect(() => {
-    if (isFetch) getPage();
-  }, [getPage, isFetch]);
-
-  // 首次进入自动加载接口数据
-  useEffect(() => {
-    if (pagePermission.page) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagePermission.page]);
-
-  // 每次进入调用
-  useEffectOnActive(
-    () => {
-      getPage();
-    },
-    [],
-    true,
-  );
+  useEffectOnActive(() => {
+    if (pagePermission.page) void getPage();
+  }, [getPage, pagePermission.page]);
 
   /**
    * 点击搜索
@@ -114,7 +107,6 @@ function Page() {
    */
   const onSearch = (values: BaseFormData) => {
     setSearchData(values);
-    setFetch(true);
   };
 
   /**
@@ -122,6 +114,9 @@ function Page() {
    * @param record - 当前行数据
    */
   const onCreate = (record?: RowData) => {
+    invalidateDetail();
+    setCreateReady(true);
+    setCreateLoading(false);
     const id = record?.id;
     let type = record?.id ? record?.type : undefined;
     if (type && type < 3) type = type + 1;
@@ -136,26 +131,36 @@ function Page() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
+    const isCurrent = beginDetailRequest();
+    setCreateReady(false);
+    setCreateData(initCreate);
     try {
       setCreateOpen(true);
       setCreateTitle(EDIT_TITLE(t, id));
       setCreateId(id);
       setCreateLoading(true);
       const { code, data } = await getMenuById(id);
+      if (!isCurrent()) return;
       if (Number(code) !== 200) return;
       setCreateData(data);
+      setCreateReady(true);
+    } catch {
+      // 请求层负责错误提示，详情失败时保持禁止提交。
     } finally {
-      setCreateLoading(false);
+      if (isCurrent()) setCreateLoading(false);
     }
   };
 
   /** 表单提交 */
   const createSubmit = () => {
+    if (!isCreateReady || isCreateLoading) return;
     createFormRef?.current?.submit();
   };
 
   /** 关闭新增/修改弹窗 */
   const closeCreate = () => {
+    invalidateDetail();
+    setCreateReady(false);
     setCreateOpen(false);
   };
 
@@ -164,6 +169,7 @@ function Page() {
    * @param values - 表单返回数据
    */
   const handleCreate = async (values: BaseFormData) => {
+    if (!isCreateReady || isCreateLoading) return;
     try {
       setCreateLoading(true);
       const functions = () => (createId ? updateMenu(createId, values) : createMenu(values));
@@ -225,7 +231,6 @@ function Page() {
   const onChangePagination = useCallback((page: number, pageSize: number) => {
     setPage(page);
     setPageSize(pageSize);
-    setFetch(true);
   }, []);
 
   /**
@@ -312,7 +317,9 @@ function Page() {
         title={createTitle}
         open={isCreateOpen}
         style={{ top: 20 }}
-        confirmLoading={isCreateLoading}
+        isLoading={isCreateLoading}
+        confirmLoading={isCreateLoading && isCreateReady}
+        okButtonProps={{ disabled: !isCreateReady }}
         onOk={createSubmit}
         onCancel={closeCreate}
       >

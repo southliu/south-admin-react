@@ -3,7 +3,7 @@ import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMemo } from 'react';
 
 function VirtualList() {
-  const { theme } = useCommonStore();
+  const { theme } = useCommonStore(['theme']);
 
   const names = useMemo(() => {
     return Array.from({ length: 10000 }, (_, i) => `Name ${i + 1}`);

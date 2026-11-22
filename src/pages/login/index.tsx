@@ -4,10 +4,12 @@ import type { LoginData } from './model';
 import type { FormProps } from 'antd';
 import { getUserRefreshPermissions } from '@/servers/system/user';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getLoginRedirect, setTitle } from '@/utils/helper';
 import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus/utils/helper';
+import { Form, Button, Input, message } from 'antd';
+import { useShallow } from 'zustand/react/shallow';
 import { LOGIN_EXPIRED_MSG } from '@south/request';
 import { cancelAllRequest } from '@/utils/request';
 import { USER_LENGTH } from '@/utils/fieldLimits';
@@ -18,27 +20,24 @@ import { useMenuStore } from '@/stores/menu';
 import { useUserStore } from '@/stores/user';
 import { useToken } from '@/hooks/useToken';
 import { useState, useEffect } from 'react';
-import { Form, Button, Input } from 'antd';
-import { setTitle } from '@/utils/helper';
-import { Checkbox, message } from 'antd';
 import { login } from '@/servers/login';
 import Logo from '@/assets/images/logo.svg';
 import Theme from '@/components/Theme';
 import I18n from '@/components/I18n';
 
-const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
-const USER_PASSWORD = 'login_password';
 
 function Login() {
   const { t, i18n } = useTranslation();
   const { search } = useLocation();
-  const { permissions } = useCommonStore();
-  const { setPermissions, setUserInfo } = useUserStore((state) => state);
-  const [isLoading, setLoading] = useState(false);
-  const [isRemember, setRemember] = useState(
-    () => localStorage.getItem(CHECK_REMEMBER) !== 'false',
+  const { permissions } = useCommonStore(['permissions']);
+  const { setPermissions, setUserInfo } = useUserStore(
+    useShallow((state) => ({
+      setPermissions: state.setPermissions,
+      setUserInfo: state.setUserInfo,
+    })),
   );
+  const [isLoading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [getToken, setToken] = useToken();
   const [messageApi, contextHolder] = message.useMessage();
@@ -100,15 +99,6 @@ function Login() {
     return result;
   };
 
-  /** 获取重定向路由 */
-  const getRedirectUrl = () => {
-    const key = '?redirect=';
-    const start = search.includes(key) ? search.indexOf(key) + 10 : 0;
-    const end = search.includes('&') ? search.indexOf('&') : search.length;
-
-    return search.substring(start, end);
-  };
-
   /**
    * 菜单跳转
    * @param permissions - 权限列表
@@ -127,12 +117,10 @@ function Login() {
     }
 
     // 如果存在重定向
-    if (search?.includes('?redirect=')) {
-      const url = getRedirectUrl();
-      if (url) {
-        navigate(url);
-        return;
-      }
+    const redirect = getLoginRedirect(search);
+    if (redirect) {
+      navigate(redirect);
+      return;
     }
 
     // 有权限则直接跳转
@@ -158,12 +146,10 @@ function Login() {
       }
     }
 
-    // 如果存在账号密码缓存，则自动填充
+    // 密码由浏览器管理器自动填充。
     const username = localStorage.getItem(USER_USERNAME);
-    const password = localStorage.getItem(USER_PASSWORD);
-    if (username && password) {
-      const newPassword = decryption(password);
-      form.setFieldsValue({ username, password: newPassword.value });
+    if (username) {
+      form.setFieldsValue({ username });
     }
 
     // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
@@ -186,9 +172,7 @@ function Login() {
       if (Number(code) !== 200) return;
       const { token, user, permissions } = data;
 
-      // 处理记住我逻辑
-      const passwordObj = { value: values.password, expire: 0 };
-      handleRemember(values.username, encryption(passwordObj));
+      localStorage.setItem(USER_USERNAME, values.username);
 
       if (!permissions?.length || !token) {
         return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
@@ -210,25 +194,6 @@ function Login() {
    */
   const handleFinishFailed: FormProps['onFinishFailed'] = (errors) => {
     console.error('错误信息:', errors);
-  };
-
-  /** 点击记住我 */
-  const onRemember = () => {
-    setRemember(!isRemember);
-    localStorage.setItem(CHECK_REMEMBER, isRemember ? 'false' : 'true');
-  };
-
-  /**
-   * 记住我逻辑
-   */
-  const handleRemember = (username: string, password: string) => {
-    if (isRemember) {
-      localStorage.setItem(USER_USERNAME, username);
-      localStorage.setItem(USER_PASSWORD, password);
-    } else {
-      localStorage.removeItem(USER_USERNAME);
-      localStorage.removeItem(USER_PASSWORD);
-    }
   };
 
   /** 点击忘记密码 */
@@ -255,7 +220,8 @@ function Login() {
           className={`
             ${themeCache === 'dark' ? 'bg-black bg-dark-200' : 'bg-white'}
             w-340px
-            p-1.8rem
+            px-1.8rem
+            py-1rem
             rounded-10px
             box-border
             absolute
@@ -267,7 +233,13 @@ function Login() {
           `}
         >
           <div className="pb-20px pt-10px flex items-center justify-center">
-            <img className="mr-2 object-contain" width="32" height="32" src={Logo} alt="LOGO" />
+            <img
+              className="mr-2 object-contain"
+              width="32"
+              height="32"
+              src={Logo}
+              alt="LOGO"
+            />
             <span className="text-22px font-bold tracking-2px">{t('login.systemLogin')}</span>
           </div>
           <Form
@@ -327,12 +299,11 @@ function Login() {
             </Button>
           </Form>
 
-          <div className="flex justify-between items-center mb-5px px-1px">
-            <Checkbox checked={isRemember} onChange={onRemember}>
-              {t('login.rememberMe')}
-            </Checkbox>
-
-            <div className="text-blue-500 cursor-pointer" onClick={onForgetPassword}>
+          <div className="flex justify-end items-center mb-5px px-1px">
+            <div
+              className="text-blue-500 cursor-pointer"
+              onClick={onForgetPassword}
+            >
               {t('login.forgetPassword')}
             </div>
           </div>

@@ -15,7 +15,7 @@ export type Langs = 'zh' | 'en';
 function I18n() {
   const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();
-  const { tabs } = useTabsStore(useShallow((state) => state));
+  const { tabs } = useTabsStore(useShallow((state) => ({ tabs: state.tabs })));
 
   useEffect(() => {
     const lang = localStorage.getItem(LANG);
@@ -64,7 +64,11 @@ function I18n() {
   };
 
   return (
-    <Dropdown placement="bottom" trigger={['click']} menu={{ items, onClick }}>
+    <Dropdown
+      placement="bottom"
+      trigger={['click']}
+      menu={{ items, onClick }}
+    >
       <div
         className="ant-dropdown-link flex items-center cursor-pointer"
         onClick={(e) => e.preventDefault()}

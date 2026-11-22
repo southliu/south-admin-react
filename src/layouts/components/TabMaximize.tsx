@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 
 function TabMaximize() {
   // 是否窗口最大化
-  const { isMaximize } = useCommonStore();
+  const { isMaximize } = useCommonStore(['isMaximize']);
   const toggleMaximize = useTabsStore((state) => state.toggleMaximize);
 
   /** 点击最大化/最小化 */

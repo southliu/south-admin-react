@@ -4,10 +4,10 @@ import type { TFunction } from 'i18next';
 import { CreateBusiness } from '@/components/Business';
 import { type KeyboardEvent, lazy } from 'react';
 import { initCompProps } from './helper';
-import { cloneDeep } from 'lodash';
 import { Input } from 'antd';
 import LoadingComponent from '@/components/Form/components/LoadingComponent';
 import LazyComponentWrapper from '../components/LazyComponentWrapper';
+import cloneDeep from 'lodash/cloneDeep';
 
 // 存储已加载的组件
 const loadedComponents = new Map<string, React.ElementType>();

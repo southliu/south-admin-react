@@ -4,14 +4,14 @@ import { createRequire } from 'node:module';
 import ts from 'typescript';
 
 const require = createRequire(import.meta.url);
-export function createLoader(mocks = {}) {
+export function createLoader(mocks = {}, transform = (source) => source) {
   const cache = new Map();
   function load(file) {
     file = resolve(file);
     if (cache.has(file)) return cache.get(file);
     const exports = {};
     cache.set(file, exports);
-    const source = readFileSync(file, 'utf8');
+    const source = transform(readFileSync(file, 'utf8'), file);
     const { outputText } = ts.transpileModule(source, {
       fileName: file,
       compilerOptions: {

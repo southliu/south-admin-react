@@ -7,7 +7,7 @@ import VirtualList from './components/VirtualList';
 
 function VirtualScroll() {
   const { t } = useTranslation();
-  const { permissions, isPhone } = useCommonStore();
+  const { permissions, isPhone } = useCommonStore(['permissions', 'isPhone']);
   const isPermission = checkPermission('/demo/virtualScroll', permissions);
 
   return (

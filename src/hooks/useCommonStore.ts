@@ -1,52 +1,53 @@
 import { useMenuStore, usePublicStore, useTabsStore, useUserStore } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
 
-/**
- * 获取常用的状态数据
- * 使用 useShallow 优化性能，只在相关状态变化时重新渲染
- */
-export const useCommonStore = () => {
-  // 使用 useShallow 优化，避免不必要的重新渲染
-  const userStore = useUserStore(
-    useShallow((state) => ({
-      permissions: state.permissions,
-      userId: state.userInfo.id,
-      roles: state.userInfo.roles,
-      username: state.userInfo.username,
-      name: state.userInfo.name,
-    })),
-  );
+const selectUser = (state: ReturnType<typeof useUserStore.getState>) => ({
+  permissions: state.permissions,
+  userId: state.userInfo.id,
+  roles: state.userInfo.roles,
+  username: state.userInfo.username,
+  name: state.userInfo.name,
+});
 
-  const tabsStore = useTabsStore(
-    useShallow((state) => ({
-      isMaximize: state.isMaximize,
-      nav: state.nav,
-      tabs: state.tabs,
-    })),
-  );
+const selectTabs = (state: ReturnType<typeof useTabsStore.getState>) => ({
+  isMaximize: state.isMaximize,
+  nav: state.nav,
+  tabs: state.tabs,
+});
 
-  const menuStore = useMenuStore(
-    useShallow((state) => ({
-      isCollapsed: state.isCollapsed,
-      isPhone: state.isPhone,
-      openKeys: state.openKeys,
-      selectedKeys: state.selectedKeys,
-      menuList: state.menuList,
-    })),
-  );
+const selectMenu = (state: ReturnType<typeof useMenuStore.getState>) => ({
+  isCollapsed: state.isCollapsed,
+  isPhone: state.isPhone,
+  openKeys: state.openKeys,
+  selectedKeys: state.selectedKeys,
+  menuList: state.menuList,
+});
 
-  const publicStore = usePublicStore(
-    useShallow((state) => ({
-      isRefresh: state.isRefresh,
-      isFullscreen: state.isFullscreen,
-      theme: state.theme,
-    })),
-  );
+const selectPublic = (state: ReturnType<typeof usePublicStore.getState>) => ({
+  isRefresh: state.isRefresh,
+  isFullscreen: state.isFullscreen,
+  theme: state.theme,
+});
 
-  return {
-    ...userStore,
-    ...tabsStore,
-    ...menuStore,
-    ...publicStore,
-  } as const;
-};
+type CommonState = ReturnType<typeof selectUser> &
+  ReturnType<typeof selectTabs> &
+  ReturnType<typeof selectMenu> &
+  ReturnType<typeof selectPublic>;
+
+function pick<T extends object>(state: T, keys?: readonly PropertyKey[]): Partial<T> {
+  if (!keys) return state;
+  return Object.fromEntries(
+    keys.filter((key) => Object.hasOwn(state, key)).map((key) => [key, state[key as keyof T]]),
+  ) as Partial<T>;
+}
+
+/** 只订阅调用方需要的字段，避免标签、菜单变化带动无关页面渲染。 */
+export function useCommonStore<K extends keyof CommonState = keyof CommonState>(
+  keys?: readonly K[],
+) {
+  const userStore = useUserStore(useShallow((state) => pick(selectUser(state), keys)));
+  const tabsStore = useTabsStore(useShallow((state) => pick(selectTabs(state), keys)));
+  const menuStore = useMenuStore(useShallow((state) => pick(selectMenu(state), keys)));
+  const publicStore = usePublicStore(useShallow((state) => pick(selectPublic(state), keys)));
+  return { ...userStore, ...tabsStore, ...menuStore, ...publicStore } as Pick<CommonState, K>;
+}

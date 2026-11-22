@@ -2,6 +2,7 @@ import type { SideMenu } from '#/public';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useTabsStore } from '@/stores';
+import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify/react';
@@ -17,8 +18,10 @@ interface Props {
 function SearchResult(props: Props) {
   const { list, active, onCancel, changActive } = props;
   const { t, i18n } = useTranslation();
-  const { permissions, menuList } = useCommonStore();
-  const { addTabs, setActiveKey } = useTabsStore((state) => state);
+  const { permissions, menuList } = useCommonStore(['permissions', 'menuList']);
+  const { addTabs, setActiveKey } = useTabsStore(
+    useShallow((state) => ({ addTabs: state.addTabs, setActiveKey: state.setActiveKey })),
+  );
   const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
   const navigate = useNavigate();
   // 获取当前语言
@@ -54,7 +57,10 @@ function SearchResult(props: Props) {
     <>
       {!list?.length && (
         <div className="flex flex-col items-center pt-5 text-warm-gray-400">
-          <Icon className="text-40px" icon="mdi:archive-cancel-outline" />
+          <Icon
+            className="text-40px"
+            icon="mdi:archive-cancel-outline"
+          />
           <span className="mt-1">{t('public.notSearchContent')}</span>
         </div>
       )}
@@ -81,7 +87,10 @@ function SearchResult(props: Props) {
               onMouseEnter={() => onMouseEnter(item.key)}
             >
               <div className="flex items-center">
-                <Icon className="text-lg mr-1" icon="gg:menu-boxed" />
+                <Icon
+                  className="text-lg mr-1"
+                  icon="gg:menu-boxed"
+                />
                 {item.nav &&
                   item.nav?.length > 0 &&
                   item.nav.map((item, index) => (
@@ -92,7 +101,10 @@ function SearchResult(props: Props) {
                   ))}
                 {!item.nav && <span>{currentLanguage === 'en' ? item.labelEn : item.label}</span>}
               </div>
-              <Icon className="icon text-20px p-2px mr-5px" icon="ant-design:enter-outlined" />
+              <Icon
+                className="icon text-20px p-2px mr-5px"
+                icon="ant-design:enter-outlined"
+              />
             </div>
           ))}
         </div>

@@ -1,46 +1,37 @@
 import type { InputProps, InputRef } from 'antd';
 import type { SideMenu } from '#/public';
-import type { Ref } from 'react';
 import { getMenuByKey, getOpenMenuByRouter, searchMenuValue } from '@/menus/utils/helper';
-import { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useTabsStore } from '@/stores';
+import { useEffect, useRef, useState } from 'react';
 import { useKeyStroke } from '@/hooks/useKeyStroke';
+import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify/react';
 import { Modal, Input } from 'antd';
-import { debounce } from 'lodash';
 import SearchResult from './SearchResult';
 import SearchFooter from './SearchFooter';
-
-export interface SearchModalProps {
-  toggle: () => void;
-}
+import debounce from 'lodash/debounce';
 
 interface Props {
-  modalRef: Ref<SearchModalProps>;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 function SearchModal(props: Props) {
-  const { modalRef } = props;
+  const { isOpen, onClose } = props;
   const { t } = useTranslation();
-  const { permissions, menuList } = useCommonStore();
-  const { addTabs, setActiveKey } = useTabsStore((state) => state);
-  const [isOpen, setOpen] = useState(false);
+  const { permissions, menuList } = useCommonStore(['permissions', 'menuList']);
+  const { addTabs, setActiveKey } = useTabsStore(
+    useShallow((state) => ({ addTabs: state.addTabs, setActiveKey: state.setActiveKey })),
+  );
   const [value, setValue] = useState(''); // 输入框值
   const [active, setActive] = useState(''); // 选中值
   const [list, setList] = useState<SideMenu[]>([]);
   const navigate = useNavigate();
   const inputRef = useRef<InputRef>(null);
   const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
-
-  // 抛出外部方法
-  useImperativeHandle(modalRef, () => ({
-    toggle: () => {
-      setOpen(!isOpen);
-    },
-  }));
 
   // 聚焦输入框
   useEffect(() => {
@@ -68,11 +59,6 @@ function SearchModal(props: Props) {
    */
   const changActive = (value: string) => {
     setActive(value);
-  };
-
-  /** 关闭模态框 */
-  const onClose = () => {
-    setOpen(false);
   };
 
   /** 点击回车 */
@@ -174,12 +160,22 @@ function SearchModal(props: Props) {
         value={value}
         placeholder={t('public.menuSearchPlaceholder')}
         allowClear={true}
-        prefix={<Icon className="text-lg text-warm-gray-400" icon="ant-design:search-outlined" />}
+        prefix={
+          <Icon
+            className="text-lg text-warm-gray-400"
+            icon="ant-design:search-outlined"
+          />
+        }
         onChange={onChange}
         onPressEnter={onPressEnter}
       />
 
-      <SearchResult list={list} active={active} onCancel={onClose} changActive={changActive} />
+      <SearchResult
+        list={list}
+        active={active}
+        onCancel={onClose}
+        changActive={changActive}
+      />
     </Modal>
   );
 }

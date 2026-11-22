@@ -2,7 +2,7 @@ import { useCommonStore } from './useCommonStore';
 import { usePublicStore } from '@/stores/public';
 
 export function useFullscreen() {
-  const { isFullscreen } = useCommonStore();
+  const { isFullscreen } = useCommonStore(['isFullscreen']);
   const setFullscreen = usePublicStore((state) => state.setFullscreen);
 
   /** 切换全屏 */

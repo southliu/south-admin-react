@@ -2,6 +2,7 @@ import type { MessageInstance } from 'antd/es/message/interface';
 import type { TabsData } from '@/stores/tabs';
 import type { TFunction } from 'i18next';
 import { LANG, VERSION } from '@/utils/config';
+import { createElement } from 'react';
 import axios from 'axios';
 
 /** 版本监控 */
@@ -24,27 +25,23 @@ export const versionCheck = async (t: TFunction, messageApi: MessageInstance) =>
     }
 
     if (version && versionLocal !== String(version)) {
-      localStorage.setItem(VERSION, String(version));
-      // 存储定时器防止被垃圾回收
-      let reloadTimer: ReturnType<typeof setTimeout> | null = null;
-
-      messageApi.info({
-        content: t('public.reloadPageMsg'),
-        key: 'reload',
-        duration: 10,
-        onClick: () => {
-          // 用户点击消息时立即刷新
-          if (reloadTimer) {
-            clearTimeout(reloadTimer);
-          }
-          window.location.reload();
-        },
-      });
-
-      // 自动刷新页面
-      reloadTimer = setTimeout(() => {
+      const refresh = () => {
+        localStorage.setItem(VERSION, String(version));
         window.location.reload();
-      }, 3000);
+      };
+      messageApi.info({
+        content: createElement(
+          'button',
+          {
+            type: 'button',
+            className: 'cursor-pointer border-0 bg-transparent text-inherit',
+            onClick: refresh,
+          },
+          t('public.reloadPageMsg'),
+        ),
+        key: 'reload',
+        duration: 0,
+      });
     }
   } catch (error) {
     console.error('版本检查失败:', error);

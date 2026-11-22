@@ -6,7 +6,7 @@ import BaseCard from '@/components/Card/BaseCard';
 
 function Dynamic() {
   const { id } = useParams();
-  const { permissions } = useCommonStore();
+  const { permissions } = useCommonStore(['permissions']);
   const isPermission = checkPermission('/demo/dynamic', permissions);
 
   return (

@@ -1,8 +1,8 @@
 import type { PagePermission } from '#/public';
 import type { BaseFormData } from '#/form';
 import { getArticlePage, deleteArticle } from '@/servers/content/article';
+import { useRequestSequence } from '@/hooks/useRequestSequence';
 import { UpdateBtn, DeleteBtn } from '@/components/Buttons';
-import { useCallback, useState, useEffect } from 'react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { checkPermission } from '@/utils/permissions';
@@ -11,6 +11,7 @@ import { INIT_PAGINATION } from '@/utils/config';
 import { usePublicStore } from '@/stores/public';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useCallback, useState } from 'react';
 import { message } from 'antd';
 import BasePagination from '@/components/Pagination/BasePagination';
 import BaseContent from '@/components/Content/BaseContent';
@@ -26,8 +27,8 @@ interface RowData {
 
 function Page() {
   const { t } = useTranslation();
-  const { permissions } = useCommonStore();
-  const [isFetch, setFetch] = useState(false);
+  const { begin: beginPageRequest } = useRequestSequence();
+  const { permissions } = useCommonStore(['permissions']);
   const [isLoading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState<BaseFormData>({});
   const [page, setPage] = useState(INIT_PAGINATION.page);
@@ -52,26 +53,27 @@ function Page() {
 
   /** 获取表格数据 */
   const getPage = useCallback(async () => {
+    const isCurrent = beginPageRequest();
     const params = { ...searchData, page, pageSize };
 
     try {
       setLoading(true);
       const { code, data } = await getArticlePage(params);
+      if (!isCurrent()) return;
 
       if (Number(code) === 200) {
         const { items, total } = data;
         setTotal(total);
         setTableData(items);
       }
+    } catch {
+      // 请求层负责错误提示。
     } finally {
-      setFetch(false);
-      setLoading(false);
+      if (isCurrent()) {
+        setLoading(false);
+      }
     }
-  }, [page, pageSize, searchData]);
-
-  useEffect(() => {
-    if (isFetch) getPage();
-  }, [getPage, isFetch]);
+  }, [beginPageRequest, page, pageSize, searchData]);
 
   // 每次进入时加载数据
   useEffectOnActive(() => {
@@ -93,17 +95,7 @@ function Page() {
   const onSearch = (values: BaseFormData) => {
     setPage(1);
     setSearchData(values);
-    setFetch(true);
   };
-
-  // 如果是新增或编辑成功重新加载页面
-  useEffect(() => {
-    if (isRefreshPage) {
-      setRefreshPage(false);
-      getPage();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRefreshPage]);
 
   /** 点击新增 */
   const onCreate = () => {
@@ -143,7 +135,6 @@ function Page() {
   const onChangePagination = (page: number, pageSize: number) => {
     setPage(page);
     setPageSize(pageSize);
-    setFetch(true);
   };
 
   /**

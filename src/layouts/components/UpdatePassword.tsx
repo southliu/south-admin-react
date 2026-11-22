@@ -1,5 +1,4 @@
 import type { FormProps } from 'antd/es/form/Form';
-import { Ref, useImperativeHandle } from 'react';
 import { updatePassword } from '@/servers/login';
 import { useTranslation } from 'react-i18next';
 import { PASSWORD_RULE } from '@/utils/config';
@@ -10,28 +9,17 @@ import { Form } from 'antd';
 import PasswordStrength from '@/components/PasswordStrength';
 import BaseModal from '@/components/Modal/BaseModal';
 
-export interface PasswordModal {
-  open: () => void;
-}
-
 interface Props {
-  passwordRef: Ref<PasswordModal>;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 function UpdatePassword(props: Props) {
-  const { passwordRef } = props;
+  const { isOpen, onClose } = props;
   const { t } = useTranslation();
-  const [isOpen, setOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [handleLogout] = useLogout();
-
-  // 抛出外部方法
-  useImperativeHandle(passwordRef, () => ({
-    open: () => {
-      setOpen(true);
-    },
-  }));
 
   /** 点击模态框确定 */
   const onOk = () => {
@@ -39,8 +27,8 @@ function UpdatePassword(props: Props) {
   };
 
   /** 关闭模态框 */
-  const onClose = () => {
-    setOpen(false);
+  const handleClose = () => {
+    onClose();
     form?.resetFields();
   };
 
@@ -60,7 +48,7 @@ function UpdatePassword(props: Props) {
       setLoading(true);
       const { code, message: messageInfo } = await updatePassword(values);
       if (Number(code) === 200) {
-        onClose();
+        handleClose();
         message.success(messageInfo);
         handleLogout();
       }
@@ -75,7 +63,7 @@ function UpdatePassword(props: Props) {
       open={isOpen}
       confirmLoading={isLoading}
       onOk={onOk}
-      onCancel={() => onClose()}
+      onCancel={handleClose}
     >
       <Form
         name="UpdatePassword"

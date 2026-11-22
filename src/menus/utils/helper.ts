@@ -2,7 +2,7 @@ import type { Langs } from '@/components/I18n';
 import type { SideMenu } from '#/public';
 import { isRouteExist } from '@/router/utils/helper';
 import { LANG } from '@/utils/config';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 /**
  * 根据路由获取展开菜单数组
@@ -419,7 +419,7 @@ export function handleFilterMenus(menus: SideMenu[], level = 0): SideMenu[] {
  * @param permissions - 权限
  */
 function hasPermission(route: SideMenu, permissions: string[]): boolean {
-  return permissions?.includes(route?.rule || '');
+  return !route.rule || permissions.includes(route.rule);
 }
 
 /**

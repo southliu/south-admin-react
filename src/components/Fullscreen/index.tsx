@@ -17,10 +17,10 @@ function Fullscreen() {
         onClick={toggleFullscreen}
       >
         <Icon
-          icon="gridicons-fullscreen-exit"
+          icon="gridicons:fullscreen-exit"
           style={{ display: isFullscreen ? 'block' : 'none' }}
         />
-        <Icon icon="gridicons-fullscreen" style={{ display: !isFullscreen ? 'block' : 'none' }} />
+        <Icon icon="gridicons:fullscreen" style={{ display: !isFullscreen ? 'block' : 'none' }} />
       </div>
     </Tooltip>
   );

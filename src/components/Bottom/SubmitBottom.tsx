@@ -6,12 +6,13 @@ interface Props {
   goBack: () => void;
   handleSubmit: () => void;
   isLoading?: boolean;
+  isDisabled?: boolean;
   children?: ReactNode;
 }
 
 function SubmitBottom(props: Props) {
   const { t } = useTranslation();
-  const { goBack, handleSubmit, isLoading, children } = props;
+  const { goBack, handleSubmit, isLoading, isDisabled, children } = props;
 
   return (
     <div
@@ -36,7 +37,7 @@ function SubmitBottom(props: Props) {
       <Button className="mr-10px" danger onClick={goBack}>
         {t('public.back')}
       </Button>
-      <Button loading={!!isLoading} type="primary" onClick={handleSubmit}>
+      <Button disabled={isDisabled} loading={!!isLoading} type="primary" onClick={handleSubmit}>
         {t('public.submit')}
       </Button>
     </div>

@@ -68,7 +68,7 @@ export default {
   refreshPage: '刷新页面',
   returnHome: '返回首页',
   pageErrorTitle: '页面出现错误',
-  reloadPageMsg: '发现新内容，自动更新中...',
+  reloadPageMsg: '发现新版本，请保存当前编辑内容后点击此提示刷新',
   pagepageErrorSubTitle: '抱歉，页面出现了错误，无法正常显示内容。',
   notPermissionMessage: '当前页面无法访问，可能没权限或已删除!',
   notFindMessage: '当前页面无法访问，可能没权限或已删除',

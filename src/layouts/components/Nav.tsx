@@ -13,7 +13,7 @@ function Nav(props: Props) {
   const { className, list } = props;
   const { i18n } = useTranslation();
   // 是否手机端
-  const { isPhone } = useCommonStore();
+  const { isPhone } = useCommonStore(['isPhone']);
 
   // 数据处理
   const handleList = useCallback(

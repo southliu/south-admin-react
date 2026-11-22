@@ -13,11 +13,11 @@ import { versionCheck } from './utils/helper';
 import { useOutlet } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useToken } from '@/hooks/useToken';
-import { debounce } from 'lodash';
 import ContentLoading from './components/ContentLoading';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
 import styles from './index.module.less';
+import debounce from 'lodash/debounce';
 import Menu from './components/Menu';
 import Tabs from './components/Tabs';
 import Forbidden from '@/pages/403';
@@ -42,7 +42,7 @@ function Layout() {
     })),
   );
 
-  const { permissions, isMaximize, isCollapsed, isPhone } = useCommonStore();
+  const { permissions, isMaximize, isCollapsed, isPhone } = useCommonStore(['permissions', 'isMaximize', 'isCollapsed', 'isPhone']);
   const [isLoading, setLoading] = useState(true);
   const [isLoadFailed, setLoadFailed] = useState(false);
   const [loadError, setLoadError] = useState<string>();

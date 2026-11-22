@@ -29,6 +29,8 @@ import { initPerformanceMonitoring } from '@/utils/performance';
 
 // 初始化全局错误处理（防止应用崩溃和自动刷新）- 必须同步执行
 if (typeof window !== 'undefined') {
+  // 已登录用户也需要在升级后立即清除旧版保存的密码。
+  localStorage.removeItem('login_password');
   window.addEventListener('unhandledrejection', (event) => {
     event.preventDefault();
     console.error('Unhandled promise rejection:', event.reason);

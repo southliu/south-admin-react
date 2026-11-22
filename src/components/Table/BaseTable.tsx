@@ -50,7 +50,7 @@ function BaseTable(props: Props) {
     onCreate,
   } = props;
   const { t } = useTranslation();
-  const { isPhone } = useCommonStore();
+  const { isPhone } = useCommonStore(['isPhone']);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [tableFilters, setTableFilters] = useState<string[] | undefined>(undefined);
   const [sortList, setSortList] = useState<string[] | undefined>(undefined);

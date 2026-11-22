@@ -5,7 +5,7 @@ import BaseContent from '@/components/Content/BaseContent';
 
 function Page() {
   const { t } = useTranslation();
-  const { permissions } = useCommonStore();
+  const { permissions } = useCommonStore(['permissions']);
   const isPermission = checkPermission('/demo/level', permissions);
 
   return (

@@ -5,7 +5,7 @@ import BaseContent from '@/components/Content/BaseContent';
 import WangEditor from '@/components/WangEditor';
 
 function MyEditor() {
-  const { permissions } = useCommonStore();
+  const { permissions } = useCommonStore(['permissions']);
   // 编辑器内容
   const [html, setHtml] = useState('<p>hello</p>');
   const isPermission = checkPermission('/demo/editor', permissions);

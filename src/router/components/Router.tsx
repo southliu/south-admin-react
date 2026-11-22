@@ -1,11 +1,14 @@
 import type { RouteObject } from 'react-router-dom';
-import { useMemo, type ComponentType } from 'react';
+import type { ComponentType } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { handleRoutes } from '../utils/helper';
 import { useRoutes } from 'react-router-dom';
-import Forget from '@/pages/forget';
-import NotFound from '@/pages/404';
+import ContentLoading from '@/layouts/components/ContentLoading';
 import Login from '@/pages/login';
 import Guards from './Guards';
+
+const Forget = lazy(() => import('@/pages/forget'));
+const NotFound = lazy(() => import('@/pages/404'));
 
 type PageFiles = Record<string, () => Promise<{ default: ComponentType }>>;
 const pages = import.meta.glob('../../pages/**/*.tsx', { eager: false }) as PageFiles;
@@ -21,7 +24,11 @@ function App() {
       },
       {
         path: 'forget',
-        element: <Forget />,
+        element: (
+          <Suspense fallback={<ContentLoading />}>
+            <Forget />
+          </Suspense>
+        ),
       },
       {
         path: '',
@@ -30,7 +37,11 @@ function App() {
       },
       {
         path: '*',
-        element: <NotFound />,
+        element: (
+          <Suspense fallback={<ContentLoading />}>
+            <NotFound />
+          </Suspense>
+        ),
       },
     ];
     return newRoutes;

@@ -55,7 +55,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
       })),
     );
 
-  const { permissions, isMaximize, menuList } = useCommonStore();
+  const { permissions, isMaximize, menuList } = useCommonStore(['permissions', 'isMaximize', 'menuList']);
   const [isContextMenuVisible, setContextMenuVisible] = useState(false);
   const [refreshTime, setRefreshTime] = useState<NodeJS.Timeout | null>(null);
   const [contextMenuKey, setContextMenuKey] = useState<string | null>(null);

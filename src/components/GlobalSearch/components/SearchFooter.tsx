@@ -15,8 +15,8 @@ function SearchFooter() {
         <span>{t('public.confirm')}</span>
       </span>
       <span className="mr-14px flex items-center">
-        <Icon className={`${styles.icon} text-20px p-2px mr-5px`} icon="mdi-arrow-up-thin" />
-        <Icon className={`${styles.icon} text-20px p-2px mr-5px`} icon="mdi-arrow-down-thin" />
+        <Icon className={`${styles.icon} text-20px p-2px mr-5px`} icon="mdi:arrow-up-thin" />
+        <Icon className={`${styles.icon} text-20px p-2px mr-5px`} icon="mdi:arrow-down-thin" />
         <span>{t('public.switch')}</span>
       </span>
       <span className="flex items-center">

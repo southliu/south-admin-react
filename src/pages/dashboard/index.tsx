@@ -1,17 +1,19 @@
 import type { BaseFormData } from '#/form';
-import { useState, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { checkPermission } from '@/utils/permissions';
 import { getDataTrends } from '@/servers/dashboard';
 import { useTranslation } from 'react-i18next';
 import { searchList } from './model';
+import { Spin } from 'antd';
 import BaseContent from '@/components/Content/BaseContent';
 import BaseSearch from '@/components/Search/BaseSearch';
 import BaseCard from '@/components/Card/BaseCard';
 import Block from './components/Block';
-import Line from './components/Line';
-import Bar from './components/Bar';
+
+const Line = lazy(() => import('./components/Line'));
+const Bar = lazy(() => import('./components/Bar'));
 
 // 初始化搜索
 const initSearch = {
@@ -20,9 +22,18 @@ const initSearch = {
 
 function Dashboard() {
   const { t } = useTranslation();
-  const { permissions, isPhone } = useCommonStore();
+  const { permissions, isPhone } = useCommonStore(['permissions', 'isPhone']);
   const [isLoading, setLoading] = useState(false);
   const isPermission = checkPermission('/dashboard', permissions);
+  const chartLoading = (
+    <div
+      role="status"
+      aria-label={t('public.loading')}
+      className="h-550px border border-gray-200 rounded-10px flex items-center justify-center"
+    >
+      <Spin size="large" />
+    </div>
+  );
 
   /**
    * 搜索提交
@@ -80,10 +91,14 @@ function Dashboard() {
 
         <div className="flex flex-wrap justify-between w-full">
           <div className={`mb-10px ${isPhone ? 'w-full' : 'w-49.5%'}`}>
-            <Line />
+            <Suspense fallback={chartLoading}>
+              <Line />
+            </Suspense>
           </div>
           <div className={`mb-10px ${isPhone ? 'w-full' : 'w-49.5%'}`}>
-            <Bar />
+            <Suspense fallback={chartLoading}>
+              <Bar />
+            </Suspense>
           </div>
         </div>
       </BaseCard>

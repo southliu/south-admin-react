@@ -7,7 +7,7 @@ import CopyBtn from '@/components/Copy/CopyBtn';
 
 function CopyPage() {
   const { t } = useTranslation();
-  const { permissions } = useCommonStore();
+  const { permissions } = useCommonStore(['permissions']);
   const isPermission = checkPermission('/demo/copy', permissions);
 
   return (

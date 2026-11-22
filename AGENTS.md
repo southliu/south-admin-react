@@ -48,7 +48,7 @@ pnpm test:e2e         # Playwright 浏览器回归测试
 - `src/servers/` — API 接口，结构与 pages 一致
 - `src/components/` — 全局公共组件（Base 前缀）
 - `src/stores/` — Zustand 状态（user/menu/tabs/public）
-- `src/hooks/useCommonStore.ts` — 聚合各 store（`useShallow` 优化），组件中优先用它而非直接访问 store
+- `src/hooks/useCommonStore.ts` — 聚合各 store（`useShallow` 优化），组件中优先使用 `useCommonStore(['permissions', 'isPhone'])` 按需订阅字段，避免订阅无关状态
 - `src/locales/{zh,en}/` — i18n 翻译（react-i18next）
 - `packages/` — monorepo 子包：`@south/request`、`@south/message`、`@south/utils`、`@south/stylelint`
 

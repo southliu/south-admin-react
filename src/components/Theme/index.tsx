@@ -82,13 +82,13 @@ function Theme() {
           style={{ display: theme === 'light' ? 'block' : 'none' }}
           onClick={(e) => onChange(e, 'dark')}
         >
-          <Icon icon="mdi-white-balance-sunny" />
+          <Icon icon="mdi:white-balance-sunny" />
         </div>
         <div
           style={{ display: theme !== 'light' ? 'block' : 'none' }}
           onClick={(e) => onChange(e, 'light')}
         >
-          <Icon icon="mdi-moon-waning-crescent" />
+          <Icon icon="mdi:moon-waning-crescent" />
         </div>
       </div>
     </Tooltip>

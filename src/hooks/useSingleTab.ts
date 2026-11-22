@@ -3,6 +3,7 @@ import { getMenuByKey, getMenuName, getOpenMenuByRouter } from '@/menus/utils/he
 import { useEffectOnActive } from 'keepalive-for-react';
 import { ADD_TITLE, EDIT_TITLE } from '@/utils/config';
 import { useMenuStore, useTabsStore } from '@/stores';
+import { useShallow } from 'zustand/react/shallow';
 import { useCommonStore } from './useCommonStore';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -26,26 +27,29 @@ export function useSingleTab(props: Props) {
   const { fatherPath, zhTitle, enTitle, name } = props;
   const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();
-  const { setOpenKeys, setSelectedKeys } = useMenuStore((state) => state);
-  const { isPhone, isCollapsed, menuList, permissions } = useCommonStore();
-  const { addTabs, setNav, setActiveKey } = useTabsStore((state) => state);
+  const { setOpenKeys, setSelectedKeys } = useMenuStore(
+    useShallow((state) => ({
+      setOpenKeys: state.setOpenKeys,
+      setSelectedKeys: state.setSelectedKeys,
+    })),
+  );
+  const { isPhone, isCollapsed, menuList, permissions } = useCommonStore([
+    'isPhone',
+    'isCollapsed',
+    'menuList',
+    'permissions',
+  ]);
+  const { addTabs, setNav, setActiveKey } = useTabsStore(
+    useShallow((state) => ({
+      addTabs: state.addTabs,
+      setNav: state.setNav,
+      setActiveKey: state.setActiveKey,
+    })),
+  );
 
   /** 获取路由对应名称 */
   function getNameByRoute(): string {
-    const route = search?.substring(1, search.length);
-    const list = route?.split('&');
-
-    for (let i = 0; i < list?.length; i++) {
-      const item = list[i];
-      const arr = item?.split('=');
-      const key = arr?.[0];
-      const value = arr?.[1];
-      if (key === name) {
-        return value;
-      }
-    }
-
-    return '';
+    return name ? new URLSearchParams(search).get(name) || '' : '';
   }
 
   /** 设置标题 */

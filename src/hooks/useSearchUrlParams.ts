@@ -1,7 +1,8 @@
 import type { BaseFormData } from '#/form';
 import { useSearchParams, useLocation } from 'react-router-dom';
-import { useCallback, useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useTabsStore } from '@/stores/tabs';
+import { useEffect, useMemo } from 'react';
 /**
  * 将搜索参数带入url中
  */
@@ -10,23 +11,15 @@ import { type FormInstance } from 'antd';
 
 export const useSearchUrlParams = (form: FormInstance) => {
   const { pathname, search } = useLocation();
-  const { setTabs } = useTabsStore((state) => state);
+  const { setTabs } = useTabsStore(useShallow((state) => ({ setTabs: state.setTabs })));
   const [, setSearchParams] = useSearchParams();
+  const searchData = useMemo(() => getUrlAllParam(search), [search]);
 
   /** url参数带入搜索表单中 */
-  const handleSetSearchForm = useCallback(() => {
-    const urlParams = getUrlAllParam(search);
-    form?.setFieldsValue({
-      ...form?.getFieldsValue(),
-      ...urlParams,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   useEffect(() => {
-    handleSetSearchForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    form.resetFields();
+    form.setFieldsValue(searchData);
+  }, [form, searchData]);
 
   /** 将搜索参数带入url中 */
   const handleSetSearchParams = (searchParams: BaseFormData) => {
@@ -43,7 +36,8 @@ export const useSearchUrlParams = (form: FormInstance) => {
 
     setSearchParams(filteredValues);
     setTabs(pathname, urlParams);
+    return urlParams === search;
   };
 
-  return [handleSetSearchParams];
+  return [handleSetSearchParams, searchData] as const;
 };
