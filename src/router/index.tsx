@@ -5,6 +5,7 @@ import { App } from 'antd';
 import RouterPage from './components/Router';
 import StaticMessage from '@south/message';
 import nprogress from 'nprogress';
+import dayjs from 'dayjs';
 
 // antd
 import { theme, ConfigProvider } from 'antd';
@@ -22,14 +23,12 @@ import { useCommonStore } from '@/hooks/useCommonStore';
 function Page() {
   const { i18n } = useTranslation();
   const { theme } = useCommonStore(['theme']);
+  const isEnglish = (i18n.resolvedLanguage ?? i18n.language).startsWith('en');
+  const locale = isEnglish ? enUS : zhCN;
 
-  // 获取当前语言
-  const currentLanguage = i18n.language;
-
-  // 根据语言选择对应的 locale
-  const locale = useMemo(() => {
-    return currentLanguage === 'en' ? enUS : zhCN;
-  }, [currentLanguage]);
+  useEffect(() => {
+    dayjs.locale(isEnglish ? 'en' : 'zh-cn');
+  }, [isEnglish]);
 
   useEffect(() => {
     // 关闭loading

@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       'process.env.DRAGGABLE_DEBUG': JSON.stringify(false),
     },
     resolve: {
+      dedupe: ['dayjs'],
       alias: {
         '@': '/src',
         '#': '/types',
