@@ -1,6 +1,5 @@
 export default {
   username: 'Username',
-  ip: 'IP Address',
   method: 'Method',
   url: 'URL',
   params: 'Params',

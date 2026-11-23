@@ -7,14 +7,13 @@ import { LOG_LENGTH } from '@/utils/fieldLimits';
 export interface LogItem {
   id: string;
   username: string;
-  ip: string;
   method: string;
   url: string;
   params: string;
   userAgent: string;
   status: string;
   error: string;
-  latency: number;
+  latency?: number | null;
   type: number;
   createdAt: string;
   updatedAt: string;
@@ -31,13 +30,6 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
     wrapperWidth: 200,
     component: 'Input',
     componentProps: { maxLength: LOG_LENGTH.username },
-  },
-  {
-    label: t('log.ip'),
-    name: 'ip',
-    wrapperWidth: 200,
-    component: 'Input',
-    componentProps: { maxLength: LOG_LENGTH.ip },
   },
   {
     label: t('log.method'),
@@ -111,11 +103,6 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
       width: 120,
     },
     {
-      title: t('log.ip'),
-      dataIndex: 'ip',
-      width: 140,
-    },
-    {
       title: t('log.method'),
       dataIndex: 'method',
       width: 90,
@@ -168,7 +155,8 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
       title: t('log.latency'),
       dataIndex: 'latency',
       width: 100,
-      render: (latency: number) => `${latency}ms`,
+      render: (latency: LogItem['latency']) =>
+        typeof latency === 'number' && Number.isFinite(latency) ? `${latency}ms` : '-',
     },
     {
       title: t('log.type'),
