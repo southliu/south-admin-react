@@ -4,12 +4,12 @@ import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useUserStore } from '@/stores';
 import { resolveErrorMessage } from '@south/request';
+import { startVersionCheck } from './utils/helper';
 import { loadMenuList } from '@/menus/utils/load';
 import { usePublicStore } from '@/stores/public';
 import { Button, Result, message } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { versionCheck } from './utils/helper';
 import { useOutlet } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useToken } from '@/hooks/useToken';
@@ -130,18 +130,15 @@ function Layout() {
     };
   }, []);
 
-  // 监测是否需要刷新
+  useEffect(() => startVersionCheck(t, messageApi), [t, messageApi]);
+
+  // 切换路由时更新进度条
   useEffect(() => {
     nprogress?.done?.();
-
-    requestAnimationFrame(() => {
-      versionCheck(t, messageApi);
-    });
 
     return () => {
       nprogress?.start?.();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   /** 判断是否是手机端 */

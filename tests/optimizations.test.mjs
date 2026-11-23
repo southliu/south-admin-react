@@ -49,7 +49,7 @@ test('未配置 rule 的菜单在显示、搜索、默认跳转和面包屑中�
   }
 });
 
-test('当前页面建立基准后发现新版本，在 1～5 秒自动刷新且只安排一次', async () => {
+test('当前页面建立基准后发现新版本，在 1～3 秒自动刷新且只安排一次', async () => {
   const original = new Map();
   const random = Math.random;
   const timers = [];
@@ -64,8 +64,8 @@ test('当前页面建立基准后发现新版本，在 1～5 秒自动刷新且�
   try {
     for (const [sample, seconds] of [
       [0, 1],
-      [0.5, 3],
-      [0.999999, 5],
+      [0.5, 2],
+      [0.999999, 3],
     ]) {
       Math.random = () => sample;
       timers.length = 0;
@@ -98,6 +98,71 @@ test('当前页面建立基准后发现新版本，在 1～5 秒自动刷新且�
     }
   } finally {
     Math.random = random;
+    for (const [key, descriptor] of original) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  }
+});
+
+test('停留同一页面也会检测更新，慢请求不重叠，停止监控后清理定时器', async () => {
+  const original = new Map();
+  const timers = [];
+  const notices = [];
+  let tick;
+  let complete;
+  let requests = 0;
+  let reloads = 0;
+  let cleared = 0;
+  for (const [key, value] of Object.entries({
+    window: { location: { reload: () => reloads++ } },
+    setTimeout: (callback, delay) => timers.push({ callback, delay }),
+    setInterval: (callback, delay) => {
+      assert.equal(delay, 1000);
+      tick = callback;
+      return 42;
+    },
+    clearInterval: (id) => {
+      assert.equal(id, 42);
+      cleared++;
+    },
+  })) {
+    original.set(key, Object.getOwnPropertyDescriptor(globalThis, key));
+    Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
+  }
+  try {
+    const { startVersionCheck } = createLoader(
+      {
+        '@/utils/config': { LANG: 'lang' },
+        axios: {
+          get: () => {
+            requests++;
+            return new Promise((resolve) => { complete = resolve; });
+          },
+        },
+      },
+      (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
+    )('src/layouts/utils/helper.ts');
+    const stop = startVersionCheck((key) => key, { info: (notice) => notices.push(notice) });
+    assert.equal(requests, 1);
+    tick();
+    assert.equal(requests, 1);
+    complete({ data: { version: 'v1' } });
+    await Promise.resolve();
+    tick();
+    assert.equal(requests, 2);
+    complete({ data: { version: 'v2' } });
+    await Promise.resolve();
+    assert.equal(notices.length, 1);
+    assert.equal(timers.length, 1);
+    assert.ok(timers[0].delay >= 1000 && timers[0].delay <= 3000);
+    tick();
+    assert.equal(requests, 2);
+    timers[0].callback();
+    assert.equal(reloads, 1);
+    stop();
+    assert.equal(cleared, 1);
+  } finally {
     for (const [key, descriptor] of original) {
       if (descriptor) Object.defineProperty(globalThis, key, descriptor);
       else delete globalThis[key];

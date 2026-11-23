@@ -5,6 +5,7 @@ import { LANG } from '@/utils/config';
 import axios from 'axios';
 
 let isRefreshScheduled = false;
+let isChecking = false;
 // 每个页面独立建立基准，新标签和整页刷新不会继承旧页面的版本。
 let currentVersion: string | undefined;
 
@@ -14,8 +15,9 @@ let currentVersion: string | undefined;
  * @param messageApi - 消息提示实例，用于展示版本更新提醒
  */
 export const versionCheck = async (t: TFunction, messageApi: MessageInstance) => {
-  if (import.meta.env.MODE === 'development' || isRefreshScheduled) return;
+  if (import.meta.env.MODE === 'development' || isRefreshScheduled || isChecking) return;
 
+  isChecking = true;
   try {
     const {
       data: { version },
@@ -33,7 +35,7 @@ export const versionCheck = async (t: TFunction, messageApi: MessageInstance) =>
     }
 
     if (currentVersion !== latestVersion && !isRefreshScheduled) {
-      const seconds = Math.floor(Math.random() * 5) + 1;
+      const seconds = Math.floor(Math.random() * 3) + 1;
       isRefreshScheduled = true;
       setTimeout(() => {
         window.location.reload();
@@ -46,7 +48,23 @@ export const versionCheck = async (t: TFunction, messageApi: MessageInstance) =>
     }
   } catch (error) {
     console.error('版本检查失败:', error);
+  } finally {
+    isChecking = false;
   }
+};
+
+/**
+ * 持续检查新版本，并返回停止监控的方法
+ * @param t - 国际化翻译函数，用于生成更新提示
+ * @param messageApi - 消息提示实例，用于展示刷新倒计时
+ */
+export const startVersionCheck = (t: TFunction, messageApi: MessageInstance) => {
+  if (import.meta.env.MODE === 'development') return;
+  void versionCheck(t, messageApi);
+  const timer = setInterval(() => {
+    void versionCheck(t, messageApi);
+  }, 1000);
+  return () => clearInterval(timer);
 };
 
 /**
