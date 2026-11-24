@@ -4,15 +4,14 @@ import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useUserStore } from '@/stores';
 import { resolveErrorMessage } from '@south/request';
-import { startVersionCheck } from './utils/helper';
 import { loadMenuList } from '@/menus/utils/load';
 import { usePublicStore } from '@/stores/public';
-import { Button, Result, message } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOutlet } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useToken } from '@/hooks/useToken';
+import { Button, Result } from 'antd';
 import ContentLoading from './components/ContentLoading';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
@@ -47,7 +46,6 @@ function Layout() {
   const [isLoadFailed, setLoadFailed] = useState(false);
   const [loadError, setLoadError] = useState<string>();
   const [getToken] = useToken();
-  const [messageApi, contextHolder] = message.useMessage();
   const token = getToken();
   const outlet = useOutlet();
   const keepaliveRef = useKeepAliveRef();
@@ -130,8 +128,6 @@ function Layout() {
     };
   }, []);
 
-  useEffect(() => startVersionCheck(t, messageApi), [t, messageApi]);
-
   // 切换路由时更新进度条
   useEffect(() => {
     nprogress?.done?.();
@@ -196,7 +192,6 @@ function Layout() {
 
   return (
     <div id="layout">
-      {contextHolder}
       {hasSidebar && <Menu />}
 
       <div className={styles.layout_right}>

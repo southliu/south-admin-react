@@ -6,6 +6,12 @@ import assert from 'node:assert/strict';
 import React, { act } from 'react';
 import test from 'node:test';
 
+const versionSource = (source, mode = 'production', buildVersion = 'v1') =>
+  source
+    .replaceAll('import.meta.env.MODE', JSON.stringify(mode))
+    .replaceAll('import.meta.env.VITE_BUILD_VERSION', JSON.stringify(buildVersion))
+    .replaceAll('import.meta.env.BASE_URL', JSON.stringify('/'));
+
 test('URL 参数完整解码，登录回跳保留多参数并拒绝外部地址与循环', () => {
   const { getUrlAllParam, getUrlParam, getLoginRedirect } = createLoader({
     '@/utils/config': {},
@@ -49,13 +55,15 @@ test('未配置 rule 的菜单在显示、搜索、默认跳转和面包屑中�
   }
 });
 
-test('当前页面建立基准后发现新版本，在 1～3 秒自动刷新且只安排一次', async () => {
+test('当前构建发现新版本，在 1～3 秒自动刷新且只安排一次', async () => {
   const original = new Map();
   const random = Math.random;
   const timers = [];
   let reloads = 0;
   for (const [key, value] of Object.entries({
-    window: { location: { reload: () => reloads++ } },
+    window: {
+      location: { href: 'https://example.test/?tenant=one#/dashboard', replace: () => reloads++ },
+    },
     setTimeout: (callback, delay) => timers.push({ callback, delay }),
   })) {
     original.set(key, Object.getOwnPropertyDescriptor(globalThis, key));
@@ -70,21 +78,21 @@ test('当前页面建立基准后发现新版本，在 1～3 秒自动刷新且�
       Math.random = () => sample;
       timers.length = 0;
       reloads = 0;
-      let version = 'old';
+      let version = 'v1';
       const notices = [];
       const { versionCheck } = createLoader(
         {
           '@/utils/config': { LANG: 'lang' },
           axios: { get: async () => ({ data: { version } }) },
         },
-        (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
+        versionSource,
       )('src/layouts/utils/helper.ts');
       const translate = (key, values) => `${key}:${values.seconds}`;
       const message = { info: (options) => notices.push(options) };
       await Promise.all([versionCheck(translate, message), versionCheck(translate, message)]);
       assert.equal(notices.length, 0);
       assert.equal(timers.length, 0);
-      version = 'new';
+      version = 'v2';
       await Promise.all([versionCheck(translate, message), versionCheck(translate, message)]);
       await versionCheck(translate, message);
       assert.equal(notices.length, 1);
@@ -115,10 +123,12 @@ test('停留同一页面也会检测更新，慢请求不重叠，停止监控�
   let reloads = 0;
   let cleared = 0;
   for (const [key, value] of Object.entries({
-    window: { location: { reload: () => reloads++ } },
+    window: {
+      location: { href: 'https://example.test/?tenant=one#/dashboard', replace: () => reloads++ },
+    },
     setTimeout: (callback, delay) => timers.push({ callback, delay }),
     setInterval: (callback, delay) => {
-      assert.equal(delay, 1000);
+      assert.equal(delay, 2000);
       tick = callback;
       return 42;
     },
@@ -137,11 +147,13 @@ test('停留同一页面也会检测更新，慢请求不重叠，停止监控�
         axios: {
           get: () => {
             requests++;
-            return new Promise((resolve) => { complete = resolve; });
+            return new Promise((resolve) => {
+              complete = resolve;
+            });
           },
         },
       },
-      (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
+      versionSource,
     )('src/layouts/utils/helper.ts');
     const stop = startVersionCheck((key) => key, { info: (notice) => notices.push(notice) });
     assert.equal(requests, 1);
@@ -182,7 +194,9 @@ test('新标签忽略旧缓存，旧标签仍能独立发现更新，刷新后�
       getItem: (key) => cache.get(key),
       setItem: (key, value) => cache.set(key, value),
     },
-    window: { location: { reload: () => reloads++ } },
+    window: {
+      location: { href: 'https://example.test/?tenant=one#/dashboard', replace: () => reloads++ },
+    },
     setTimeout: (callback) => timers.push(callback),
   })) {
     original.set(key, Object.getOwnPropertyDescriptor(globalThis, key));
@@ -195,7 +209,7 @@ test('新标签忽略旧缓存，旧标签仍能独立发现更新，刷新后�
           '@/utils/config': { LANG: 'lang', VERSION: 'admin_version' },
           axios: { get: async () => ({ data: { version } }) },
         },
-        (source) => source.replaceAll('import.meta.env.MODE', "'production'"),
+        (source) => versionSource(source, 'production', version),
       )('src/layouts/utils/helper.ts').versionCheck;
     const message = { info: (notice) => notices.push(notice) };
     const oldPage = newPage();
@@ -223,7 +237,7 @@ test('新标签忽略旧缓存，旧标签仍能独立发现更新，刷新后�
   }
 });
 
-test('首次检查无效后可重新建立基准，开发环境不检查版本', async () => {
+test('首次检查无效后仍保持构建版本，开发环境不检查版本', async () => {
   let version;
   let requests = 0;
   const load = (mode) =>
@@ -237,7 +251,7 @@ test('首次检查无效后可重新建立基准，开发环境不检查版本',
           },
         },
       },
-      (source) => source.replaceAll('import.meta.env.MODE', JSON.stringify(mode)),
+      (source) => versionSource(source, mode),
     )('src/layouts/utils/helper.ts').versionCheck;
   const message = { info: () => assert.fail('不应出现更新提示') };
   const check = load('production');

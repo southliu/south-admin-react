@@ -275,6 +275,39 @@ const menuList = defaultMenus;
 #### 6. 无法执行build？
 `pnpm build` 会先执行 TypeScript 检查。若提示缺少标识符，请补充对应的显式导入；类型使用 `import type`，无需先启动开发服务器。
 
+## 部署与版本更新
+
+执行 `pnpm build`，完整发布 `dist/`。页面会自动检测新版本并刷新；保留上一版哈希资源，避免旧页面请求文件时出现 404。
+
+以下配置合入现有 Nginx `server`，沿用其 `root`；已有同名 `location` 时合并，部署在子路径时调整对应路径。
+
+```nginx
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # 静态页面
+    location / {
+        add_header Cache-Control "no-cache" always;
+        try_files $uri $uri/ /index.html;
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache" always;
+    }
+
+    location = /version.json {
+        add_header Cache-Control "no-store" always;
+        try_files $uri =404;
+    }
+
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        try_files $uri =404;
+    }
+```
+
+执行 `nginx -t`，通过后重载。使用 CDN 时同步缓存规则，并清理旧首页和版本文件缓存。
+
 ## 🧡 捐赠
 如果您觉得这个项目对您有帮助，您可以帮作者买一杯咖啡表示支持!
 

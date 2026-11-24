@@ -1,3 +1,4 @@
+import { startVersionCheck } from '@/layouts/utils/helper';
 import { HashRouter as Router } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
@@ -19,6 +20,14 @@ nprogress.configure({ showSpinner: false });
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 import { useCommonStore } from '@/hooks/useCommonStore';
+
+/** 在登录页和业务页面统一监测构建更新 */
+function VersionMonitor() {
+  const { message } = App.useApp();
+  const { t } = useTranslation();
+  useEffect(() => startVersionCheck(t, message), [t, message]);
+  return null;
+}
 
 function Page() {
   const { i18n } = useTranslation();
@@ -50,6 +59,7 @@ function Page() {
     <Router>
       <ConfigProvider locale={locale} theme={themeConfig}>
         <App>
+          <VersionMonitor />
           <StaticMessage />
           <RouterPage />
         </App>
