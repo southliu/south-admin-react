@@ -10,7 +10,7 @@ test('模块下载失败展示错误页，由用户手动刷新后恢复', async
     isBlocked ? route.abort() : route.continue(),
   );
   await page.route('**/api/**', (route) => route.fulfill({ json: { code: 200, data: {} } }));
-  await page.goto('/#/login');
+  await page.goto('/login');
   await page.getByText('忘记密码?', { exact: true }).click();
   await expect(page.getByText('页面出现错误', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /刷新页面/ })).toBeVisible();
@@ -39,17 +39,19 @@ test('错误页切换路由后恢复，首屏 loading 在应用挂载后才关�
   });
   await page.route('**/src/pages/404.tsx*', (route) => route.abort());
   await page.route('**/api/**', (route) => route.fulfill({ json: { code: 200, data: {} } }));
-  await page.goto('/#/login');
+  await page.goto('/login');
   await expect(page.locator('input[autocomplete="username"]')).toBeVisible();
   const observations = await page.evaluate(() => Reflect.get(window, 'loadingObservations'));
   expect(observations.length).toBeGreaterThan(0);
   expect(observations.every(Boolean)).toBe(true);
   await page.evaluate(() => {
-    window.location.hash = '/missing-page';
+    window.history.pushState(null, '', '/missing-page');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
   await expect(page.getByText('页面出现错误', { exact: true })).toBeVisible();
   await page.evaluate(() => {
-    window.location.hash = '/login';
+    window.history.pushState(null, '', '/login');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
   await expect(page.locator('input[autocomplete="username"]')).toBeVisible();
   await expect(page.getByText('页面出现错误', { exact: true })).toHaveCount(0);

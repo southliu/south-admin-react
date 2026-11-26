@@ -48,7 +48,7 @@ test('日志延迟缺失显示占位符，溢出文字与刷新后的提示正�
       };
     await route.fulfill({ json: { code: 200, data } });
   });
-  await page.goto('/#/login');
+  await page.goto('/login');
   await page.locator('input[autocomplete="username"]').fill('tester');
   await page.locator('input[type="password"]').fill('Testpass1');
   await page.getByRole('button', { name: /登.*录/ }).click();

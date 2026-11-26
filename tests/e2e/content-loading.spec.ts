@@ -36,7 +36,7 @@ for (const theme of ['light', 'dark']) {
       else if (path.endsWith('/role/list')) data = [];
       await route.fulfill({ json: { code: 200, data } });
     });
-    await page.goto('/#/login');
+    await page.goto('/login');
     await page.locator('input[autocomplete="username"]').fill('tester');
     await page.locator('input[type="password"]').fill('Testpass1');
     await page.getByRole('button', { name: /登.*录/ }).click();

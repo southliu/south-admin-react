@@ -1,5 +1,5 @@
 import { startVersionCheck } from '@/layouts/utils/helper';
-import { HashRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
 import { App } from 'antd';

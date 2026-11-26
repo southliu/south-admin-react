@@ -33,7 +33,7 @@ test('首屏使用图标子集，图表慢加载不阻塞统计，弹窗首次�
   });
 
   try {
-    await page.goto('/#/login');
+    await page.goto('/login');
     await expect(page.locator('input[autocomplete="username"]')).toBeVisible();
     await page.waitForLoadState('networkidle');
     expect(requests.filter((path) => /\/pages\/(forget\/|404\.)/.test(path))).toEqual([]);
@@ -112,7 +112,7 @@ test('重置密码页面延迟下载时显示加载动画', async ({ page }) => 
     await route.continue();
   });
   try {
-    await page.goto('/#/login');
+    await page.goto('/login');
     await page.getByText('忘记密码?', { exact: true }).click();
     await expect(page.getByRole('status', { name: '加载中' })).toBeVisible();
     forget.resolve();

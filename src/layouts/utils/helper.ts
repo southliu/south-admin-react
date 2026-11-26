@@ -30,17 +30,35 @@ export const versionCheck = async (t: TFunction, messageApi: MessageInstance) =>
 
     if ((typeof version !== 'string' && typeof version !== 'number') || !String(version).trim())
       return;
+    const target = new URL(window.location.href);
+    const isHashRouter = target.hash.startsWith('#/');
+    const route = isHashRouter ? new URL(target.hash.slice(1), target.origin) : target;
+    const legacyVersion = isHashRouter ? target.searchParams.get('__app_version') : null;
+    if (legacyVersion !== null) {
+      if (!route.searchParams.has('__app_version')) {
+        route.searchParams.set('__app_version', legacyVersion);
+      }
+      target.searchParams.delete('__app_version');
+      target.hash = `${route.pathname}${route.search}`;
+      window.history.replaceState(window.history.state, '', target.href);
+    }
     const latestVersion = String(version);
 
     if (currentVersion !== latestVersion && !isRefreshScheduled) {
-      const target = new URL(window.location.href);
       // 同一版本已尝试绕过首页缓存时，不因服务器部署不一致而反复刷新。
-      if (target.searchParams.get('__app_version') === latestVersion) return;
-      target.searchParams.set('__app_version', latestVersion);
+      if (route.searchParams.get('__app_version') === latestVersion) return;
+      route.searchParams.set('__app_version', latestVersion);
+      if (isHashRouter) target.hash = `${route.pathname}${route.search}`;
       const seconds = Math.floor(Math.random() * 3) + 1;
       isRefreshScheduled = true;
       setTimeout(() => {
-        window.location.replace(target.href);
+        if (isHashRouter) {
+          // 仅改变 Hash 不会重新加载构建，更新地址后必须显式整页刷新。
+          window.history.replaceState(window.history.state, '', target.href);
+          window.location.reload();
+        } else {
+          window.location.replace(target.href);
+        }
       }, seconds * 1000);
       messageApi.info({
         content: t('public.reloadPageMsg', { seconds }),

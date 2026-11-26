@@ -29,7 +29,7 @@ async function openUsers(
     else if (path.endsWith('/role/list')) data = [];
     await route.fulfill({ json: { code: 200, data } });
   });
-  await page.goto(`/#/system/user${search}`);
+  await page.goto(`/system/user${search}`);
   await expect(page.locator('input[autocomplete="username"]')).toBeVisible();
   await page.locator('input[autocomplete="username"]').fill('tester');
   await page.locator('input[type="password"]').fill('Testpass1');
@@ -43,7 +43,7 @@ test('登录清理旧密码、只记住用户名，回跳完整恢复查询并�
     localStorage.setItem('login_username', 'old-user');
     localStorage.setItem('remember_me', 'false');
   });
-  await page.goto('/#/login');
+  await page.goto('/login');
   await expect(page.locator('input[autocomplete="username"]')).toHaveValue('old-user');
   await expect(page.getByRole('checkbox')).toHaveCount(0);
   const queries: URLSearchParams[] = [];
@@ -84,11 +84,13 @@ test('列表旧响应不能覆盖新查询，浏览器后退恢复对应查询',
       return true;
     });
     await page.evaluate(() => {
-      window.location.hash = '/system/user?email=old@example.com';
+      window.history.pushState(null, '', '/system/user?email=old@example.com');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     });
     await started.promise;
     await page.evaluate(() => {
-      window.location.hash = '/system/user?email=new@example.com';
+      window.history.pushState(null, '', '/system/user?email=new@example.com');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     });
     const table = page.locator('.ant-table-tbody');
     await expect(table.getByText('new@example.com', { exact: true })).toBeVisible();
@@ -183,7 +185,8 @@ test('文章标签切换保留未保存草稿，切换到详情失败的记录�
     return true;
   });
   await page.evaluate(() => {
-    window.location.hash = '/content/article/update?id=article-1';
+    window.history.pushState(null, '', '/content/article/update?id=article-1');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
   const title = page.getByRole('textbox', { name: /标题/ });
   await expect(title).toHaveValue('原始标题');
@@ -191,13 +194,15 @@ test('文章标签切换保留未保存草稿，切换到详情失败的记录�
   await page.getByRole('menuitem', { name: '用户管理', exact: true }).click();
   await expect(page.locator('.ant-table-tbody').getByText('alice', { exact: true })).toBeVisible();
   await page.evaluate(() => {
-    window.location.hash = '/content/article/update?id=article-1';
+    window.history.pushState(null, '', '/content/article/update?id=article-1');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
   await expect
     .poll(async () => ({ title: await title.inputValue(), details }))
     .toEqual({ title: '未保存草稿', details: 1 });
   await page.evaluate(() => {
-    window.location.hash = '/content/article/update?id=missing';
+    window.history.pushState(null, '', '/content/article/update?id=missing');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
   await expect(page.getByText('文章详情暂时不可用', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /提.*交/ })).toBeDisabled();

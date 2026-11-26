@@ -62,7 +62,7 @@ test('当前构建发现新版本，在 1～3 秒自动刷新且只安排一次'
   let reloads = 0;
   for (const [key, value] of Object.entries({
     window: {
-      location: { href: 'https://example.test/?tenant=one#/dashboard', replace: () => reloads++ },
+      location: { href: 'https://example.test/dashboard?tenant=one', replace: () => reloads++ },
     },
     setTimeout: (callback, delay) => timers.push({ callback, delay }),
   })) {
@@ -124,7 +124,7 @@ test('停留同一页面也会检测更新，慢请求不重叠，停止监控�
   let cleared = 0;
   for (const [key, value] of Object.entries({
     window: {
-      location: { href: 'https://example.test/?tenant=one#/dashboard', replace: () => reloads++ },
+      location: { href: 'https://example.test/dashboard?tenant=one', replace: () => reloads++ },
     },
     setTimeout: (callback, delay) => timers.push({ callback, delay }),
     setInterval: (callback, delay) => {
@@ -195,7 +195,7 @@ test('新标签忽略旧缓存，旧标签仍能独立发现更新，刷新后�
       setItem: (key, value) => cache.set(key, value),
     },
     window: {
-      location: { href: 'https://example.test/?tenant=one#/dashboard', replace: () => reloads++ },
+      location: { href: 'https://example.test/dashboard?tenant=one', replace: () => reloads++ },
     },
     setTimeout: (callback) => timers.push(callback),
   })) {
@@ -237,7 +237,12 @@ test('新标签忽略旧缓存，旧标签仍能独立发现更新，刷新后�
   }
 });
 
-test('首次检查无效后仍保持构建版本，开发环境不检查版本', async () => {
+test('首次检查无效后仍保持构建版本，开发环境不检查版本', async (context) => {
+  const originalWindow = globalThis.window;
+  context.after(() => {
+    globalThis.window = originalWindow;
+  });
+  globalThis.window = { location: { href: 'https://example.test/login' } };
   let version;
   let requests = 0;
   const load = (mode) =>

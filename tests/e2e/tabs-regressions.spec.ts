@@ -27,7 +27,7 @@ async function openUsers(page: Page) {
     else if (path.endsWith('/role/list')) data = [];
     await route.fulfill({ json: { code: 200, data } });
   });
-  await page.goto('/#/login');
+  await page.goto('/login');
   await page.locator('input[autocomplete="username"]').fill('tester');
   await page.locator('input[type="password"]').fill('Testpass1');
   await page.getByRole('button', { name: /登.*录/ }).click();
@@ -110,7 +110,7 @@ test('关闭非当前标签保持当前位置，关闭当前标签恢复相邻�
   await page.getByRole('tab', { name: '仪表盘', exact: true }).click();
   await page.getByRole('tab', { name: '角色管理', exact: true }).click({ button: 'right' });
   await page.getByRole('menuitem', { name: /关闭标签$/ }).click();
-  await expect(page).toHaveURL(/#\/dashboard$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole('tab', { name: '角色管理', exact: true })).toHaveCount(0);
   await page
     .locator('.ant-tabs-tab')
@@ -143,6 +143,6 @@ test('关闭第一个当前标签进入右侧标签，关闭其他标签保留�
     .filter({ has: page.getByRole('tab', { name: '用户管理', exact: true }) })
     .getByRole('button', { name: 'remove' })
     .click();
-  await expect(page).toHaveURL(/#\/dashboard$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole('tab', { name: '用户管理', exact: true })).toHaveCount(0);
 });

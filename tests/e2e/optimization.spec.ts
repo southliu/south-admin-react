@@ -66,7 +66,7 @@ test('登录不预加载后台页面，菜单持续失败后可恢复并折叠',
     else if (path.endsWith('/role/list')) data = [{ id: 1, name: '管理员' }];
     await route.fulfill({ json: { code: 200, data } });
   });
-  await page.goto('/#/login', { waitUntil: 'domcontentloaded' });
+  await page.goto('/login', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('input[autocomplete="username"]')).toBeVisible();
   await page.waitForTimeout(800);
   expect(loadedPages).toEqual([]);
@@ -81,7 +81,8 @@ test('登录不预加载后台页面，菜单持续失败后可恢复并折叠',
   await expect(page.getByRole('button', { name: /登.*录/ })).not.toHaveClass(/ant-btn-loading/);
   await expect(page.getByText('临时失败', { exact: true })).toBeVisible();
   await page.evaluate(() => {
-    window.location.hash = '/system/user';
+    window.history.pushState(null, '', '/system/user');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
   await expect.poll(() => menuCalls, { timeout: 15000 }).toBe(4);
   await expect(page.getByRole('button', { name: '重新加载', exact: true })).toBeVisible();

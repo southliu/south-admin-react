@@ -12,7 +12,7 @@ test('日期范围面板跟随语言切换月份和星期，并保留选中日�
       data = [{ key: '/dashboard', label: '仪表盘', rule: '/dashboard' }];
     await route.fulfill({ json: { code: 200, data } });
   });
-  await page.goto('/#/login');
+  await page.goto('/login');
   await page.locator('input[autocomplete="username"]').fill('tester');
   await page.locator('input[type="password"]').fill('Testpass1');
   await page.getByRole('button', { name: /登.*录/ }).click();
