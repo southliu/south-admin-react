@@ -1,7 +1,7 @@
-import '@wangeditor/editor/dist/css/style.css';
-import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
+import '@wangeditor-next/editor/dist/css/style.css';
+import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor-next/editor';
+import { Editor, Toolbar } from '@wangeditor-next/editor-for-react';
 import { useState, useEffect, type HTMLAttributes } from 'react';
-import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { useTranslation } from 'react-i18next';
 import { FILE_API } from '@/utils/config';
 

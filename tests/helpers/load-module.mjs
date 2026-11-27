@@ -34,7 +34,7 @@ export function createLoader(mocks = {}, transform = (source) => source) {
         if (target?.endsWith('.json')) return require(target);
         if (target) return load(target);
       }
-      return require(id);
+      return createRequire(file)(id);
     }
     new Function('require', 'exports', outputText)(localRequire, exports);
     return exports;

@@ -314,3 +314,9 @@ const menuList = defaultMenus;
 | 微信 | 支付宝 |
 | --- | --- |
 | <img src="https://github.com/southliu/github-static/blob/main/pay/wechat.jpg" width="250" alt="wechat"> | <img src="https://github.com/southliu/github-static/blob/main/pay/alipay.jpg" width="250" alt="alipay">  |
+
+### 维护中的依赖替代
+
+crypto-js 已替换为 crypto-es 3.1.3，AES 缓存格式和 MD5 协议保持兼容，由 `tests/crypto.test.mjs` 验证旧密文读取和新密文往返。
+
+暂停维护的 wangEditor 已替换为 wangEditor-next 6.7.0，并同步更新 React 包装器。保留 HTML 值、工具栏和原图片/视频上传接口。v6 可导入旧 HTML；视频输出改用 figure 容器与 data-w-e-align，服务端若配置 HTML 白名单，需要允许这些元素和属性。详见[官方迁移说明](https://wangeditor-next.github.io/docs/en/guide/migration-v6)。
