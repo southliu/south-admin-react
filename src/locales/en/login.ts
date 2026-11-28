@@ -1,4 +1,5 @@
 export default {
+  rememberAccount: 'Remember account',
   login: 'Login',
   systemLogin: 'System Login',
   oldPassword: 'Old Password',

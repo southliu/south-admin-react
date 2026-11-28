@@ -1,4 +1,5 @@
 export default {
+  rememberAccount: '记住账号',
   login: '登录',
   systemLogin: '系统登录',
   oldPassword: '旧密码',

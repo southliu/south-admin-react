@@ -3,12 +3,12 @@ import type { SideMenu } from '#/public';
 import type { LoginData } from './model';
 import type { FormProps } from 'antd';
 import { getUserRefreshPermissions } from '@/servers/system/user';
+import { Form, Button, Input, Checkbox, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getLoginRedirect, setTitle } from '@/utils/helper';
 import { THEME_KEY, PASSWORD_RULE } from '@/utils/config';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { getFirstMenu } from '@/menus/utils/helper';
-import { Form, Button, Input, message } from 'antd';
 import { useShallow } from 'zustand/react/shallow';
 import { LOGIN_EXPIRED_MSG } from '@south/request';
 import { cancelAllRequest } from '@/utils/request';
@@ -26,6 +26,10 @@ import Theme from '@/components/Theme';
 import I18n from '@/components/I18n';
 
 const USER_USERNAME = 'login_username';
+const CHECK_REMEMBER = 'remember_me';
+const showDefaultAccount = import.meta.env.VITE_SHOW_DEFAULT_ACCOUNT === 'true';
+const defaultUsername = showDefaultAccount ? 'admin' : '';
+const defaultPassword = showDefaultAccount ? 'admin123456' : '';
 
 function Login() {
   const { t, i18n } = useTranslation();
@@ -38,6 +42,7 @@ function Login() {
     })),
   );
   const [isLoading, setLoading] = useState(false);
+  const [isRemember, setRemember] = useState(() => localStorage.getItem(CHECK_REMEMBER) !== 'false');
   const [form] = Form.useForm();
   const [getToken, setToken] = useToken();
   const [messageApi, contextHolder] = message.useMessage();
@@ -146,11 +151,9 @@ function Login() {
       }
     }
 
-    // 密码由浏览器管理器自动填充。
-    const username = localStorage.getItem(USER_USERNAME);
-    if (username) {
-      form.setFieldsValue({ username });
-    }
+    // 迁移旧缓存：只记住账号，取消勾选时不恢复用户名。
+    localStorage.removeItem('login_password');
+    if (!isRemember) localStorage.removeItem(USER_USERNAME);
 
     // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
     const expiredMsg = localStorage.getItem(LOGIN_EXPIRED_MSG);
@@ -167,12 +170,11 @@ function Login() {
    */
   const handleFinish: FormProps['onFinish'] = async (values: LoginData) => {
     try {
+      handleRemember(isRemember, values.username);
       setLoading(true);
       const { code, data } = await login(values);
       if (Number(code) !== 200) return;
       const { token, user, permissions } = data;
-
-      localStorage.setItem(USER_USERNAME, values.username);
 
       if (!permissions?.length || !token) {
         return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
@@ -194,6 +196,18 @@ function Login() {
    */
   const handleFinishFailed: FormProps['onFinishFailed'] = (errors) => {
     console.error('错误信息:', errors);
+  };
+
+  /**
+   * 保存账号记忆偏好及用户名
+   * @param checked - 是否记住账号，取消时立即清除缓存
+   * @param username - 当前输入的用户名，不保存密码
+   */
+  const handleRemember = (checked: boolean, username: string = form.getFieldValue('username') || '') => {
+    setRemember(checked);
+    localStorage.setItem(CHECK_REMEMBER, String(checked));
+    if (checked && username) localStorage.setItem(USER_USERNAME, username);
+    else localStorage.removeItem(USER_USERNAME);
   };
 
   /** 点击忘记密码 */
@@ -249,11 +263,10 @@ function Login() {
             autoComplete="on"
             onFinish={handleFinish}
             onFinishFailed={handleFinishFailed}
-            initialValues={
-              import.meta.env.VITE_SHOW_DEFAULT_ACCOUNT === 'true'
-                ? { username: 'admin', password: 'admin123456' }
-                : {}
-            }
+            initialValues={{ username: (isRemember ? localStorage.getItem(USER_USERNAME) : '') || defaultUsername, password: defaultPassword }}
+            onValuesChange={(changed) => {
+              if ('username' in changed) handleRemember(isRemember, changed.username);
+            }}
           >
             <div className="text-#AAA6A6 text-14px mb-8px">{t('login.username')}</div>
 
@@ -299,7 +312,10 @@ function Login() {
             </Button>
           </Form>
 
-          <div className="flex justify-end items-center mb-5px px-1px">
+          <div className="flex justify-between items-center mb-5px px-1px">
+            <Checkbox checked={isRemember} onChange={(event) => handleRemember(event.target.checked)}>
+              {t('login.rememberAccount')}
+            </Checkbox>
             <div
               className="text-blue-500 cursor-pointer"
               onClick={onForgetPassword}
